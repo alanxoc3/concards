@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"./gui"
+	"github.com/alanxoc3/concards-go/gui"
 )
 
 func main() {
