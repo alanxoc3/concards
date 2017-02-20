@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"testing"
 	"strings"
+	"testing"
 
 	"github.com/alanxoc3/concards-go/gui"
 )
@@ -23,8 +23,6 @@ func testWithStr(str string) int {
 
 func TestGui1(t *testing.T) {
 	testWithStr("home apple pear --no-main ap ap")
-	testWithStr("home apple pear --no-main")
-}
-
-func TestGui2(t *testing.T) {
+	testWithStr("home -hrdmg apple pear --no-main")
+	testWithStr("home -v -n 4 nion -g 3ha -g 4ha and 你好mye")
 }
