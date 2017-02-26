@@ -1,0 +1,6 @@
+{
+	"ImportPath": "github.com/alanxoc3/concards-go",
+	"GoVersion": "go1.8",
+	"GodepVersion": "v60",
+	"Deps": []
+}
