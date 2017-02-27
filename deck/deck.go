@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"regexp"
 	"strings"
 
 	"github.com/alanxoc3/concards-go/card"
@@ -11,7 +12,7 @@ import (
 
 // Deck contains a set of cards
 type Deck struct {
-	Cards []card.Card
+	Cards []*card.Card
 }
 
 type block struct {
@@ -27,6 +28,8 @@ func (d *Deck) Size() int {
 
 // Open opens filename and loads cards into new deck
 func Open(filename string) (d *Deck, err error) {
+	d = &Deck{}
+
 	file, err := os.Open(filename)
 	if err != nil {
 		err = fmt.Errorf("Unable to open deck: %s", err)
@@ -34,12 +37,32 @@ func Open(filename string) (d *Deck, err error) {
 	}
 
 	currLine := 0
+	currGroup := ""
 	scanner := bufio.NewScanner(file)
+	scanner.Scan() // required for nextBlock() to work cleanly
 	for {
 		eof, b := nextBlock(scanner, currLine)
 		currLine = b.end + 1
 
-		// handle block
+		if len(b.lines) > 0 {
+			if group := pullGroup(b); group != "" {
+				currGroup = group
+			} else {
+				var c *card.Card
+				c, err = card.New(b.lines)
+				if err != nil {
+					err = fmt.Errorf("Unable to load card starting at %s:%d: %s",
+						filename, b.start, err)
+					return
+				}
+
+				if currGroup != "" {
+					c.Groups = append(c.Groups, currGroup)
+				}
+
+				d.Cards = append(d.Cards, c)
+			}
+		}
 
 		if eof {
 			break
@@ -50,7 +73,18 @@ func Open(filename string) (d *Deck, err error) {
 		err = fmt.Errorf("Error reading file: %s", err)
 	}
 
-	d = &Deck{}
+	return
+}
+
+var groupRegex = regexp.MustCompile(`##\s+(\w[\s\w]*)`)
+
+func pullGroup(b block) (grp string) {
+	for _, line := range b.lines {
+		if groupRegex.MatchString(line) {
+			grp = groupRegex.FindStringSubmatch(line)[1]
+		}
+	}
+
 	return
 }
 
@@ -59,7 +93,6 @@ func nextBlock(scanner *bufio.Scanner, currLine int) (atEOF bool, b block) {
 	b.start = currLine
 	b.lines = make([]string, 0)
 
-	scanner.Scan()
 	for {
 		t := scanner.Text()
 		t = strings.TrimRight(t, "\t\n\r ")
