@@ -42,3 +42,17 @@ func TestIt(t *testing.T) {
 		fmt.Println("--- NO ERRORS ----")
 	}
 }
+
+func TestThat(t *testing.T) {
+	var item *SpaceAlg
+	var err error
+
+	item, err = GenSpaceAlg("apple|1-1-2017|3-3-2018|23|-3|3|an|_the|rest|_s|ere")
+	fmt.Println(item.ToString())
+
+	if err != nil {
+		fmt.Println(err.Error())
+	} else {
+		fmt.Println("--- NO ERRORS ----")
+	}
+}

@@ -2,6 +2,7 @@ package deck
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 	"testing"
 
@@ -49,4 +50,16 @@ func TestPullGroup(t *testing.T) {
 
 	g := pullGroup(b)
 	assert.NotEqual(t, "", g, "failed to pull group")
+}
+
+func TestBetterFile(t *testing.T) {
+	d, err := Open("other_deck.txt")
+	fmt.Println(len(d.Cards))
+	for _, x := range d.Cards {
+		fmt.Printf("%s : %s : %s : %v \n", x.Question, x.Answer, x.Metadata, x.Groups)
+	}
+
+	assert.NotNil(t, d, "returned nil instead of deck")
+	assert.NoError(t, err, "returned error")
+	assert.Equal(t, 3, len(d.Cards), "empty deck")
 }
