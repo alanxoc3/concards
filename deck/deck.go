@@ -112,3 +112,11 @@ func nextBlock(scanner *bufio.Scanner, currLine int) (atEOF bool, b block) {
 
 	return
 }
+
+// Prints out the cards in the deck, for debugging purposes.
+func (d *Deck) Print() {
+	for i, c := range d.Cards {
+		fmt.Printf("Card %d\n", i)
+		c.Print()
+	}
+}

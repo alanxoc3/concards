@@ -1,7 +1,7 @@
-## GroupName1 
+## GroupName1 GROUP3
 
 Question 1
-    Answer 1
+	Answer 1
 ~~ SM2|02.25.2017|02.29.2017|1|2|4.00
 
 Question 2

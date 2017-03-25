@@ -15,13 +15,9 @@ func main() {
 	}
 
 	d, err := deck.Open("sample.txt")
-
-	for i, c := range d.Cards {
-		fmt.Println(i, c, "\n")
-
+	if err != nil {
+		fmt.Print(err)
 	}
 
-	// options := cfg.Opts
-
-	//fmt.Printf("%s", cfg.Help())
+	d.Print()
 }

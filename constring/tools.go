@@ -5,6 +5,35 @@ import "errors"
 import "time"
 import "fmt"
 
+func TrimLineBegin(line string, trimStr string) string {
+	if len(trimStr) > len(line) {
+		return ""
+	}
+
+	i := 0
+	for ; i < len(trimStr); i++ {
+		if trimStr[i] != line[i] {
+			break
+		}
+	}
+
+	return line[i:]
+}
+
+func DoesLineBeginWith(line string, test string) bool {
+	if len(test) > len(line) {
+		return false
+	}
+
+	for i := 0; i < len(test); i++ {
+		if test[i] != line[i] {
+			return false
+		}
+	}
+
+	return true
+}
+
 func Trim(str string) string {
 	return strings.Trim(str, " \n\t")
 }
