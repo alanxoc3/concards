@@ -2,12 +2,26 @@ package main
 
 import (
 	"fmt"
-	"github.com/alanxoc3/concards-go/gui"
+	"os"
+
+	"github.com/alanxoc3/concards-go/deck"
+	"github.com/alanxoc3/concards-go/termhelp"
 )
 
 func main() {
-	cfg := gui.GenConfig()
+	_, err := gui.ParseConfig(os.Args)
+	if err != nil {
+		fmt.Print(err)
+	}
+
+	d, err := deck.Open("sample.txt")
+
+	for i, c := range d.Cards {
+		fmt.Println(i, c, "\n")
+
+	}
+
 	// options := cfg.Opts
 
-	fmt.Printf("%s", cfg.Help())
+	//fmt.Printf("%s", cfg.Help())
 }
