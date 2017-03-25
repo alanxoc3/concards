@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/alanxoc3/concards-go/card"
+	"github.com/alanxoc3/concards-go/constring"
 )
 
 // Deck contains a set of cards
@@ -101,14 +102,15 @@ func nextBlock(scanner *bufio.Scanner, currLine int) (atEOF bool, b block) {
 			atEOF = true
 		}
 
-		if t == "" {
+		// End block on empty lines or groups.
+		if t == "" || constring.DoesLineBeginWith(t, "## ") {
+			b.end = currLine - 1
 			break
 		} else {
 			b.lines = append(b.lines, t)
 			currLine++
 		}
 	}
-	b.end = currLine - 1
 
 	return
 }

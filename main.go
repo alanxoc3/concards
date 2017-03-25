@@ -11,12 +11,14 @@ import (
 func main() {
 	_, err := gui.ParseConfig(os.Args)
 	if err != nil {
-		fmt.Print(err)
+		fmt.Println(err)
+		return
 	}
 
 	d, err := deck.Open("sample.txt")
 	if err != nil {
-		fmt.Print(err)
+		fmt.Println(err)
+		return
 	}
 
 	d.Print()

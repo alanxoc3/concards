@@ -49,10 +49,10 @@ func New(lines []string) (*Card, error) {
 		if !(inMeta || inAnswer || inQuestion) {
 			if metDel {
 				// ERROR: Not only meta
-				return nil, errors.New("file: You can't have meta data on its own!")
+				return nil, errors.New("You can't have meta data on its own!")
 			} else if ansDel {
 				// ERROR: Not only answer
-				return nil, errors.New("file: You can't have an answer on its own!")
+				return nil, errors.New("You can't have an answer on its own!")
 			} else {
 				inQuestion = true
 				c.Question = line
@@ -69,7 +69,7 @@ func New(lines []string) (*Card, error) {
 				inQuestion = false
 				c.Answer = constring.TrimLineBegin(line, "\t")
 			} else {
-				c.Question += line
+				c.Question += "\n" + line
 			}
 
 			// Check for answer.
@@ -79,16 +79,16 @@ func New(lines []string) (*Card, error) {
 				inAnswer = false
 				c.Metadata = constring.TrimLineBegin(line, "~~ ")
 			} else if ansDel {
-				c.Answer += constring.TrimLineBegin(line, "\t")
+				c.Answer += "\n" + constring.TrimLineBegin(line, "\t")
 			} else {
 				// ERROR: Not only meta
-				return nil, errors.New("file: Can't have a question in the answer.")
+				return nil, errors.New("Can't have a question in the answer.")
 			}
 
 			// This means there was stuff after the meta data.
 		} else {
 			// assert(inMeta && !inQuestion && !inAnswer)
-			return nil, errors.New("file: Found extra lines after the metadata.")
+			return nil, errors.New("Found extra lines after the metadata.")
 		}
 	}
 
