@@ -1,4 +1,4 @@
-## GroupName1 GROUP3
+## GroupName1 GROUP3 alla
 
 Question 1
 second line
@@ -6,11 +6,11 @@ third line
 	Answer 1
 	another
     another one!
-~~ SM2|02.25.2017|02.29.2017|1|2|4.00
+~~ 
 
 ## GROUP3 GroupName1
 Question 2
-~~ test
+~~ SM2|02.25.2017|02.29.2017|1|2|4.00
 ## GroupName2
 
 ## hello
