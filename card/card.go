@@ -97,7 +97,12 @@ func New(lines []string) (*Card, error) {
 
 // Prints out the card, for debugging purposes.
 func (c *Card) Print() {
-	fmt.Println("G: ", c.Groups)
+	fmt.Print("G: ")
+	for _, x := range c.Groups {
+		fmt.Printf("%s, ", x)
+	}
+	fmt.Println()
+
 	fmt.Println("Q: ", c.Question)
 	fmt.Println("A: ", c.Answer)
 	fmt.Println("M: ", c.Metadata)
