@@ -1,4 +1,4 @@
-package gui
+package termhelp
 
 import "fmt"
 

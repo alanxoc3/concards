@@ -5,11 +5,12 @@ import (
 	"os"
 
 	"github.com/alanxoc3/concards-go/deck"
+	"github.com/alanxoc3/concards-go/termgui"
 	"github.com/alanxoc3/concards-go/termhelp"
 )
 
 func main() {
-	_, err := gui.ParseConfig(os.Args)
+	_, err := termhelp.ParseConfig(os.Args)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -22,4 +23,6 @@ func main() {
 	}
 
 	d.Print()
+
+	termgui.Run()
 }

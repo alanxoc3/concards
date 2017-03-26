@@ -1,4 +1,4 @@
-package gui
+package termhelp
 
 const (
 	REVIEW   = iota
@@ -19,7 +19,7 @@ const (
 	DEFALG   = iota
 )
 
-func (cfg *Config) Usage() (ret string) {
+func Usage() (ret string) {
 	ret += "Usage:\n"
 	ret += "   concards [OPTIONS...] FILE1\n"
 	ret += "   concards [OPTIONS...] DIRECTORY\n"
@@ -27,8 +27,8 @@ func (cfg *Config) Usage() (ret string) {
 	return
 }
 
-func (cfg *Config) Help() (ret string) {
-	ret = cfg.Usage()
+func Help() (ret string) {
+	ret = Usage()
 	ret += "\n"
 	ret += "For more detailed options, read the fine man page.\n"
 
