@@ -10,11 +10,13 @@ import (
 )
 
 func main() {
-	_, err := termhelp.ParseConfig(os.Args)
+	cfg, err := termhelp.ParseConfig(os.Args)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
+
+	fmt.Println(cfg.MainScreen)
 
 	d, err := deck.Open("sample.txt")
 	if err != nil {

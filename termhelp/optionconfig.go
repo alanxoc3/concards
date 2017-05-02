@@ -7,30 +7,30 @@ import "strconv"
 
 type Config struct {
 	// The various true or false options
-	review        bool
-	memorize      bool
-	done          bool
-	numberEnabled bool
-	groupsEnabled bool
+	Review        bool
+	Memorize      bool
+	Done          bool
+	NumberEnabled bool
+	GroupsEnabled bool
 
-	help    bool
-	version bool
-	color   bool
+	Help    bool
+	Version bool
+	Color   bool
 
-	viewMode   bool
-	editMode   bool
-	printMode  bool
-	updateMode bool
+	ViewMode   bool
+	EditMode   bool
+	PrintMode  bool
+	UpdateMode bool
 
-	mainScreen bool
-	write      bool
-	editor     string
-	defalg     string
+	MainScreen bool
+	Write      bool
+	Editor     string
+	Defalg     string
 
 	// The variable options passed in.
-	number int
-	groups map[string]bool
-	files  []string
+	Number int
+	Groups map[string]bool
+	Files  []string
 
 	Opts []*Option
 }
@@ -58,8 +58,8 @@ func ParseConfig(args []string) (*Config, error) {
 			pc.waitForGroup = false
 			lst := constring.StringToList(arg)
 			for _, x := range *lst {
-				if cfg.groups[x] == false {
-					cfg.groups[x] = true
+				if cfg.Groups[x] == false {
+					cfg.Groups[x] = true
 				} else { // ERROR same group
 					return nil, errors.New("You tried to pass the same group multiple times.")
 				}
@@ -71,13 +71,13 @@ func ParseConfig(args []string) (*Config, error) {
 			if err != nil {
 				return nil, errors.New("You didn't pass a number to the number option.")
 			}
-			cfg.number = num
+			cfg.Number = num
 		} else if pc.waitForDefAlg { // PARSE STRING
 			pc.waitForDefAlg = false
-			cfg.defalg = arg
+			cfg.Defalg = arg
 		} else if pc.waitForEditor { // PARSE STRING
 			pc.waitForEditor = false
-			cfg.editor = arg
+			cfg.Editor = arg
 		} else {
 			if arg[0] == '-' {
 				if curLen == 1 {
@@ -110,7 +110,7 @@ func ParseConfig(args []string) (*Config, error) {
 					}
 				}
 			} else { // This is a file!
-				cfg.files = append(cfg.files, arg)
+				cfg.Files = append(cfg.Files, arg)
 			}
 		}
 	}
@@ -125,47 +125,47 @@ func ParseConfig(args []string) (*Config, error) {
 // For debugging purposes.
 func (cfg *Config) Print() {
 	fmt.Printf("REV - MEM - DON - num - grp - hlp - ver - col - scr - wri\n")
-	fmt.Printf("%t %t %t %t %t %t %t %t %t %t\n", cfg.review,
-		cfg.memorize, cfg.done, cfg.numberEnabled, cfg.groupsEnabled, cfg.help,
-		cfg.version, cfg.color, cfg.mainScreen, cfg.write)
+	fmt.Printf("%t %t %t %t %t %t %t %t %t %t\n", cfg.Review,
+		cfg.Memorize, cfg.Done, cfg.NumberEnabled, cfg.GroupsEnabled, cfg.Help,
+		cfg.Version, cfg.Color, cfg.MainScreen, cfg.Write)
 
-	fmt.Printf("ED: %s | DEF: %s | NUM: %d | GRP %v | FIL %v\n\n", cfg.editor,
-		cfg.defalg, cfg.number, cfg.groups, cfg.files)
+	fmt.Printf("ED: %s | DEF: %s | NUM: %d | GRP %v | FIL %v\n\n", cfg.Editor,
+		cfg.Defalg, cfg.Number, cfg.Groups, cfg.Files)
 }
 
 // Helpers...
 func executeCommandWithNumber(num int, pc *parseConfig, cfg *Config) error {
 	switch num {
 	case REVIEW:
-		cfg.review = true
+		cfg.Review = true
 	case MEMORIZE:
-		cfg.memorize = true
+		cfg.Memorize = true
 	case DONE:
-		cfg.done = true
+		cfg.Done = true
 	case GROUPS:
 		pc.waitForGroup = true
-		cfg.groupsEnabled = true
+		cfg.GroupsEnabled = true
 	case NUMBER:
 		pc.waitForNum = true
 	case ONE:
-		cfg.number = 1
-		cfg.numberEnabled = true
+		cfg.Number = 1
+		cfg.NumberEnabled = true
 	case EDIT:
-		cfg.editMode = true
+		cfg.EditMode = true
 	case PRINT:
-		cfg.printMode = true
+		cfg.PrintMode = true
 	case UPDATE:
-		cfg.updateMode = true
+		cfg.UpdateMode = true
 	case HELP:
-		cfg.help = true
+		cfg.Help = true
 	case VERSION:
-		cfg.version = true
+		cfg.Version = true
 	case COLOR:
-		cfg.color = true
+		cfg.Color = true
 	case NOMAIN:
-		cfg.mainScreen = false
+		cfg.MainScreen = false
 	case NOWRITE:
-		cfg.write = false
+		cfg.Write = false
 	case EDITOR:
 		pc.waitForEditor = true
 	case DEFALG:
@@ -196,11 +196,11 @@ type parseConfig struct {
 func configInit() *Config {
 	// Everything besides these are set to false or 0
 	var cfg Config
-	cfg.mainScreen = true
-	cfg.viewMode = true
-	cfg.editor = "$EDITOR"
-	cfg.defalg = "SM2"
-	cfg.groups = make(map[string]bool)
+	cfg.MainScreen = true
+	cfg.ViewMode = true
+	cfg.Editor = "$EDITOR"
+	cfg.Defalg = "SM2"
+	cfg.Groups = make(map[string]bool)
 	return &cfg
 }
 
