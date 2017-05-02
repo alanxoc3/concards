@@ -14,6 +14,8 @@ type Card struct {
 	Answer   string
 	Groups   []string
 	Metadata interface{}
+	Id       int
+	File     string
 }
 
 // Parses and validates block of text as card.
@@ -103,6 +105,8 @@ func (c *Card) Print() {
 	}
 	fmt.Println()
 
+	fmt.Println("#: ", c.Id)
+	fmt.Println("F: ", c.File)
 	fmt.Println("Q: ", c.Question)
 	fmt.Println("A: ", c.Answer)
 	fmt.Println("M: ", c.Metadata)

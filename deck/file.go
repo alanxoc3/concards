@@ -41,21 +41,21 @@ func Open(filename string) (d *Deck, err error) {
 		curLine = b.end
 
 		// Step 2: Put the batch into groups and a file.
-		sd, err2 := batchToSubDeck(b)
+		od, err2 := batchToDeck(b, &filename)
 		if err2 != nil {
 			err = err2
 			return
 		}
 
-		d.SubDecks = append(d.SubDecks, sd)
+		d.AddDeckWithId(od)
 	}
 
 	return
 }
 
 // Takes a batch and puts it into a subdeck. Could have parsing errors.
-func batchToSubDeck(batch *block) (*SubDeck, error) {
-	subDeck := &SubDeck{}
+func batchToDeck(batch *block, filename *string) (*Deck, error) {
+	deck := &Deck{}
 	i := 0
 
 	// Step 1: The top lines will be groups in a file, we will go through these.
@@ -64,7 +64,7 @@ func batchToSubDeck(batch *block) (*SubDeck, error) {
 
 		if constring.DoesLineBeginWith(x, "## ") {
 			x = constring.TrimLineBegin(x, "## ")
-			subDeck.Groups = append(subDeck.Groups, *constring.StringToList(x)...)
+			deck.AddGroups(constring.StringToList(x))
 		} else if x != "" {
 			break
 		}
@@ -82,7 +82,8 @@ func batchToSubDeck(batch *block) (*SubDeck, error) {
 			if err != nil {
 				return nil, err
 			}
-			subDeck.AddCard(c)
+			c.File = *filename
+			deck.AddCardWithId(c)
 
 			// Remember to empty the buffer for the next card.
 			buff = nil
@@ -100,11 +101,12 @@ func batchToSubDeck(batch *block) (*SubDeck, error) {
 		if err != nil {
 			return nil, err
 		}
-		subDeck.AddCard(c)
+		c.File = *filename
+		deck.AddCardWithId(c)
 	}
 
 	// Finished with the batch!!! Woohoo!
-	return subDeck, nil
+	return deck, nil
 }
 
 // This needs scanner to have already scanned something before.
