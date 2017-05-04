@@ -4,12 +4,13 @@ import (
 	"fmt"
 
 	"github.com/alanxoc3/concards-go/card"
+	"github.com/alanxoc3/concards-go/constring"
 )
 
 // Deck contains a set of groupDecks
 type Deck struct {
 	counter int // incremented when cards are added, never decremented.
-	Cards   []*card.Card
+	Cards   Cards
 	Groups  []string
 }
 
@@ -41,20 +42,10 @@ func (d *Deck) AddDeckWithoutId(od *Deck) {
 	}
 }
 
-// A for some quantifier.
-func isInStrList(list1 []string, item string) bool {
-	for _, str := range list1 {
-		if item == str {
-			return true
-		}
-	}
-	return false
-}
-
 // Treat the group splice like a set.
 func (d *Deck) AddGroups(gps *[]string) {
 	for _, str := range *gps {
-		if !isInStrList(d.Groups, str) {
+		if !constring.IsInStrList(d.Groups, str) {
 			d.Groups = append(d.Groups, str)
 		}
 	}
@@ -70,4 +61,28 @@ func (d *Deck) AddCardWithoutId(c *card.Card) {
 func (d *Deck) AddCardWithId(c *card.Card) {
 	c.Id = d.counter
 	d.AddCardWithoutId(c)
+}
+
+// given a file name, returns a string of all the cards part of that file.
+func (d *Deck) ToStringFromFile(file string) string {
+	var list Cards
+	list = d.Cards.FilterFile(file)
+	list.Sort()
+	return list.ToString()
+}
+
+// given a bunch of groups,
+func (d *Deck) ToStringFromGroups(groups []string) string {
+	var list Cards
+	list = d.Cards.FilterGroups(groups)
+	list.Sort()
+	return list.ToString()
+}
+
+// given a file name, returns a string of all the cards part of that file.
+func (d *Deck) ToStringFromGroup(group string) string {
+	var list Cards
+	list = d.Cards.FilterGroup(group)
+	list.Sort()
+	return list.ToString()
 }

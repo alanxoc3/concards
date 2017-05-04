@@ -1,6 +1,7 @@
 package constring
 
 import "strings"
+import "sort"
 import "errors"
 import "time"
 import "fmt"
@@ -32,6 +33,17 @@ func DoesLineBeginWith(line string, test string) bool {
 	}
 
 	return true
+}
+
+func TabsToNewlines(str *string) string {
+	newStr := ""
+	for i := 0; i < len(*str); i++ {
+		newStr += string((*str)[i])
+		if string((*str)[i]) == "\n" {
+			newStr += "\t"
+		}
+	}
+	return newStr
 }
 
 func Trim(str string) string {
@@ -135,4 +147,68 @@ func FormatList(clist []string) string {
 	}
 
 	return outStr
+}
+
+// A for some quantifier.
+func IsInStrList(list1 []string, item string) bool {
+	for _, str := range list1 {
+		if item == str {
+			return true
+		}
+	}
+	return false
+}
+
+func StringListsIdentical(list1 []string, list2 []string) bool {
+	sort.Strings(list1)
+	sort.Strings(list2)
+
+	if len(list1) == len(list2) {
+		for i := 0; i < len(list1); i++ {
+			if list1[i] != list2[i] {
+				return false
+			}
+		}
+	} else {
+		return false
+	}
+
+	return true
+}
+
+func ListToString(list []string) string {
+	if len(list) <= 0 {
+		return ""
+	}
+
+	retStr := "##"
+
+	for _, str := range list {
+		retStr += " " + str
+	}
+
+	return retStr
+}
+
+func ListHasOtherList(list1 []string, list2 []string) bool {
+	if len(list1) < len(list2) {
+		return false
+	}
+
+	sort.Strings(list1)
+	sort.Strings(list2)
+
+	indList2 := 0
+
+	for i := 0; i < len(list1); i++ {
+		if list1[i] == list2[indList2] {
+			indList2++
+		}
+
+		if indList2 == len(list2) {
+			return true
+		}
+	}
+
+	return false
 }

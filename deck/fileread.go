@@ -83,6 +83,7 @@ func batchToDeck(batch *block, filename *string) (*Deck, error) {
 				return nil, err
 			}
 			c.File = *filename
+			c.Groups = deck.Groups
 			deck.AddCardWithId(c)
 
 			// Remember to empty the buffer for the next card.
@@ -102,6 +103,7 @@ func batchToDeck(batch *block, filename *string) (*Deck, error) {
 			return nil, err
 		}
 		c.File = *filename
+		c.Groups = deck.Groups
 		deck.AddCardWithId(c)
 	}
 

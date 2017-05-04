@@ -30,5 +30,9 @@ func main() {
 
 	d.Print()
 
+	fmt.Println("--START--")
+	fmt.Print(d.ToStringFromGroup("GroupName1"))
+	fmt.Println("--END--")
+
 	termgui.Run()
 }

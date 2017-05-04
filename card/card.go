@@ -113,3 +113,13 @@ func (c *Card) Print() {
 
 	fmt.Println()
 }
+
+func (c *Card) ToString() string {
+	str := c.Question
+
+	if c.Answer != "" {
+		str += "\n\t" + constring.TabsToNewlines(&c.Answer)
+	}
+
+	return str
+}
