@@ -134,16 +134,12 @@ func IsEmpty(str string) bool {
 	return true
 }
 
-// Formats a list of strings as: x|y|z|a...
+// Formats a list of strings as: x, y, z, a...
 func FormatList(clist []string) string {
 	outStr := ""
 
-	for i, x := range clist {
-		if i == 0 {
-			outStr += x
-		} else {
-			outStr += "|" + x
-		}
+	for _, x := range clist {
+		outStr += ", " + x
 	}
 
 	return outStr

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/alanxoc3/concards-go/algs"
 	"github.com/alanxoc3/concards-go/constring"
 )
 
@@ -13,7 +14,7 @@ type Card struct {
 	Question string
 	Answer   string
 	Groups   []string
-	Metadata interface{}
+	Metadata algs.SpaceAlg
 	Id       int
 	File     string
 }
@@ -21,6 +22,9 @@ type Card struct {
 // Parses and validates block of text as card.
 func New(lines []string) (*Card, error) {
 	c := &Card{}
+
+	alg, _ := algs.New("SM2")
+	c.Metadata = *alg
 
 	// Assume we are in question first.
 	inQuestion := false
@@ -65,7 +69,12 @@ func New(lines []string) (*Card, error) {
 			if metDel {
 				inMeta = true
 				inQuestion = false
-				c.Metadata = constring.TrimLineBegin(line, "~~ ")
+
+				alg, err := algs.New(constring.TrimLineBegin(line, "~~ "))
+				if err != nil {
+					return nil, err
+				}
+				c.Metadata = *alg
 			} else if ansDel {
 				inAnswer = true
 				inQuestion = false
@@ -79,7 +88,12 @@ func New(lines []string) (*Card, error) {
 			if metDel {
 				inMeta = true
 				inAnswer = false
-				c.Metadata = constring.TrimLineBegin(line, "~~ ")
+
+				alg, err := algs.New(constring.TrimLineBegin(line, "~~ "))
+				if err != nil {
+					return nil, err
+				}
+				c.Metadata = *alg
 			} else if ansDel {
 				c.Answer += "\n" + constring.TrimLineBegin(line, "\t")
 			} else {
@@ -120,6 +134,8 @@ func (c *Card) ToString() string {
 	if c.Answer != "" {
 		str += "\n\t" + constring.TabsToNewlines(&c.Answer)
 	}
+
+	str += "\n~~ " + c.Metadata.ToString()
 
 	return str
 }

@@ -91,7 +91,7 @@ func batchToDeck(batch *block, filename *string) (*Deck, error) {
 			continue
 
 			// Here we add buffer lines to a card.
-		} else {
+		} else if x != "" {
 			buff = append(buff, x)
 		}
 	}

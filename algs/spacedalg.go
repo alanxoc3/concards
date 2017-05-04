@@ -1,6 +1,7 @@
 package algs
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -24,17 +25,31 @@ func (s *SpaceAlg) ToString() string {
 	first := constring.DateToString(s.first)
 	extra := constring.FormatList(s.extra)
 
-	str := fmt.Sprintf("%s|%s|%s|%d|%d|%d|%s", s.name, next, first, s.streak, s.high, s.low, extra)
+	str := fmt.Sprintf("%s, %s, %s, %d, %d, %d%s", s.name, next, first, s.streak, s.high, s.low, extra)
 	return str
 }
 
-func GenSpaceAlg(str string) (*SpaceAlg, error) {
+func New(str string) (*SpaceAlg, error) {
 	// Split the string into bins, then put the bins in the correct spots.
 	space := SpaceAlg{}
-	bins := strings.Split(str, "|")
+	bins := strings.Split(str, ",")
 	binsLen := len(bins)
 
+	// trim the bins
+	for i := 0; i < binsLen; i++ {
+		bins[i] = constring.Trim(bins[i])
+	}
+
 	space.name = bins[0] // NAME
+	bins[0] = strings.ToUpper(bins[0])
+
+	if bins[0] == "" {
+		space.name = "SM2"
+	} else if IsValidAlgName(bins[0]) {
+		space.name = bins[0]
+	} else {
+		return nil, errors.New("Invalid Algorithm Name")
+	}
 
 	if binsLen > 1 && !constring.IsEmpty(bins[1]) { // NEXT
 		x, err := constring.StrToDate(bins[1])
@@ -98,3 +113,7 @@ them. These properties are:
 	Each algorithm must worry about all these variables in order to work correctly.
 
 */
+
+func IsValidAlgName(name string) bool {
+	return name == "SM2" || name == "PRATT" || name == "DAILY" || name == "SHELL"
+}

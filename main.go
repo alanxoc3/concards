@@ -31,7 +31,7 @@ func main() {
 	d.Print()
 
 	fmt.Println("--START--")
-	fmt.Print(d.ToStringFromGroup("GroupName1"))
+	fmt.Print(d.ToStringFromFile("sample.txt"))
 	fmt.Println("--END--")
 
 	termgui.Run()
