@@ -2,87 +2,72 @@ package deck
 
 import (
 	"fmt"
+	"math/rand"
+	"sort"
 
 	"github.com/alanxoc3/concards-go/card"
 	"github.com/alanxoc3/concards-go/constring"
 )
 
-// Deck contains a set of groupDecks
-type Deck struct {
-	counter int // incremented when cards are added, never decremented.
-	Cards   Cards
-	Groups  []string
+type Deck []*card.Card
+
+func (cards Deck) Len() int {
+	return len(cards)
 }
 
-// Size returns the number of cards in the deck
-func (d *Deck) Size() int {
-	return len(d.Cards)
+func (cards Deck) Less(i, j int) bool {
+	return cards[i].Id < cards[j].Id
+}
+
+func (cards Deck) Swap(i, j int) {
+	cards[i], cards[j] = cards[j], cards[i]
+}
+
+func (cards Deck) Sort() {
+	sort.Sort(cards)
+}
+
+// includes the group markers
+func (cards Deck) ToString() string {
+	// do groups stuff
+	str := ""
+	var curGroups []string
+
+	for _, c := range cards {
+		if !constring.StringListsIdentical(curGroups, c.Groups) {
+			curGroups = c.Groups
+			str += constring.GroupListToString(curGroups) + "\n"
+		}
+
+		str += c.FormatFile() + "\n\n"
+	}
+
+	return str
+}
+
+// fisher-yates shuffle
+func (cards Deck) Shuffle() {
+	// start at the end of the deck, go down.
+	for i := len(cards) - 1; i > 0; i-- {
+		swapPlace := rand.Intn(i)
+		cards.Swap(i, swapPlace)
+	}
 }
 
 // Prints out the cards in the deck, for debugging purposes.
-func (d *Deck) Print() {
+func (cards Deck) Print() {
 	count := 0
-	for _, c := range d.Cards {
+	for _, c := range cards {
 		count += 1
 		fmt.Printf("Card %d\n", count)
 		c.Print()
 	}
 }
 
-// Use these to add another deck's cards to the deck.
-func (d *Deck) AddDeckWithId(od *Deck) {
-	for _, c := range od.Cards {
-		d.AddCardWithId(c)
+func (cards Deck) Top() *card.Card {
+	if len(cards) > 0 {
+		return cards[0]
+	} else {
+		return nil
 	}
-}
-
-func (d *Deck) AddDeckWithoutId(od *Deck) {
-	for _, c := range od.Cards {
-		d.AddCardWithoutId(c)
-	}
-}
-
-// Treat the group splice like a set.
-func (d *Deck) AddGroups(gps *[]string) {
-	for _, str := range *gps {
-		if !constring.IsInStrList(d.Groups, str) {
-			d.Groups = append(d.Groups, str)
-		}
-	}
-}
-
-// These are what adds cards. The main decks should have ids.
-func (d *Deck) AddCardWithoutId(c *card.Card) {
-	d.counter += 1
-	d.AddGroups(&c.Groups)
-	d.Cards = append(d.Cards, c)
-}
-
-func (d *Deck) AddCardWithId(c *card.Card) {
-	c.Id = d.counter
-	d.AddCardWithoutId(c)
-}
-
-// given a file name, returns a string of all the cards part of that file.
-func (d *Deck) ToStringFromFile(file string) string {
-	var list Cards
-	list = d.Cards.FilterFile(file)
-	list.Sort()
-	return list.ToString()
-}
-
-// given a bunch of groups,
-func (d *Deck) ToStringFromGroups(groups []string) string {
-	var list Cards
-	list = d.Cards.FilterGroups(groups)
-	list.Sort()
-	return list.ToString()
-}
-
-// given a file name, returns a string of all the cards part of that file.
-func (d *Deck) ToStringFromGroup(group string) string {
-	var list Cards
-	list = d.Cards.FilterGroup(group)
-	list.Sort()
-	return list.ToString()
 }

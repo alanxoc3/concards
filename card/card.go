@@ -23,7 +23,7 @@ type Card struct {
 func New(lines []string) (*Card, error) {
 	c := &Card{}
 
-	alg, _ := algs.New("SM2")
+	alg, _ := algs.New("")
 	c.Metadata = *alg
 
 	// Assume we are in question first.
@@ -128,7 +128,26 @@ func (c *Card) Print() {
 	fmt.Println()
 }
 
-func (c *Card) ToString() string {
+// Prints out the card according to the format needed for the file.
+func (c *Card) FormatQuestion() string {
+	str := c.Question
+	return str
+}
+
+// Prints out the card according to the format needed for the file.
+func (c *Card) FormatAnswer() string {
+	str := "\t" + constring.TabsToNewlines(&c.Answer)
+	return str
+}
+
+// Prints out the card according to the format needed for the file.
+func (c *Card) FormatGroups() string {
+	str := constring.GroupListToString(c.Groups)
+	return str
+}
+
+// Prints out the card according to the format needed for the file.
+func (c *Card) FormatFile() string {
 	str := c.Question
 
 	if c.Answer != "" {

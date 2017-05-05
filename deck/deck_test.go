@@ -18,7 +18,7 @@ func TestOpen(t *testing.T) {
 }
 
 func TestSize(t *testing.T) {
-	d := &Deck{}
+	d := &DeckControl{}
 	d.Cards = append(d.Cards, &card.Card{})
 	assert.Equal(t, 1, d.Size(), "wrong size")
 }

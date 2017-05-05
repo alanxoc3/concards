@@ -25,7 +25,6 @@ type Config struct {
 	MainScreen bool
 	Write      bool
 	Editor     string
-	Defalg     string
 
 	// The variable options passed in.
 	Number int
@@ -72,9 +71,6 @@ func ParseConfig(args []string) (*Config, error) {
 				return nil, errors.New("You didn't pass a number to the number option.")
 			}
 			cfg.Number = num
-		} else if pc.waitForDefAlg { // PARSE STRING
-			pc.waitForDefAlg = false
-			cfg.Defalg = arg
 		} else if pc.waitForEditor { // PARSE STRING
 			pc.waitForEditor = false
 			cfg.Editor = arg
@@ -129,8 +125,8 @@ func (cfg *Config) Print() {
 		cfg.Memorize, cfg.Done, cfg.NumberEnabled, cfg.GroupsEnabled, cfg.Help,
 		cfg.Version, cfg.Color, cfg.MainScreen, cfg.Write)
 
-	fmt.Printf("ED: %s | DEF: %s | NUM: %d | GRP %v | FIL %v\n\n", cfg.Editor,
-		cfg.Defalg, cfg.Number, cfg.Groups, cfg.Files)
+	fmt.Printf("ED: %s | NUM: %d | GRP %v | FIL %v\n\n", cfg.Editor,
+		cfg.Number, cfg.Groups, cfg.Files)
 }
 
 // Helpers...
@@ -168,8 +164,6 @@ func executeCommandWithNumber(num int, pc *parseConfig, cfg *Config) error {
 		cfg.Write = false
 	case EDITOR:
 		pc.waitForEditor = true
-	case DEFALG:
-		pc.waitForDefAlg = true
 	default:
 		// It doesn't exist here
 		return errors.New("You have an invalid command-line option.")
@@ -189,7 +183,7 @@ func executeAlias(cmd byte, pc *parseConfig, cfg *Config) error {
 }
 
 type parseConfig struct {
-	waitForGroup, waitForNum, waitForDefAlg, waitForEditor bool
+	waitForGroup, waitForNum, waitForEditor bool
 }
 
 // Set the defaults for the config
@@ -199,11 +193,10 @@ func configInit() *Config {
 	cfg.MainScreen = true
 	cfg.ViewMode = true
 	cfg.Editor = "$EDITOR"
-	cfg.Defalg = "SM2"
 	cfg.Groups = make(map[string]bool)
 	return &cfg
 }
 
 func (pc *parseConfig) check() bool {
-	return pc.waitForGroup || pc.waitForNum || pc.waitForDefAlg || pc.waitForEditor
+	return pc.waitForGroup || pc.waitForNum || pc.waitForEditor
 }

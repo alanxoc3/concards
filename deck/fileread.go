@@ -18,8 +18,8 @@ type block struct {
 }
 
 // Open opens filename and loads cards into new deck
-func Open(filename string) (d *Deck, err error) {
-	d = &Deck{}
+func Open(filename string) (d *DeckControl, err error) {
+	d = &DeckControl{}
 
 	file, err1 := os.Open(filename)
 	if err1 != nil {
@@ -54,8 +54,8 @@ func Open(filename string) (d *Deck, err error) {
 }
 
 // Takes a batch and puts it into a subdeck. Could have parsing errors.
-func batchToDeck(batch *block, filename *string) (*Deck, error) {
-	deck := &Deck{}
+func batchToDeck(batch *block, filename *string) (*DeckControl, error) {
+	deck := &DeckControl{}
 	i := 0
 
 	// Step 1: The top lines will be groups in a file, we will go through these.

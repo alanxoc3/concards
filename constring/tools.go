@@ -172,7 +172,7 @@ func StringListsIdentical(list1 []string, list2 []string) bool {
 	return true
 }
 
-func ListToString(list []string) string {
+func GroupListToString(list []string) string {
 	if len(list) <= 0 {
 		return ""
 	}

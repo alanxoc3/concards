@@ -16,7 +16,6 @@ const (
 	NOMAIN   = iota
 	NOWRITE  = iota
 	EDITOR   = iota
-	DEFALG   = iota
 )
 
 func Usage() (ret string) {
@@ -55,7 +54,6 @@ func genOptions() []*Option {
 	opts = append(opts, newOptionNoParam(0, "no-main", "Disables the main screen."))
 	opts = append(opts, newOptionNoParam(0, "no-write", "Concards will not write to any file."))
 	opts = append(opts, newOption(0, "editor", "e", "Change the editor 'ed' used when editing. Default is \"$EDITOR\"."))
-	opts = append(opts, newOption(0, "def-alg", "a", "The default algorithm 'alg' used. This is set to 'SM2' by default."))
 
 	return opts
 }

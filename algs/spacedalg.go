@@ -11,27 +11,22 @@ import (
 )
 
 type SpaceAlg struct {
-	name   string
-	next   time.Time
-	first  time.Time
-	streak int
-	high   int
-	low    int
-	extra  []string
+	Next   time.Time
+	Streak int
+	Rank   float32
 }
 
 func (s *SpaceAlg) ToString() string {
-	next := constring.DateToString(s.next)
-	first := constring.DateToString(s.first)
-	extra := constring.FormatList(s.extra)
+	next := constring.DateToString(s.Next)
 
-	str := fmt.Sprintf("%s, %s, %s, %d, %d, %d%s", s.name, next, first, s.streak, s.high, s.low, extra)
+	str := fmt.Sprintf("%s, %d, %.2f", next, s.Streak, s.Rank)
 	return str
 }
 
 func New(str string) (*SpaceAlg, error) {
 	// Split the string into bins, then put the bins in the correct spots.
-	space := SpaceAlg{}
+	space := SpaceAlg{Next: time.Now(), Streak: 0, Rank: 2.5}
+
 	bins := strings.Split(str, ",")
 	binsLen := len(bins)
 
@@ -40,80 +35,36 @@ func New(str string) (*SpaceAlg, error) {
 		bins[i] = constring.Trim(bins[i])
 	}
 
-	space.name = bins[0] // NAME
-	bins[0] = strings.ToUpper(bins[0])
-
-	if bins[0] == "" {
-		space.name = "SM2"
-	} else if IsValidAlgName(bins[0]) {
-		space.name = bins[0]
-	} else {
-		return nil, errors.New("Invalid Algorithm Name")
-	}
-
-	if binsLen > 1 && !constring.IsEmpty(bins[1]) { // NEXT
-		x, err := constring.StrToDate(bins[1])
+	if binsLen > 0 && !constring.IsEmpty(bins[0]) { // NEXT
+		x, err := constring.StrToDate(bins[0])
 		if err != nil {
-			return nil, err
+			return nil, err //errors.New("Problem parsing meta data.")
 		}
-		space.next = x
+		space.Next = x
 	}
 
-	if binsLen > 2 && !constring.IsEmpty(bins[2]) { // FIRST
-		x, err := constring.StrToDate(bins[2])
+	if binsLen > 1 && !constring.IsEmpty(bins[1]) { // STREAK
+		x, err := strconv.Atoi(bins[1])
 		if err != nil {
-			return nil, err
+			return nil, errors.New("Problem parsing meta data.")
 		}
-		space.first = x
+		space.Streak = x
 	}
 
-	if binsLen > 3 && !constring.IsEmpty(bins[3]) { // STREAK
-		x, err := strconv.Atoi(bins[3])
+	if binsLen > 2 && !constring.IsEmpty(bins[2]) { // STREAK
+		x, err := strconv.ParseFloat(bins[2], 32)
 		if err != nil {
-			return nil, err
+			return nil, errors.New("Problem parsing meta data.")
 		}
-		space.streak = x
-	}
-
-	if binsLen > 4 && !constring.IsEmpty(bins[4]) { // HIGH
-		x, err := strconv.Atoi(bins[4])
-		if err != nil {
-			return nil, err
-		}
-		space.high = x
-	}
-
-	if binsLen > 5 && !constring.IsEmpty(bins[5]) { // LOW
-		x, err := strconv.Atoi(bins[5])
-		if err != nil {
-			return nil, err
-		}
-		space.low = x
-	}
-
-	if binsLen > 6 { // EXTRA
-		space.extra = bins[6:]
+		space.Rank = float32(x)
 	}
 
 	return &space, nil
 }
 
 /*
-Spaced Algorithms explained:
-All Spaced Algorithms have certain properties that are the same between
-them. These properties are:
-	name   = the name of the algorithm.
-	next   = the next date the card needs to be reviewed.
-	first  = initial date the card was passed
-	streak = the current number of times you have gotten the card correct.
-	high   = high score streak
-	low    = low score streak
-	extra  = extra data specific to the algorithm.
-
-	Each algorithm must worry about all these variables in order to work correctly.
-
+	Spaced algorithm has these values.
+	Next date - Next time algorithm should be used
+	Streak    - how many times you've gotten it right.
+	Rank    - a number specific to the algorithm.
 */
-
-func IsValidAlgName(name string) bool {
-	return name == "SM2" || name == "PRATT" || name == "DAILY" || name == "SHELL"
-}

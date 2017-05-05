@@ -5,17 +5,26 @@ import (
 	"io"
 	"strings"
 
-	"github.com/alanxoc3/concards-go/termhelp"
+	"github.com/alanxoc3/concards-go/algs"
+	"github.com/alanxoc3/concards-go/deck"
 	"github.com/chzyer/readline"
 )
 
 var completer = readline.NewPrefixCompleter(
-	readline.PcItem("reverse"),
-	readline.PcItem("reshow"),
+	readline.PcItem("yes"),
+	readline.PcItem("no"),
+	readline.PcItem("idk"),
+	readline.PcItem("ask"),
 	readline.PcItem("help"),
+	readline.PcItem("show"),
+	readline.PcItem("grps"),
+
+	// temp command
+	readline.PcItem("detail"),
+	readline.PcItem("howmany"),
 )
 
-func Run() {
+func Run(d deck.Deck) {
 	// Some basic Readline setup
 	l, err := readline.NewEx(&readline.Config{
 		Prompt:          "> ",
@@ -32,13 +41,6 @@ func Run() {
 	}
 
 	defer l.Close()
-
-	setPasswordCfg := l.GenPasswordConfig()
-	setPasswordCfg.SetListener(func(line []rune, pos int, key rune) (newLine []rune, newPos int, ok bool) {
-		l.SetPrompt(fmt.Sprintf("Enter password(%v): ", len(line)))
-		l.Refresh()
-		return nil, 0, false
-	})
 
 	for {
 		// Read line, quit on a ctrl-d
@@ -57,13 +59,37 @@ func Run() {
 		line = strings.TrimSpace(line)
 		switch {
 		case line == "help":
-			fmt.Println(termhelp.Help())
-		case strings.HasPrefix(line, "settop"):
-			readline.TopText = line + "\n"
-		case strings.HasPrefix(line, "setprompt"):
-			if len(line) <= 10 {
-				break
-			}
+			fmt.Println("help - displays this menu.              ")
+			fmt.Println("ask  - shows the question.              ")
+			fmt.Println("show - shows the answer.                ")
+			fmt.Println("grps - shows the groups this card is in.")
+			fmt.Println("yes  - passes the card.                 ")
+			fmt.Println("no   - fails the card.                  ")
+			fmt.Println("idk  - fails the card, but less harshly.")
+		case line == "ask":
+			fmt.Println(d.Top().FormatQuestion())
+		case line == "show":
+			fmt.Println(d.Top().FormatAnswer())
+		case line == "grps":
+			fmt.Println(d.Top().FormatGroups())
+		case line == "yes":
+			d.Top().Metadata.Execute(algs.YES)
+			d = d[1:] // pop top
+		case line == "no":
+			d.Top().Metadata.Execute(algs.NO)
+			d = append(d[1:], d[0]) // top to bottom
+		case line == "idk":
+			d.Top().Metadata.Execute(algs.IDK)
+			d = append(d[1:], d[0]) // top to bottom
+
+		case line == "detail":
+			fmt.Println(d.Top().FormatFile())
+		case line == "howmany":
+			fmt.Printf("There are %d cards left.\n", d.Len())
+		}
+
+		if d.Top() == nil {
+			return
 		}
 	}
 }
