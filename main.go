@@ -28,6 +28,11 @@ func main() {
 		return
 	}
 
+	fmt.Println("Printing File Breaks...")
+	for _, x := range d.FileBreaks {
+		x.Print()
+	}
+
 	//d.Deck.Print()
 
 	// fmt.Println("--START--")

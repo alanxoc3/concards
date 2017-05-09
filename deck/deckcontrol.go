@@ -1,27 +1,35 @@
+// remove ids soon
 package deck
 
 import (
+	"fmt"
+
 	"github.com/alanxoc3/concards-go/card"
 	"github.com/alanxoc3/concards-go/constring"
 )
 
+type FileBreak struct {
+	Id   int
+	Text string
+}
+
 // DeckControl contains a deck and controls what goes in it as well as which is the current card.
 type DeckControl struct {
-	counter int // incremented when cards are added, never decremented.
-	Deck    Deck
-	Groups  []string
+	counter    int // incremented when cards are added, never decremented.
+	Deck       Deck
+	Groups     []string
+	FileBreaks []FileBreak // the sections of the file that is not flash cards.
+}
+
+func (d *DeckControl) AddFileBreak(fb string) {
+	d.counter += 1
+	d.FileBreaks = append(d.FileBreaks, FileBreak{Id: d.counter, Text: fb})
 }
 
 // Use these to add another deck's cards to the deck.
 func (d *DeckControl) AddDeckWithId(od *DeckControl) {
 	for _, c := range od.Deck {
 		d.AddCardWithId(c)
-	}
-}
-
-func (d *DeckControl) AddDeckWithoutId(od *DeckControl) {
-	for _, c := range od.Deck {
-		d.AddCardWithoutId(c)
 	}
 }
 
@@ -68,4 +76,10 @@ func (d *DeckControl) ToStringFromGroup(group string) string {
 	list = d.Deck.FilterGroup(group)
 	list.Sort()
 	return list.ToString()
+}
+
+func (fb FileBreak) Print() {
+	fmt.Printf("---- File Break %d Begin ----\n", fb.Id)
+	fmt.Println(fb.Text)
+	fmt.Printf("---- File Break %d End   ----\n", fb.Id)
 }

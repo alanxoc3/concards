@@ -30,24 +30,44 @@ func Open(filename string) (d *DeckControl, err error) {
 	// Set up the line stuff
 	curLine := 1
 	scanner := bufio.NewScanner(file)
-	scanner.Scan()
-	eof := false
+	eof := !scanner.Scan()
 	var b *block
+	loopOnBatch := false // start out reading the preamble (text before cards).
 
 	// Loop through each batch.
 	for !eof {
-		// Step 1: Read a batch, aka the current group.
-		eof, b = readBatch(scanner, curLine)
-		curLine = b.end
+		if loopOnBatch {
+			// Read a batch, aka the current group.
+			eof, b = readBatch(scanner, curLine)
 
-		// Step 2: Put the batch into groups and a file.
-		od, err2 := batchToDeck(b, &filename)
-		if err2 != nil {
-			err = err2
-			return
+			// Put the batch into groups and a file.
+			od, err2 := batchToDeck(b, &filename)
+			if err2 != nil {
+				err = err2
+				return
+			}
+
+			d.AddDeckWithId(od)
+
+		} else {
+			// Read file break.
+			eof, b = readFileBreak(scanner, curLine)
+			fb := ""
+
+			for i, line := range b.lines {
+				fb += line
+				if i < len(b.lines)-1 {
+					fb += "\n"
+				}
+			}
+
+			if fb != "" {
+				d.AddFileBreak(fb)
+			}
 		}
 
-		d.AddDeckWithId(od)
+		curLine = b.end
+		loopOnBatch = !loopOnBatch
 	}
 
 	return
@@ -62,8 +82,8 @@ func batchToDeck(batch *block, filename *string) (*DeckControl, error) {
 	for ; i < len(batch.lines); i++ {
 		x := batch.lines[i]
 
-		if constring.DoesLineBeginWith(x, "## ") {
-			x = constring.TrimLineBegin(x, "## ")
+		if constring.DoesLineBeginWith(x, "##") {
+			x = constring.TrimLineBegin(x, "##")
 			deck.AddGroups(constring.StringToList(x))
 		} else if x != "" {
 			break
@@ -124,7 +144,7 @@ func readBatch(scanner *bufio.Scanner, curLine int) (eof bool, b *block) {
 		t := scanner.Text()
 		t = strings.TrimRight(t, "\t\n\r ")
 
-		parsedGroup := constring.DoesLineBeginWith(t, "## ")
+		parsedGroup := constring.DoesLineBeginWith(t, "##")
 
 		// Finish the group header section.
 		if onGroup && !parsedGroup && t != "" {
@@ -143,6 +163,47 @@ func readBatch(scanner *bufio.Scanner, curLine int) (eof bool, b *block) {
 		}
 
 		curLine++
+	}
+
+	b.end = curLine
+
+	return
+}
+
+// This needs scanner to have already scanned something before.
+func readFileBreak(scanner *bufio.Scanner, curLine int) (eof bool, b *block) {
+	b = &block{}
+	b.start = curLine
+	b.lines = make([]string, 0)
+
+	// If line is ##, then skip that line. If line is a group, get out of here.
+	t := scanner.Text()
+	t = strings.TrimRight(t, "\t\n\r ")
+	if t == "##" {
+		if !scanner.Scan() {
+			eof = true
+		}
+
+		curLine++
+	}
+
+	for !eof {
+		// Some preprocessing on the current line
+		t := scanner.Text()
+		t = strings.TrimRight(t, "\t\n\r ")
+
+		parsedGroup := constring.DoesLineBeginWith(t, "##") && t != "##"
+
+		if parsedGroup {
+			break
+		} else {
+			b.lines = append(b.lines, t)
+
+			curLine++
+			if !scanner.Scan() {
+				eof = true
+			}
+		}
 	}
 
 	b.end = curLine
