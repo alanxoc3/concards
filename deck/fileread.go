@@ -79,12 +79,19 @@ func Open(filename string) (d *DeckControl, err error) {
 	return
 }
 
+func isLineQuestion(line string) bool {
+	return !constring.DoesLineBeginWith(line, "\t") &&
+		!constring.DoesLineBeginWith(line, "    ") &&
+		!constring.DoesLineBeginWith(line, "~~") &&
+		constring.Trim(line) != ""
+}
+
 // Takes a batch and puts it into a subdeck. Could have parsing errors.
 func batchToDeck(batch *block, filename *string) (*DeckControl, error) {
 	deck := &DeckControl{}
 	i := 0
 
-	// Step 1: The top lines will be groups in a file, we will go through these.
+	// Step 1: The top lines will be groups in a batch, we will go through these.
 	for ; i < len(batch.lines); i++ {
 		x := batch.lines[i]
 
@@ -97,13 +104,14 @@ func batchToDeck(batch *block, filename *string) (*DeckControl, error) {
 	}
 
 	buff := make([]string, 0)
+	onQuestion := false
 
 	// Step 2: The rest of the lines will be cards.
 	for ; i < len(batch.lines); i++ {
 		x := batch.lines[i]
 
 		// This is when you create a card.
-		if x == "" && len(buff) != 0 {
+		if !onQuestion && isLineQuestion(x) && len(buff) != 0 {
 			c, err := card.New(buff)
 			if err != nil {
 				return nil, err
@@ -114,10 +122,15 @@ func batchToDeck(batch *block, filename *string) (*DeckControl, error) {
 
 			// Remember to empty the buffer for the next card.
 			buff = nil
-			continue
+			onQuestion = true
+		}
 
-			// Here we add buffer lines to a card.
-		} else if x != "" {
+		if !isLineQuestion(x) {
+			onQuestion = false
+		}
+
+		// Here we add buffer lines to a card.
+		if x != "" && len(buff) == 0 || len(buff) > 0 {
 			buff = append(buff, x)
 		}
 	}

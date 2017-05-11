@@ -30,11 +30,13 @@ func New(lines []string) (*Card, error) {
 	inQuestion := false
 	inAnswer := false
 	inMeta := false
+	inEmpty := false
 
 	// Helper vars with parsing.
 	ansDel := false
 	grpDel := false
 	metDel := false
+	empDel := false
 
 	for _, line := range lines {
 		// Preformatting for multiple spaces.
@@ -45,10 +47,11 @@ func New(lines []string) (*Card, error) {
 		ansDel = constring.DoesLineBeginWith(line, "\t")
 		grpDel = constring.DoesLineBeginWith(line, "## ")
 		metDel = constring.DoesLineBeginWith(line, "~~ ")
+		empDel = (constring.Trim(line) == "")
 
 		if grpDel {
 			// ERROR: Logic, shouldn't get ## in here.
-			return nil, errors.New("logic: found group delim in card")
+			return nil, errors.New("Logic Error: Found group delim in card")
 		}
 
 		// Check at the beginning.
@@ -59,7 +62,7 @@ func New(lines []string) (*Card, error) {
 			} else if ansDel {
 				// ERROR: Not only answer
 				return nil, errors.New("You can't have an answer on its own!")
-			} else {
+			} else if !empDel {
 				inQuestion = true
 				c.Question = line
 			}
@@ -79,7 +82,7 @@ func New(lines []string) (*Card, error) {
 				inAnswer = true
 				inQuestion = false
 				c.Answer = constring.TrimLineBegin(line, "\t")
-			} else {
+			} else if !empDel {
 				c.Question += "\n" + line
 			}
 
@@ -95,14 +98,22 @@ func New(lines []string) (*Card, error) {
 				}
 				c.Metadata = *alg
 			} else if ansDel {
+				// Add a single new line for all the empty lines in the answer.
+				if inEmpty {
+					c.Answer += "\n\t"
+					inEmpty = false
+				}
+
 				c.Answer += "\n" + constring.TrimLineBegin(line, "\t")
+			} else if empDel {
+				inEmpty = true
 			} else {
 				// ERROR: Not only meta
 				return nil, errors.New("Can't have a question in the answer.")
 			}
 
 			// This means there was stuff after the meta data.
-		} else {
+		} else if !empDel {
 			// assert(inMeta && !inQuestion && !inAnswer)
 			return nil, errors.New("Found extra lines after the metadata.")
 		}

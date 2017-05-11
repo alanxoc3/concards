@@ -63,8 +63,7 @@ func EditDeck(editor string, d Deck, message string) {
 	} else {
 		copyDeckContents(&d, &dc.Deck)
 	}
-
-	fmt.Printf("%s is the filename.\n", tempFile.Name())
+	// fmt.Printf("%s is the filename.\n", tempFile.Name())
 }
 
 func copyDeckContents(dst, src *Deck) {
