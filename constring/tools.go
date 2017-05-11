@@ -6,6 +6,11 @@ import "errors"
 import "time"
 import "fmt"
 
+func TrimRight(t string) string {
+	// stub
+	return t
+}
+
 func TrimLineBegin(line string, trimStr string) string {
 	if len(trimStr) > len(line) {
 		return ""
@@ -35,11 +40,11 @@ func DoesLineBeginWith(line string, test string) bool {
 	return true
 }
 
-func TabsToNewlines(str *string) string {
+func TabsToNewlines(str string) string {
 	newStr := ""
-	for i := 0; i < len(*str); i++ {
-		newStr += string((*str)[i])
-		if string((*str)[i]) == "\n" {
+	for _, x := range str {
+		newStr += string(x)
+		if string(x) == "\n" {
 			newStr += "\t"
 		}
 	}

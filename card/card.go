@@ -147,7 +147,7 @@ func (c *Card) FormatQuestion() string {
 
 // Prints out the card according to the format needed for the file.
 func (c *Card) FormatAnswer() string {
-	str := "\t" + constring.TabsToNewlines(&c.Answer)
+	str := "\t" + constring.TabsToNewlines(c.Answer)
 	return str
 }
 
@@ -162,7 +162,7 @@ func (c *Card) FormatFile() string {
 	str := c.Question
 
 	if c.Answer != "" {
-		str += "\n\t" + constring.TabsToNewlines(&c.Answer)
+		str += "\n\t" + constring.TabsToNewlines(c.Answer)
 	}
 
 	str += "\n~~ " + c.Metadata.ToString()
