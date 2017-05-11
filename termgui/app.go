@@ -7,6 +7,7 @@ import (
 
 	"github.com/alanxoc3/concards-go/algs"
 	"github.com/alanxoc3/concards-go/deck"
+	"github.com/alanxoc3/concards-go/termhelp"
 	"github.com/chzyer/readline"
 )
 
@@ -14,6 +15,8 @@ var completer = readline.NewPrefixCompleter(
 	readline.PcItem("yes"),
 	readline.PcItem("no"),
 	readline.PcItem("idk"),
+	readline.PcItem("editdeck"),
+	readline.PcItem("editcard"),
 	readline.PcItem("ask"),
 	readline.PcItem("help"),
 	readline.PcItem("show"),
@@ -24,7 +27,7 @@ var completer = readline.NewPrefixCompleter(
 	readline.PcItem("howmany"),
 )
 
-func Run(d deck.Deck) {
+func Run(d deck.Deck, cfg *termhelp.Config) {
 	// Some basic Readline setup
 	l, err := readline.NewEx(&readline.Config{
 		Prompt:          "> ",
@@ -81,6 +84,12 @@ func Run(d deck.Deck) {
 		case line == "idk":
 			d.Top().Metadata.Execute(algs.IDK)
 			d = append(d[1:], d[0]) // top to bottom
+
+		case line == "editdeck":
+			deck.EditDeck(cfg.Editor, d, "You may ONLY EDIT the cards here.\nREARRANGING, DELETING, or ADDING cards WILL CORRUPT your files.")
+
+		case line == "editcard":
+			deck.EditCard(cfg.Editor, d.Top(), "You may ONLY EDIT the cards here.\nREARRANGING, DELETING, or ADDING cards WILL CORRUPT your files.")
 
 		case line == "detail":
 			fmt.Println(d.Top().FormatFile())

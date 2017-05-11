@@ -22,16 +22,20 @@ func main() {
 
 	cfg.Print()
 
-	d, err := deck.Open("sample.txt")
+	d, err := deck.Open(cfg.Files[0])
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	fmt.Println("Printing File Breaks...")
-	for _, x := range d.FileBreaks {
-		x.Print()
-	}
+	//fmt.Println("----------- file begin  -----------")
+	//fmt.Print(d.ToString())
+	//fmt.Println("----------- file end    -----------")
+
+	//fmt.Println("Printing File Breaks...")
+	//for _, x := range d.FileBreaks {
+	//x.Print()
+	//}
 
 	//d.Deck.Print()
 
@@ -55,5 +59,12 @@ func main() {
 		sessionDeck = append(sessionDeck, d.Deck.FilterDone()...)
 	}
 
-	termgui.Run(sessionDeck)
+	termgui.Run(sessionDeck, cfg)
+
+	// For writing the deck
+	if err := deck.WriteDeckControl(d); err != nil {
+		fmt.Println(err)
+		return
+	}
+
 }

@@ -56,7 +56,7 @@ func Open(filename string) (d *DeckControl, err error) {
 
 			for i, line := range b.lines {
 				fb += line
-				if i < len(b.lines)-1 {
+				if !eof || i < len(b.lines)-1 {
 					fb += "\n"
 				}
 			}
@@ -68,6 +68,12 @@ func Open(filename string) (d *DeckControl, err error) {
 
 		curLine = b.end
 		loopOnBatch = !loopOnBatch
+	}
+
+	if len(d.Deck) > 0 {
+		d.Filename = filename
+	} else { // the file had no cards.
+		err = fmt.Errorf("File \"%s\" had no cards in it.", filename)
 	}
 
 	return
@@ -152,6 +158,8 @@ func readBatch(scanner *bufio.Scanner, curLine int) (eof bool, b *block) {
 
 			// If the last thing is a group, then you are done.
 		} else if !onGroup && parsedGroup {
+			break
+		} else if t == "##" {
 			break
 		}
 

@@ -15,15 +15,16 @@ type FileBreak struct {
 
 // DeckControl contains a deck and controls what goes in it as well as which is the current card.
 type DeckControl struct {
+	Filename   string
 	counter    int // incremented when cards are added, never decremented.
 	Deck       Deck
 	Groups     []string
-	FileBreaks []FileBreak // the sections of the file that is not flash cards.
+	fileBreaks []FileBreak // the sections of the file that is not flash cards.
 }
 
 func (d *DeckControl) AddFileBreak(fb string) {
 	d.counter += 1
-	d.FileBreaks = append(d.FileBreaks, FileBreak{Id: d.counter, Text: fb})
+	d.fileBreaks = append(d.fileBreaks, FileBreak{Id: d.counter, Text: fb})
 }
 
 // Use these to add another deck's cards to the deck.
@@ -43,7 +44,7 @@ func (d *DeckControl) AddGroups(gps *[]string) {
 }
 
 // These are what adds cards. The main decks should have ids.
-func (d *DeckControl) AddCardWithoutId(c *card.Card) {
+func (d *DeckControl) addCardWithoutId(c *card.Card) {
 	d.counter += 1
 	d.AddGroups(&c.Groups)
 	d.Deck = append(d.Deck, c)
@@ -51,31 +52,50 @@ func (d *DeckControl) AddCardWithoutId(c *card.Card) {
 
 func (d *DeckControl) AddCardWithId(c *card.Card) {
 	c.Id = d.counter
-	d.AddCardWithoutId(c)
+	d.addCardWithoutId(c)
 }
 
-// given a file name, returns a string of all the cards part of that file.
-func (d *DeckControl) ToStringFromFile(file string) string {
-	var list Deck
-	list = d.Deck.FilterFile(file)
+// returns a string of all the cards in their sorted order.
+func (d *DeckControl) ToString() string {
+	// Step 1: Make a sorted copy of the deck.
+	list := make(Deck, len(d.Deck))
+	copy(list, d.Deck)
 	list.Sort()
-	return list.ToString()
-}
 
-// given a bunch of groups,
-func (d *DeckControl) ToStringFromGroups(groups []string) string {
-	var list Deck
-	list = d.Deck.FilterGroups(groups)
-	list.Sort()
-	return list.ToString()
-}
+	// Step 2: Make a string and temporary deck.
+	str := ""
+	var tmp Deck
 
-// given a file name, returns a string of all the cards part of that file.
-func (d *DeckControl) ToStringFromGroup(group string) string {
-	var list Deck
-	list = d.Deck.FilterGroup(group)
-	list.Sort()
-	return list.ToString()
+	// Step 3: Loop through both File Breaks and Cards, putting the ids in order.
+	// i is for list, j is for d.fileBreaks
+	for i, j := 0, 0; i+j <= len(list)+len(d.fileBreaks); {
+		listFin := (i == len(list))
+		breakFin := (j == len(d.fileBreaks))
+		done := (breakFin && listFin)
+		listTurn := !breakFin && !listFin && (list[i].Id < d.fileBreaks[j].Id) || breakFin && !listFin
+		breakTurn := !listTurn
+
+		if done || breakTurn {
+			if len(tmp) != 0 {
+				str += tmp.ToString()
+				str += "##\n"
+				tmp = nil
+			}
+		}
+
+		if done {
+			break
+		} else if listTurn {
+			tmp = append(tmp, list[i])
+			i++
+		} else if breakTurn {
+			str += d.fileBreaks[j].Text
+			j++
+		}
+
+		//fmt.Printf("i is %d, j is %d\n", i, j)
+	}
+	return str
 }
 
 func (fb FileBreak) Print() {

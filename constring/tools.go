@@ -155,7 +155,11 @@ func IsInStrList(list1 []string, item string) bool {
 	return false
 }
 
-func StringListsIdentical(list1 []string, list2 []string) bool {
+func StringListsIdentical(l1 []string, l2 []string) bool {
+	list1 := make([]string, len(l1))
+	list2 := make([]string, len(l2))
+	copy(list1, l1)
+	copy(list2, l2)
 	sort.Strings(list1)
 	sort.Strings(list2)
 
@@ -186,11 +190,15 @@ func GroupListToString(list []string) string {
 	return retStr
 }
 
-func ListHasOtherList(list1 []string, list2 []string) bool {
-	if len(list1) < len(list2) {
+func ListHasOtherList(l1 []string, l2 []string) bool {
+	if len(l1) < len(l2) {
 		return false
 	}
 
+	list1 := make([]string, len(l1))
+	list2 := make([]string, len(l2))
+	copy(list1, l1)
+	copy(list2, l2)
 	sort.Strings(list1)
 	sort.Strings(list2)
 

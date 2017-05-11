@@ -192,7 +192,7 @@ func configInit() *Config {
 	var cfg Config
 	cfg.MainScreen = true
 	cfg.ViewMode = true
-	cfg.Editor = "$EDITOR"
+	cfg.Editor = ""
 	cfg.Groups = make(map[string]bool)
 	return &cfg
 }
