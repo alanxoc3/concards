@@ -2,16 +2,28 @@ package deck
 
 type DeckControls []*DeckControl
 
-func (decks DeckControls) FilterFile(param string) (out_deck Deck) {
+// Writes multiple deck controls
+func (decks DeckControls) Write() error {
 	for _, d := range decks {
-		out_deck = append(out_deck, d.Deck.FilterFile(param)...)
+		err := d.Write()
+		if err != nil {
+			return err
+		}
 	}
-	return
+
+	return nil
 }
 
 func (decks DeckControls) FilterGroups(param []string) (out_deck Deck) {
 	for _, d := range decks {
 		out_deck = append(out_deck, d.Deck.FilterGroups(param)...)
+	}
+	return
+}
+
+func (decks DeckControls) FilterGroupsAdd(param []string) (out_deck Deck) {
+	for _, d := range decks {
+		out_deck = append(out_deck, d.Deck.FilterGroupsAdd(param)...)
 	}
 	return
 }

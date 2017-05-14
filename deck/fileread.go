@@ -23,7 +23,7 @@ func Open(filename string) (d *DeckControl, err error) {
 
 	file, err1 := os.Open(filename)
 	if err1 != nil {
-		err = fmt.Errorf("Error: Unable to open file \"%s\"")
+		err = fmt.Errorf("Error: Unable to open file \"%s\"", filename)
 		return
 	}
 

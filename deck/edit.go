@@ -18,7 +18,10 @@ func min(a, b int) int {
 	}
 }
 
-func EditDeck(editor string, d Deck, message string) error {
+// Assumes the deck is sorted how you want it to be sorted.
+func EditDeck(editor string, d Deck) error {
+	message := "You may ONLY EDIT the cards here.\nREARRANGING, DELETING, or ADDING cards WILL CORRUPT your files."
+
 	env := editor
 	d.Sort()
 
@@ -70,8 +73,8 @@ func copyDeckContents(dst, src *Deck) {
 	}
 }
 
-func EditCard(editor string, c *card.Card, message string) error {
+func EditCard(editor string, c *card.Card) error {
 	var d Deck
 	d = append(d, c)
-	return EditDeck(editor, d, message)
+	return EditDeck(editor, d)
 }

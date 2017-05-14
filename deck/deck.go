@@ -49,7 +49,7 @@ func (cards Deck) ToString() string {
 func (cards Deck) Shuffle() {
 	// start at the end of the deck, go down.
 	for i := len(cards) - 1; i > 0; i-- {
-		swapPlace := rand.Intn(i)
+		swapPlace := rand.Intn(i + 1) // The plus one is to enable the card to remain in the same place.
 		cards.Swap(i, swapPlace)
 	}
 }

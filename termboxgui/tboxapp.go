@@ -7,7 +7,7 @@ import (
 	termbox "github.com/nsf/termbox-go"
 )
 
-func TermBoxRun(d deck.Deck, cfg *termhelp.Config, ctrl []*deck.DeckControl) error {
+func TermBoxRun(d deck.Deck, cfg *termhelp.Config, ctrl deck.DeckControls) error {
 	err := termbox.Init()
 	if err != nil {
 		return err
@@ -43,7 +43,7 @@ func TermBoxRun(d deck.Deck, cfg *termhelp.Config, ctrl []*deck.DeckControl) err
 			} else if inp == "h" {
 				help_mode = !help_mode
 			} else if inp == "w" {
-				err = deck.WriteDeckControls(ctrl)
+				err = ctrl.Write()
 				if err != nil {
 					update_stat_msg(err.Error(), termbox.ColorRed)
 				} else {
@@ -63,7 +63,7 @@ func TermBoxRun(d deck.Deck, cfg *termhelp.Config, ctrl []*deck.DeckControl) err
 					d = d[1:]
 					card_shown = false
 				} else if inp == "e" {
-					err := deck.EditCard(cfg.Editor, d.Top(), "You may ONLY EDIT the cards here.\nREARRANGING, DELETING, or ADDING cards WILL CORRUPT your files.")
+					err := deck.EditCard(cfg.Editor, d.Top())
 
 					if err != nil {
 						update_stat_msg(err.Error(), termbox.ColorRed)

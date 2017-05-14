@@ -5,6 +5,14 @@ import "fmt"
 import "github.com/alanxoc3/concards-go/constring"
 import "strconv"
 
+type UsageMode int
+
+const (
+	VIEWMODE  UsageMode = iota
+	EDITMODE            = iota
+	PRINTMODE           = iota
+)
+
 type Config struct {
 	// The various true or false options
 	Review        bool
@@ -17,19 +25,16 @@ type Config struct {
 	Version bool
 	Color   bool
 
-	ViewMode   bool
-	EditMode   bool
-	PrintMode  bool
-	UpdateMode bool
+	Usage UsageMode
 
-	MainScreen bool
-	Write      bool
+	UpdateMode bool // Just writes files.
 	Editor     string
 
 	// The variable options passed in.
-	Number int
-	Groups map[string]bool
-	Files  []string
+	Number      int
+	Groups      map[string]bool
+	GroupsSlice []string
+	Files       []string
 
 	Opts []*Option
 }
@@ -50,17 +55,21 @@ func ParseConfig(args []string) (*Config, error) {
 
 		if curLen == 0 {
 			// ERROR empty parameter
-			return nil, errors.New("You entered an empty parameter.")
+			return nil, errors.New("Error: You entered an empty parameter.")
 		}
 
 		if pc.waitForGroup { // PARSE GROUP STRINGS
 			pc.waitForGroup = false
 			lst := constring.StringToList(arg)
+			if len(*lst) == 0 {
+				return nil, fmt.Errorf("Error: You tried to pass an empty group list.")
+			}
+
 			for _, x := range *lst {
 				if cfg.Groups[x] == false {
 					cfg.Groups[x] = true
 				} else { // ERROR same group
-					return nil, errors.New("You tried to pass the same group multiple times.")
+					return nil, errors.New("Error: You tried to pass the same group multiple times.")
 				}
 			}
 
@@ -68,7 +77,7 @@ func ParseConfig(args []string) (*Config, error) {
 			pc.waitForNum = false
 			num, err := strconv.Atoi(arg)
 			if err != nil {
-				return nil, errors.New("You didn't pass a number to the number option.")
+				return nil, errors.New("Error: You didn't pass a number to the number option.")
 			}
 			cfg.Number = num
 		} else if pc.waitForEditor { // PARSE STRING
@@ -78,13 +87,13 @@ func ParseConfig(args []string) (*Config, error) {
 			if arg[0] == '-' {
 				if curLen == 1 {
 					// ERROR, there is an argument with just a dash!
-					return nil, errors.New("You entered a dash with no options.")
+					return nil, errors.New("Error: You entered a dash with no options.")
 				}
 
 				if arg[1] == '-' { // Double Dash (Mario Kart?)
 					if curLen == 2 {
 						// ERROR, there is an argument with just two dashes!
-						return nil, errors.New("You entered two dashes with no options.")
+						return nil, errors.New("Error: You entered two dashes with no options.")
 					}
 					tmpArg = arg[2:]
 					err := executeCommand(&tmpArg, &pc, cfg)
@@ -96,7 +105,7 @@ func ParseConfig(args []string) (*Config, error) {
 					tmpArg = arg[1:]
 					for i := 0; i < len(tmpArg); i++ {
 						if pc.check() {
-							return nil, errors.New("You didn't provide a parameter for one of the options.")
+							return nil, errors.New("Error: You didn't provide a parameter for one of the options.")
 						}
 						err := executeAlias(tmpArg[i], &pc, cfg)
 						if err != nil {
@@ -112,7 +121,7 @@ func ParseConfig(args []string) (*Config, error) {
 	}
 
 	if pc.check() {
-		return nil, errors.New("You didn't provide a parameter for one of the options.")
+		return nil, errors.New("Error: You didn't provide a parameter for one of the options.")
 	}
 
 	return cfg, nil
@@ -120,13 +129,15 @@ func ParseConfig(args []string) (*Config, error) {
 
 // For debugging purposes.
 func (cfg *Config) Print() {
-	fmt.Printf("REV - MEM - DON - num - grp - hlp - ver - col - scr - wri\n")
-	fmt.Printf("%t %t %t %t %t %t %t %t %t %t\n", cfg.Review,
+	fmt.Printf("REV - MEM - DON - num - grp - hlp - ver\n")
+	fmt.Printf("%t %t %t %t %t %t %t\n", cfg.Review,
 		cfg.Memorize, cfg.Done, cfg.NumberEnabled, cfg.GroupsEnabled, cfg.Help,
-		cfg.Version, cfg.Color, cfg.MainScreen, cfg.Write)
+		cfg.Version)
+	fmt.Printf("VIE - EDI - PRI - UPD\n")
+	fmt.Printf("%t %d\n", cfg.UpdateMode, cfg.Usage)
 
-	fmt.Printf("ED: %s | NUM: %d | GRP %v | FIL %v\n\n", cfg.Editor,
-		cfg.Number, cfg.Groups, cfg.Files)
+	fmt.Printf("ED: %s | NUM: %d | GRP %v | FIL %v | GRPSLC %v\n\n", cfg.Editor,
+		cfg.Number, cfg.Groups, cfg.Files, cfg.GroupsSlice)
 }
 
 // Helpers...
@@ -143,30 +154,25 @@ func executeCommandWithNumber(num int, pc *parseConfig, cfg *Config) error {
 		cfg.GroupsEnabled = true
 	case NUMBER:
 		pc.waitForNum = true
+		cfg.NumberEnabled = true
 	case ONE:
 		cfg.Number = 1
 		cfg.NumberEnabled = true
 	case EDIT:
-		cfg.EditMode = true
+		cfg.Usage = EDITMODE
 	case PRINT:
-		cfg.PrintMode = true
+		cfg.Usage = PRINTMODE
 	case UPDATE:
 		cfg.UpdateMode = true
 	case HELP:
 		cfg.Help = true
 	case VERSION:
 		cfg.Version = true
-	case COLOR:
-		cfg.Color = true
-	case NOMAIN:
-		cfg.MainScreen = false
-	case NOWRITE:
-		cfg.Write = false
 	case EDITOR:
 		pc.waitForEditor = true
 	default:
 		// It doesn't exist here
-		return errors.New("You have an invalid command-line option.")
+		return errors.New("Error: You have an invalid command-line option.")
 	}
 
 	return nil
@@ -190,8 +196,6 @@ type parseConfig struct {
 func configInit() *Config {
 	// Everything besides these are set to false or 0
 	var cfg Config
-	cfg.MainScreen = true
-	cfg.ViewMode = true
 	cfg.Editor = ""
 	cfg.Groups = make(map[string]bool)
 	return &cfg

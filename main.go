@@ -23,30 +23,70 @@ func main() {
 
 	cfg, err := termhelp.ValidateAndParseConfig(os.Args)
 	do_err(err)
+	if cfg == nil {
+		os.Exit(0)
+	}
+
+	//cfg.Print()
 
 	decks, err := deck.OpenDecks(cfg.Files)
 	do_err(err)
 
-	var sessionDeck deck.Deck
+	writeFunc := func() {
+		err := decks.Write()
+		do_err(err)
+	}
 
+	if cfg.UpdateMode {
+		writeFunc()
+
+	} else {
+		session, err := gen_session_deck(cfg, decks)
+		do_err(err)
+
+		if cfg.Usage == termhelp.VIEWMODE {
+			err = termboxgui.TermBoxRun(session, cfg, decks)
+			writeFunc()
+			do_err(err)
+		} else if cfg.Usage == termhelp.EDITMODE {
+			session.Sort()
+			err = deck.EditDeck(cfg.Editor, session)
+			writeFunc()
+			do_err(err)
+		} else if cfg.Usage == termhelp.PRINTMODE {
+			fmt.Print(session.ToString())
+		}
+	}
+}
+
+func gen_session_deck(cfg *termhelp.Config, decks deck.DeckControls) (session deck.Deck, err error) {
+	// Build Deck
 	if cfg.Review {
-		sessionDeck = append(sessionDeck, decks.FilterReview()...)
+		session = append(session, decks.FilterReview()...)
 	}
 
 	if cfg.Memorize {
-		sessionDeck = append(sessionDeck, decks.FilterMemorize()...)
+		session = append(session, decks.FilterMemorize()...)
 	}
 
 	if cfg.Done {
-		sessionDeck = append(sessionDeck, decks.FilterDone()...)
+		session = append(session, decks.FilterDone()...)
 	}
 
-	sessionDeck.Shuffle()
+	// Filter Deck
+	if cfg.GroupsEnabled {
+		session = session.FilterGroupsAdd(cfg.GroupsSlice)
+	}
 
-	err = termboxgui.TermBoxRun(sessionDeck, cfg, decks)
-	do_err(err)
+	session.Shuffle()
 
-	// For writing the deck
-	err = deck.WriteDeckControls(decks)
-	do_err(err)
+	if cfg.NumberEnabled {
+		session = session.FilterNumber(cfg.Number)
+	}
+
+	if len(session) == 0 {
+		return nil, fmt.Errorf("Error: There were no cards that met your demands.")
+	}
+
+	return
 }

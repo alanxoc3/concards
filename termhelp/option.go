@@ -22,13 +22,13 @@ func newOptionNoParam(alias byte, command string, description string) *Option {
 	return newOption(alias, command, "", description)
 }
 
-func optionToString(opt *Option) (ret string) {
+func (opt *Option) ToString() (ret string) {
 	ret += fmt.Sprintf("  ")
 
 	if opt.Alias == 0 {
 		ret += fmt.Sprintf("    ")
 	} else {
-		ret += fmt.Sprintf("-%s, ", opt.Alias)
+		ret += fmt.Sprintf("-%s, ", string(opt.Alias))
 	}
 
 	if opt.Param == "" {

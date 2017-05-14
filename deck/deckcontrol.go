@@ -8,6 +8,8 @@ import (
 	"github.com/alanxoc3/concards-go/constring"
 )
 
+var counter int = 0
+
 type FileBreak struct {
 	Id   int
 	Text string
@@ -16,15 +18,14 @@ type FileBreak struct {
 // DeckControl contains a deck and controls what goes in it as well as which is the current card.
 type DeckControl struct {
 	Filename   string
-	counter    int // incremented when cards are added, never decremented.
 	Deck       Deck
 	Groups     []string
 	fileBreaks []FileBreak // the sections of the file that is not flash cards.
 }
 
 func (d *DeckControl) AddFileBreak(fb string) {
-	d.counter += 1
-	d.fileBreaks = append(d.fileBreaks, FileBreak{Id: d.counter, Text: fb})
+	counter += 1
+	d.fileBreaks = append(d.fileBreaks, FileBreak{Id: counter, Text: fb})
 }
 
 // Use these to add another deck's cards to the deck.
@@ -45,13 +46,13 @@ func (d *DeckControl) AddGroups(gps *[]string) {
 
 // These are what adds cards. The main decks should have ids.
 func (d *DeckControl) addCardWithoutId(c *card.Card) {
-	d.counter += 1
+	counter += 1
 	d.AddGroups(&c.Groups)
 	d.Deck = append(d.Deck, c)
 }
 
 func (d *DeckControl) AddCardWithId(c *card.Card) {
-	c.Id = d.counter
+	c.Id = counter
 	d.addCardWithoutId(c)
 }
 
