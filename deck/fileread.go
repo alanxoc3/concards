@@ -23,7 +23,7 @@ func Open(filename string) (d *DeckControl, err error) {
 
 	file, err1 := os.Open(filename)
 	if err1 != nil {
-		err = fmt.Errorf("Unable to open deck: %s", err)
+		err = fmt.Errorf("Error: Unable to open file \"%s\"")
 		return
 	}
 
@@ -73,7 +73,7 @@ func Open(filename string) (d *DeckControl, err error) {
 	if len(d.Deck) > 0 {
 		d.Filename = filename
 	} else { // the file had no cards.
-		err = fmt.Errorf("File \"%s\" had no cards in it.", filename)
+		err = fmt.Errorf("Error: File \"%s\" had no cards in it.", filename)
 	}
 
 	return
@@ -114,7 +114,7 @@ func batchToDeck(batch *block, filename *string) (*DeckControl, error) {
 		if !onQuestion && isLineQuestion(x) && len(buff) != 0 {
 			c, err := card.New(buff)
 			if err != nil {
-				return nil, err
+				return nil, fmt.Errorf("Error: \"%s\" near line %d. %s", *filename, batch.start+i, err)
 			}
 			c.File = *filename
 			c.Groups = deck.Groups
@@ -139,7 +139,7 @@ func batchToDeck(batch *block, filename *string) (*DeckControl, error) {
 	if len(buff) != 0 {
 		c, err := card.New(buff)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("Error: \"%s\" near line %d. %s", *filename, batch.start+i, err)
 		}
 		c.File = *filename
 		c.Groups = deck.Groups

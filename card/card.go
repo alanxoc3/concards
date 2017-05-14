@@ -34,7 +34,6 @@ func New(lines []string) (*Card, error) {
 
 	// Helper vars with parsing.
 	ansDel := false
-	grpDel := false
 	metDel := false
 	empDel := false
 
@@ -45,14 +44,8 @@ func New(lines []string) (*Card, error) {
 		}
 
 		ansDel = constring.DoesLineBeginWith(line, "\t")
-		grpDel = constring.DoesLineBeginWith(line, "## ")
 		metDel = constring.DoesLineBeginWith(line, "~~ ")
 		empDel = (constring.Trim(line) == "")
-
-		if grpDel {
-			// ERROR: Logic, shouldn't get ## in here.
-			return nil, errors.New("Logic Error: Found group delim in card")
-		}
 
 		// Check at the beginning.
 		if !(inMeta || inAnswer || inQuestion) {
@@ -168,4 +161,8 @@ func (c *Card) FormatFile() string {
 	str += "\n~~ " + c.Metadata.ToString()
 
 	return str
+}
+
+func (c *Card) HasAnswer() bool {
+	return c.Answer != ""
 }

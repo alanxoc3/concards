@@ -1,8 +1,21 @@
 package deck
 
 import (
+	"fmt"
 	"io/ioutil"
 )
+
+// Writes multiple deck controls
+func WriteDeckControls(dcks []*DeckControl) error {
+	for _, d := range dcks {
+		err := WriteDeckControl(d)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
 
 // Assumes a sorted deck by Id.
 // Will write in blocks. The first block will be up until a different file is
@@ -11,7 +24,7 @@ func WriteDeckControl(d *DeckControl) error {
 	str := []byte(d.ToString())
 	err := ioutil.WriteFile(d.Filename, str, 0644)
 	if err != nil {
-		return err
+		return fmt.Errorf("Error: Writing to \"%s\" failed.", d.Filename)
 	}
 
 	return nil
@@ -21,7 +34,7 @@ func WriteDeck(d *Deck, filename string, message string) error {
 	str := []byte(message + "\n\n" + d.ToString())
 	err := ioutil.WriteFile(filename, str, 0644)
 	if err != nil {
-		return err
+		return fmt.Errorf("Error: Writing to \"%s\" failed.", filename)
 	}
 
 	return nil

@@ -7,64 +7,46 @@ import (
 	"time"
 
 	"github.com/alanxoc3/concards-go/deck"
-	"github.com/alanxoc3/concards-go/termgui"
+	"github.com/alanxoc3/concards-go/termboxgui"
 	"github.com/alanxoc3/concards-go/termhelp"
 )
 
 func main() {
+	do_err := func(err error) {
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err.Error())
+			os.Exit(1)
+		}
+	}
+
 	rand.Seed(time.Now().UTC().UnixNano())
 
 	cfg, err := termhelp.ValidateAndParseConfig(os.Args)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+	do_err(err)
 
-	cfg.Print()
-
-	d, err := deck.Open(cfg.Files[0])
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	//fmt.Println("----------- file begin  -----------")
-	//fmt.Print(d.ToString())
-	//fmt.Println("----------- file end    -----------")
-
-	//fmt.Println("Printing File Breaks...")
-	//for _, x := range d.FileBreaks {
-	//x.Print()
-	//}
-
-	//d.Deck.Print()
-
-	// fmt.Println("--START--")
-	// fmt.Print(d.ToStringFromFile("sample.txt"))
-	// fmt.Println("--END--")
-
-	d.Deck.Shuffle()
+	decks, err := deck.OpenDecks(cfg.Files)
+	do_err(err)
 
 	var sessionDeck deck.Deck
 
 	if cfg.Review {
-		sessionDeck = append(sessionDeck, d.Deck.FilterReview()...)
+		sessionDeck = append(sessionDeck, decks.FilterReview()...)
 	}
 
 	if cfg.Memorize {
-		sessionDeck = append(sessionDeck, d.Deck.FilterMemorize()...)
+		sessionDeck = append(sessionDeck, decks.FilterMemorize()...)
 	}
 
 	if cfg.Done {
-		sessionDeck = append(sessionDeck, d.Deck.FilterDone()...)
+		sessionDeck = append(sessionDeck, decks.FilterDone()...)
 	}
 
-	termgui.Run(sessionDeck, cfg)
+	sessionDeck.Shuffle()
+
+	err = termboxgui.TermBoxRun(sessionDeck, cfg, decks)
+	do_err(err)
 
 	// For writing the deck
-	if err := deck.WriteDeckControl(d); err != nil {
-		fmt.Println(err)
-		return
-	}
-
+	err = deck.WriteDeckControls(decks)
+	do_err(err)
 }

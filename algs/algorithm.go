@@ -2,14 +2,16 @@ package algs
 
 import "time"
 
+type Know uint16
+
 const (
-	NO  = iota
-	IDK = iota
-	YES = iota
+	NO  Know = iota
+	IDK      = iota
+	YES      = iota
 )
 
 // Implementing the SM2 algorithm.
-func (s *SpaceAlg) Execute(input int) {
+func (s *SpaceAlg) Execute(input Know) {
 	// If today is after the next day, then we can review the card.
 	if time.Now().Before(s.Next) && input == YES {
 		return

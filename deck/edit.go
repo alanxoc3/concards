@@ -1,6 +1,7 @@
 package deck
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -17,26 +18,23 @@ func min(a, b int) int {
 	}
 }
 
-func EditDeck(editor string, d Deck, message string) {
+func EditDeck(editor string, d Deck, message string) error {
 	env := editor
 	d.Sort()
 
 	if env == "" {
 		if env = os.Getenv("EDITOR"); env == "" {
-			fmt.Println("Error: Your \"EDITOR\" environment variable isn't set.")
-			return
+			return fmt.Errorf("Error: Your \"EDITOR\" environment variable isn't set.")
 		}
 	}
 
 	if _, err := exec.LookPath(env); err != nil {
-		fmt.Printf("Error: \"%s\" is not installed on this machine.", editor)
-		return
+		return fmt.Errorf("Error: \"%s\" is not installed on this machine.", editor)
 	}
 
 	tempFile, err := ioutil.TempFile("", "concards")
 	if err != nil {
-		fmt.Printf("Error: Couldn't create a temporary file for editing.\n")
-		return
+		return fmt.Errorf("Error: Couldn't create a temporary file for editing.\n")
 	}
 
 	// It doesn't really matter if there is an error removing the temp file.
@@ -44,8 +42,7 @@ func EditDeck(editor string, d Deck, message string) {
 
 	err = WriteDeck(&d, tempFile.Name(), message)
 	if err != nil {
-		fmt.Printf("Error: Couldn't write to a temporary file for editing.\n")
-		return
+		return fmt.Errorf("Error: Couldn't write to a temporary file for editing.\n")
 	}
 
 	cmd := exec.Command(env, tempFile.Name())
@@ -53,17 +50,16 @@ func EditDeck(editor string, d Deck, message string) {
 	cmd.Stdout = os.Stdout
 
 	if err := cmd.Run(); err != nil {
-		fmt.Printf("Error: The editor returned an error code.")
-		return
+		errors.New(fmt.Sprintf("Error: The editor returned an error code."))
 	}
 
 	if dc, err := Open(tempFile.Name()); err != nil {
-		fmt.Printf("Error: \"%s\"", err)
-		return
+		return err
 	} else {
 		copyDeckContents(&d, &dc.Deck)
 	}
-	// fmt.Printf("%s is the filename.\n", tempFile.Name())
+
+	return nil
 }
 
 func copyDeckContents(dst, src *Deck) {
@@ -74,8 +70,8 @@ func copyDeckContents(dst, src *Deck) {
 	}
 }
 
-func EditCard(editor string, c *card.Card, message string) {
+func EditCard(editor string, c *card.Card, message string) error {
 	var d Deck
 	d = append(d, c)
-	EditDeck(editor, d, message)
+	return EditDeck(editor, d, message)
 }
