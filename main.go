@@ -54,6 +54,7 @@ func main() {
 			writeFunc()
 			do_err(err)
 		} else if cfg.Usage == termhelp.PRINTMODE {
+			session.Sort()
 			fmt.Print(session.ToString())
 		}
 	}

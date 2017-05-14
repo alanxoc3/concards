@@ -71,6 +71,7 @@ func TermBoxRun(d deck.Deck, cfg *termhelp.Config, ctrl deck.DeckControls) error
 						update_stat_msg("Card was successfully edited.", termbox.ColorYellow)
 					}
 					finished_editing = true
+					card_shown = false
 				} else if inp == " " || inp == "\r" {
 					if d.Top().HasAnswer() {
 						card_shown = !card_shown

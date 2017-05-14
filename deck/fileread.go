@@ -104,7 +104,7 @@ func batchToDeck(batch *block, filename *string) (*DeckControl, error) {
 	}
 
 	buff := make([]string, 0)
-	onQuestion := false
+	onQuestion := true
 
 	// Step 2: The rest of the lines will be cards.
 	for ; i < len(batch.lines); i++ {
