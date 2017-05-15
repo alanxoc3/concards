@@ -6,6 +6,7 @@ import (
 	"github.com/alanxoc3/concards-go/algs"
 	"github.com/alanxoc3/concards-go/card"
 	"github.com/alanxoc3/concards-go/deck"
+	runewidth "github.com/mattn/go-runewidth"
 	termbox "github.com/nsf/termbox-go"
 )
 
@@ -57,12 +58,13 @@ func flush() {
 func tbprint(x, y int, fg, bg termbox.Attribute, msg string) (int, int) {
 	xinitial := x
 	for _, c := range msg {
+		inc := runewidth.StringWidth(string(c))
 		if char := string(c); char == "\n" {
 			y++
 			x = xinitial
 		} else if char != "\t" {
 			termbox.SetCell(x, y, c, fg, bg)
-			x++
+			x += inc
 		}
 	}
 
@@ -73,17 +75,18 @@ func tbprintwrap(x, y int, fg, bg termbox.Attribute, msg string) (int, int) {
 	w, _ := termbox.Size()
 	xinitial := x
 	for _, c := range msg {
+		inc := runewidth.StringWidth(string(c))
 		if char := string(c); char == "\n" {
 			y++
 			x = xinitial
 		} else if char != "\t" {
 			termbox.SetCell(x, y, c, fg, bg)
-			x++
-		}
+			if x+inc > w {
+				x = 0
+				y++
+			}
 
-		if x >= w {
-			x = 0
-			y++
+			x += inc
 		}
 	}
 
