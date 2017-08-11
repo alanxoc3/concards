@@ -54,43 +54,33 @@ func flush() {
 	termbox.Flush()
 }
 
-// ignores tabs, returns the final x and y position.
-func tbprint(x, y int, fg, bg termbox.Attribute, msg string) (int, int) {
+func _tb_print_helper(x, y int, fg, bg termbox.Attribute, msg string, wrap bool) (int, int) {
+	w, _ := termbox.Size()
 	xinitial := x
 	for _, c := range msg {
 		inc := runewidth.StringWidth(string(c))
-		if char := string(c); char == "\n" {
-			y++
+		char := string(c)
+
+		if (wrap && x+inc > w) || char == "\n" {
 			x = xinitial
-		} else if char != "\t" {
-			termbox.SetCell(x, y, c, fg, bg)
-			x += inc
+			y++
 		}
+
+		termbox.SetCell(x, y, c, fg, bg)
+		x += inc
 	}
 
 	return x, y
 }
 
+// ignores tabs, returns the final x and y position.
+func tbprint(x, y int, fg, bg termbox.Attribute, msg string) (int, int) {
+	return _tb_print_helper(x,y,fg,bg,msg,false)
+}
+
+// returns final x and y position.
 func tbprintwrap(x, y int, fg, bg termbox.Attribute, msg string) (int, int) {
-	w, _ := termbox.Size()
-	xinitial := x
-	for _, c := range msg {
-		inc := runewidth.StringWidth(string(c))
-		if char := string(c); char == "\n" {
-			y++
-			x = xinitial
-		} else if char != "\t" {
-			termbox.SetCell(x, y, c, fg, bg)
-			if x+inc > w {
-				x = 0
-				y++
-			}
-
-			x += inc
-		}
-	}
-
-	return x, y
+	return _tb_print_helper(x,y,fg,bg,msg,true)
 }
 
 func tbhorizontal(y int, color termbox.Attribute) {
@@ -115,7 +105,7 @@ func tbprint_gq(c *card.Card, color termbox.Attribute) (int, int) {
 	_, y := tbprintwrap(0, 0, termbox.ColorCyan, coldef, grps)
 
 	ques := fmt.Sprintf(c.FormatQuestion())
-	return tbprint(0, y+2, color, coldef, ques)
+	return tbprintwrap(0, y+2, color, coldef, ques)
 }
 
 // print question and answer
@@ -165,7 +155,7 @@ func display_help_mode(color termbox.Attribute) {
 		y = 0
 	}
 
-	tbprintwrap(x, y, color, coldef, str2)
+	tbprint(x, y, color, coldef, str2)
 }
 
 func display_card_mode(c *card.Card, showAnswer bool) {

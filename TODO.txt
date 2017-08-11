@@ -1,3 +1,10 @@
-TODO: Fix character wrapping.
-TODO: Undo feature.
+## Todo
+CON-2 Undo feature.
 
+## Done
+CON-1 Fix character wrapping.
+	This includes help and double width characters for question group and
+	answer.
+
+CON-3 Check tabs (if they work/what they do).
+	They are just removed at some point when displaying.
