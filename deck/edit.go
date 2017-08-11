@@ -1,7 +1,6 @@
 package deck
 
 import (
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -53,7 +52,7 @@ func EditDeck(editor string, d Deck) error {
 	cmd.Stdout = os.Stdout
 
 	if err := cmd.Run(); err != nil {
-		errors.New(fmt.Sprintf("Error: The editor returned an error code."))
+		return fmt.Errorf("Error: The editor returned an error code.")
 	}
 
 	if dc, err := Open(tempFile.Name()); err != nil {

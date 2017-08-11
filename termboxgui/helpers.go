@@ -152,12 +152,15 @@ func display_help_mode(color termbox.Attribute) {
 
 	w, h := termbox.Size()
 
-	x := w/2 - 18
+	// 36 characters wide, 12 lines tall.
+	lw, lh := 36, 12
+
+	x := w/2 - lw/2
 	if x < 0 {
 		x = 0
 	}
 
-	y := h/2 - 7
+	y := h/2 - lh/2
 	if y < 0 {
 		y = 0
 	}
