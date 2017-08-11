@@ -20,7 +20,7 @@ func ValidateAndParseConfig(args []string) (*Config, error) {
 		if !cfg.Review && !cfg.Memorize && !cfg.Done {
 			cfg.Review = true
 			cfg.Memorize = true
-			cfg.Done = true
+			cfg.Done = false
 		}
 
 		// Make the group slice :).
