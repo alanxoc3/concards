@@ -1,5 +1,9 @@
 ## Todo
-CON-2 Undo feature.
+CON-4 Enable ctrl-L (reloads the display).
+CON-2 Undo feature for inputs messed up on.
+	More complicated than simply saving an array, because the cards are changed
+	during it. May have to save the card and automatically account for editing
+	as well.
 
 ## Done
 CON-1 Fix character wrapping.
