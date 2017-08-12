@@ -5,6 +5,15 @@ CON-2 Undo feature for inputs messed up on.
 	during it. May have to save the card and automatically account for editing
 	as well.
 
+CON-5 Create a concards lock file.
+	Don't want concards editing the same files at the same time.
+	Make sure that if files aren't being used that were passed in are returned
+	to the pool of availability or whatever.
+
+CON-6 Create a daily progress file.
+	Concards can keep track of your stats each day. How many cards were
+	completed and so on.
+
 ## Done
 CON-1 Fix character wrapping.
 	This includes help and double width characters for question group and
