@@ -27,6 +27,7 @@ func TermBoxRun(d deck.Deck, cfg *termhelp.Config, ctrl deck.DeckControls) error
 	quit_mode := false
 	finished_editing := false
 
+	save(d) // Save at beginning, and end of each editing command.
 	for len(d) > 0 {
 		draw_screen(d, help_mode, card_shown, finished_editing)
 		finished_editing = false
@@ -54,14 +55,17 @@ func TermBoxRun(d deck.Deck, cfg *termhelp.Config, ctrl deck.DeckControls) error
 					update_stat_msg_and_card(d.Top(), algs.NO)
 					d = append(d[1:], d[0]) // top to bottom
 					card_shown = false
+					save(d)
 				} else if inp == "2" {
 					update_stat_msg_and_card(d.Top(), algs.IDK)
 					d = append(d[1:], d[0]) // top to bottom
 					card_shown = false
+					save(d)
 				} else if inp == "3" {
 					update_stat_msg_and_card(d.Top(), algs.YES)
 					d = d[1:]
 					card_shown = false
+					save(d)
 				} else if inp == "e" {
 					err := deck.EditCard(cfg.Editor, d.Top())
 
@@ -72,6 +76,25 @@ func TermBoxRun(d deck.Deck, cfg *termhelp.Config, ctrl deck.DeckControls) error
 					}
 					finished_editing = true
 					card_shown = false
+					save(d)
+				} else if inp == "u" {
+					td, terr := undo()
+					if terr != nil {
+						update_stat_msg(terr.Error(), termbox.ColorRed)
+					} else {
+						d = td
+						update_stat_msg("Undo.", termbox.ColorYellow)
+						card_shown = false
+					}
+				} else if inp == "r" {
+					td, terr := redo()
+					if terr != nil {
+						update_stat_msg(terr.Error(), termbox.ColorRed)
+					} else {
+						d = td
+						update_stat_msg("Redo.", termbox.ColorCyan)
+						card_shown = false
+					}
 				} else if inp == " " || inp == "\r" {
 					if d.Top().HasAnswer() {
 						card_shown = !card_shown

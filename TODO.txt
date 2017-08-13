@@ -1,9 +1,12 @@
 ## Todo
-CON-4 Enable ctrl-L (reloads the display).
 CON-2 Undo feature for inputs messed up on.
 	More complicated than simply saving an array, because the cards are changed
 	during it. May have to save the card and automatically account for editing
 	as well.
+
+	So, I'll first save the card's previous state, then save the deck.
+
+CON-4 Enable ctrl-L (reloads the display).
 
 CON-5 Create a concards lock file.
 	Don't want concards editing the same files at the same time.
@@ -13,6 +16,12 @@ CON-5 Create a concards lock file.
 CON-6 Create a daily progress file.
 	Concards can keep track of your stats each day. How many cards were
 	completed and so on.
+
+CON-7 Create Info Command with file name.
+	It needs to show the file the card came from for now.
+
+CON-8 Enable Control-C and Control-Z
+	It is getting pesky without those.
 
 ## Done
 CON-1 Fix character wrapping.
