@@ -1,11 +1,6 @@
+** Tags for commits in this todo file!
+
 ## Todo
-CON-2 Undo feature for inputs messed up on.
-	More complicated than simply saving an array, because the cards are changed
-	during it. May have to save the card and automatically account for editing
-	as well.
-
-	So, I'll first save the card's previous state, then save the deck.
-
 CON-4 Enable ctrl-L (reloads the display).
 
 CON-5 Create a concards lock file.
@@ -28,5 +23,10 @@ CON-1 Fix character wrapping.
 	This includes help and double width characters for question group and
 	answer.
 
-CON-3 Check tabs (if they work/what they do).
+CON-2 Undo feature for inputs messed up on.
+	More complicated than simply saving an array, because the cards are changed
+	during it. May have to save the card and automatically account for editing
+	as well.
+
+CON-3 Check tab characters (if they work/what they do).
 	They are just removed at some point when displaying.
