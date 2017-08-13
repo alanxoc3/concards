@@ -132,6 +132,8 @@ func display_help_mode(color termbox.Attribute) {
 		"w, WRITE - your cards to their files\n" +
 		"q, QUIT  - the program\n" +
 		"h, HELP  - toggle this menu\n" +
+		"u, UNDO  - you messed up\n" +
+		"r, REDO  - maybe not\n" +
 		"\n" +
 		"1, INPUT 1 - Not a clue.\n" +
 		"2, INPUT 2 - Sounds familiar.\n" +
@@ -141,14 +143,12 @@ func display_help_mode(color termbox.Attribute) {
 	// 12 lines, longest line is 36 characters
 
 	w, h := termbox.Size()
+	h = h - 2 // Status bar at the bottom.
 
-	// 36 characters wide, 12 lines tall.
-	lw, lh := 36, 12
+	// characters wide, lines tall.
+	lw, lh := 36, 14
 
 	x := w/2 - lw/2
-	if x < 0 {
-		x = 0
-	}
 
 	y := h/2 - lh/2
 	if y < 0 {
