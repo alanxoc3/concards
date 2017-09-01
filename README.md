@@ -19,8 +19,8 @@ go build; # Or `./install.sh`
 * Reading in from multiple files.
 * Undoing/Redoing
 * Easily editing a card while reviewing your cards.
-* And More!!! (You gotta get it to find out :)
+* And More!!! (I think :)
 
 ## Usage
-The file syntax was designed to be very simple and flexible, allowing anyone to quickly embed flashcards into their text document without extra hassle of other flashcard apps (like [Anki](https://apps.ankiweb.net/) or [Memrise](https://www.memrise.com/).
+The file syntax was designed to be very simple and flexible, allowing anyone to quickly embed flashcards into their text document without extra hassle of other flashcard apps (like [Anki](https://apps.ankiweb.net/) or [Memrise](https://www.memrise.com/)).
 
