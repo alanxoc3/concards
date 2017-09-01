@@ -3,6 +3,7 @@ package deck
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"os"
 	"strings"
 
@@ -17,6 +18,12 @@ type block struct {
 	lines []string
 }
 
+// Returns true if we a Byte Order Marker at the beginning of the file.
+// TODO: Don't make this just a hotfix, get rid of any marker, not just UTF-8.
+func isBOM(bom []byte) bool {
+	return bom[0] == 0xef && bom[1] == 0xbb && bom[2] == 0xbf
+}
+
 // Open opens filename and loads cards into new deck
 func Open(filename string) (d *DeckControl, err error) {
 	d = &DeckControl{}
@@ -25,6 +32,15 @@ func Open(filename string) (d *DeckControl, err error) {
 	if err1 != nil {
 		err = fmt.Errorf("Error: Unable to open file \"%s\"", filename)
 		return
+	}
+
+	// Get rid of UTF-8 encoding.
+	bom := make([]byte, 3, 3)
+
+	// Returns an error if fewer than 3 bytes were read.
+	io.ReadFull(file, bom[:])
+	if !isBOM(bom) {
+		file.Seek(0, 0)
 	}
 
 	// Set up the line stuff

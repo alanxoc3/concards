@@ -18,6 +18,16 @@ CON-7 Create Info Command with file name.
 CON-8 Enable Control-C and Control-Z
 	It is getting pesky without those.
 
+CON-9 Piping support.
+	This would just be able to format the file(s) into a nice concard format. I
+	would have to think about the functionality of this a bit more.
+
+CON-10 Create a man page.
+
+CON-11 Create an AUR package.
+
+CON-13 Get rid of all BOM markers.
+
 ## Done
 CON-1 Fix character wrapping.
 	This includes help and double width characters for question group and
@@ -30,3 +40,8 @@ CON-2 Undo feature for inputs messed up on.
 
 CON-3 Check tab characters (if they work/what they do).
 	They are just removed at some point when displaying.
+
+CON-12 Error: File "" had no cards in it.
+	Concards needs to get rid of BOM for files. I hotfixed it, so it gets rid of
+	UTF-8 BOM now :).
+
