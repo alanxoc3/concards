@@ -33,9 +33,7 @@ CON-14 Have undo and redo not refresh the card on the screen.
 CON-15 Have the ability to see where in the file the card was, or line number
 	or something. Maybe prerequisite cards could help out with this idea.
 
-CON-16 Fix the bug with something staying being memorized. The bug comes from
-	editing the card while reviewing it. Editing it must revert the date or
-	something.
+CON-17 Allow the ability to delete a card.
 
 ## Done
 CON-1 Fix character wrapping.
@@ -53,4 +51,10 @@ CON-3 Check tab characters (if they work/what they do).
 CON-12 Error: File "" had no cards in it.
 	Concards needs to get rid of BOM for files. I hotfixed it, so it gets rid of
 	UTF-8 BOM now :).
+
+CON-16 Fix the bug with something staying being memorized. The bug comes from
+	editing the card while reviewing it. Editing it must revert the date or
+	something.
+
+CON-18 Fix the % MISSING bug.
 

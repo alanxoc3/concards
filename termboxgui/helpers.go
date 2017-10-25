@@ -104,7 +104,7 @@ func tbprint_gq(c *card.Card, color termbox.Attribute) (int, int) {
 	grps := c.FormatGroups()
 	_, y := tbprintwrap(0, 0, termbox.ColorCyan, coldef, grps)
 
-	ques := fmt.Sprintf(c.FormatQuestion())
+	ques := c.FormatQuestion()
 	return tbprintwrap(0, y+2, color, coldef, ques)
 }
 
