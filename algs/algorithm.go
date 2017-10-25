@@ -12,10 +12,9 @@ const (
 
 // Implementing the SM2 algorithm.
 func (s *SpaceAlg) Execute(input Know) {
-	// If today is after the next day, then we can review the card.
-	if time.Now().Before(s.Next) && input == YES {
-		return
-	}
+	// Before, on this line, I was checking the date of the card, but there were
+	// odd errors and it really isn't wanted, so I just deleted it. It's weird
+	// how extra logic can screw things up.
 
 	// Validate input.
 	if input != NO && input != IDK && input != YES {

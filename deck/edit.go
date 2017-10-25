@@ -22,6 +22,8 @@ func EditDeck(editor string, d Deck) error {
 	message := "You may ONLY EDIT the cards here.\nREARRANGING, DELETING, or ADDING cards WILL CORRUPT your files."
 
 	env := editor
+
+	// TODO: If I'm assuming a sort, why am I calling sort here?
 	d.Sort()
 
 	if env == "" {
