@@ -1,4 +1,4 @@
-** Tags for commits in this todo file!
+** Tag your commits with items in this file!
 
 ## Todo
 CON-4 Enable ctrl-L (reloads the display).
@@ -34,6 +34,8 @@ CON-15 Have the ability to see where in the file the card was, or line number
 	or something. Maybe prerequisite cards could help out with this idea.
 
 CON-17 Allow the ability to delete a card.
+
+CON-19 Show a warning message if you add extra cards when you only have one card.
 
 ## Done
 CON-1 Fix character wrapping.
