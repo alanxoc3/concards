@@ -14,7 +14,7 @@ func TermBoxRun(d deck.Deck, cfg *termhelp.Config, ctrl deck.DeckControls) error
 	}
 
 	defer termbox.Close()
-	defer termbox.Sync()
+	defer termbox.Sync() // TODO: Not sure what the purpose of this is.
 	termbox.SetInputMode(termbox.InputAlt)
 	termbox.Clear(termbox.ColorBlack, termbox.ColorBlack)
 	flush()

@@ -86,11 +86,7 @@ func Open(filename string) (d *DeckControl, err error) {
 		loopOnBatch = !loopOnBatch
 	}
 
-	if len(d.Deck) > 0 {
-		d.Filename = filename
-	} else { // the file had no cards.
-		err = fmt.Errorf("Error: File \"%s\" had no cards in it.", filename)
-	}
+	d.Filename = filename
 
 	return
 }

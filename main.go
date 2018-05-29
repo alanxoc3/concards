@@ -41,26 +41,28 @@ func main() {
 		writeFunc()
 
 	} else {
-		session, err := gen_session_deck(cfg, decks)
-		do_err(err)
 
-		if cfg.Usage == termhelp.VIEWMODE {
-			err = termboxgui.TermBoxRun(session, cfg, decks)
-			writeFunc()
-			do_err(err)
-		} else if cfg.Usage == termhelp.EDITMODE {
-			session.Sort()
-			err = deck.EditDeck(cfg.Editor, session)
-			writeFunc()
-			do_err(err)
-		} else if cfg.Usage == termhelp.PRINTMODE {
-			session.Sort()
-			fmt.Print(session.ToString())
+		session := gen_session_deck(cfg, decks)
+
+		if len(session) > 0 {
+			if cfg.Usage == termhelp.VIEWMODE {
+				err := termboxgui.TermBoxRun(session, cfg, decks)
+				writeFunc()
+				do_err(err)
+			} else if cfg.Usage == termhelp.EDITMODE {
+				session.Sort()
+				err := deck.EditDeck(cfg.Editor, session)
+				writeFunc()
+				do_err(err)
+			} else if cfg.Usage == termhelp.PRINTMODE {
+				session.Sort()
+				fmt.Print(session.ToString())
+			}
 		}
 	}
 }
 
-func gen_session_deck(cfg *termhelp.Config, decks deck.DeckControls) (session deck.Deck, err error) {
+func gen_session_deck(cfg *termhelp.Config, decks deck.DeckControls) (session deck.Deck) {
 	// Build Deck
 	if cfg.Review {
 		session = append(session, decks.FilterReview()...)
@@ -83,10 +85,6 @@ func gen_session_deck(cfg *termhelp.Config, decks deck.DeckControls) (session de
 
 	if cfg.NumberEnabled {
 		session = session.FilterNumber(cfg.Number)
-	}
-
-	if len(session) == 0 {
-		return nil, fmt.Errorf("Error: There were no cards that met your demands.")
 	}
 
 	return
