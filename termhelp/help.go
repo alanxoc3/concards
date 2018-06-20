@@ -52,7 +52,7 @@ func genOptions() []*Option {
 
 	opts = append(opts, newOptionNoParam('h', "help", "Prints out a usage/help menu."))
 	opts = append(opts, newOptionNoParam('v', "version", "Prints out which version is being used."))
-	opts = append(opts, newOption(0, "editor", "e", "Change the editor \"ed\" used when editing. Default is \"$EDITOR\"."))
+	opts = append(opts, newOption(0, "editor", "e", "Change the editor \"e\" used when editing. Default is \"$EDITOR\"."))
 
 	return opts
 }
