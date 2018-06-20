@@ -72,6 +72,11 @@ func TermBoxRun(d deck.Deck, cfg *termhelp.Config, ctrl deck.DeckControls) error
 					d = d[1:]
 					card_shown = false
 					save(d)
+				} else if inp == "s" {
+               update_stat_msg("Skipped.", termbox.ColorYellow)
+					d = append(d[1:], d[0]) // top to bottom
+					card_shown = false
+					save(d)
 				} else if inp == "e" {
 					err := deck.EditCard(cfg.Editor, d.Top())
 

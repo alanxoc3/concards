@@ -130,6 +130,7 @@ func display_help_mode(color termbox.Attribute) {
 		"------------------------------------\n" +
 		"e, EDIT   - the current card\n" +
 		"d, DELETE - delete the current card\n" +
+		"s, SKIP   - skips the current card\n" +
 		"w, WRITE  - your cards to their files\n" +
 		"q, QUIT   - the program\n" +
 		"h, HELP   - toggle this menu\n" +
@@ -147,7 +148,7 @@ func display_help_mode(color termbox.Attribute) {
 	h = h - 2 // Status bar at the bottom.
 
 	// characters wide, lines tall.
-	lw, lh := 37, 15
+	lw, lh := 37, 16
 
 	x := w/2 - lw/2
 
