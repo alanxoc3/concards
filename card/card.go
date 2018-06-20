@@ -8,6 +8,8 @@ import (
 	"github.com/alanxoc3/concards-go/constring"
 )
 
+const SPACES string = "   "
+
 // Card represents a single flash card. Contains all
 // information pertaining to a card.
 type Card struct {
@@ -17,6 +19,7 @@ type Card struct {
 	Metadata algs.SpaceAlg
 	Id       int
 	File     string
+	Deleted  bool
 }
 
 // Parses and validates block of text as card.
@@ -39,8 +42,8 @@ func New(lines []string) (*Card, error) {
 
 	for _, line := range lines {
 		// Preformatting for multiple spaces.
-		if constring.DoesLineBeginWith(line, "    ") {
-			line = "\t" + constring.TrimLineBegin(line, "    ")
+		if constring.DoesLineBeginWith(line, SPACES) {
+			line = "\t" + constring.TrimLineBegin(line, SPACES)
 		}
 
 		ansDel = constring.DoesLineBeginWith(line, "\t")

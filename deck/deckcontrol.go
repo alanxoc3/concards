@@ -87,7 +87,9 @@ func (d *DeckControl) ToString() string {
 		if done {
 			break
 		} else if listTurn {
-			tmp = append(tmp, list[i])
+         if !list[i].Deleted {
+            tmp = append(tmp, list[i])
+         }
 			i++
 		} else if breakTurn {
 			str += d.fileBreaks[j].Text

@@ -66,6 +66,12 @@ func TermBoxRun(d deck.Deck, cfg *termhelp.Config, ctrl deck.DeckControls) error
 					d = d[1:]
 					card_shown = false
 					save(d)
+				} else if inp == "d" {
+               d.Top().Deleted = true
+               update_stat_msg("Deleted.", termbox.ColorYellow)
+					d = d[1:]
+					card_shown = false
+					save(d)
 				} else if inp == "e" {
 					err := deck.EditCard(cfg.Editor, d.Top())
 

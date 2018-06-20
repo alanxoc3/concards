@@ -93,7 +93,7 @@ func Open(filename string) (d *DeckControl, err error) {
 
 func isLineQuestion(line string) bool {
 	return !constring.DoesLineBeginWith(line, "\t") &&
-		!constring.DoesLineBeginWith(line, "    ") &&
+		!constring.DoesLineBeginWith(line, card.SPACES) &&
 		!constring.DoesLineBeginWith(line, "~~") &&
 		constring.Trim(line) != ""
 }
