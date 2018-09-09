@@ -39,6 +39,8 @@ CON-19 Show a warning message if you add extra cards when you only have one card
 
 CON-20 A mode that saves the file in a basic format (without any metadata).
 
+CON-22 Better documentation.
+
 ## Done
 CON-1 Fix character wrapping.
 	This includes help and double width characters for question group and
