@@ -1,4 +1,9 @@
 # concards-go
+
+<h1 align=center>
+<img src="Logo/horizontal.png" width=70%>
+</h1>
+
 Turning notes into flashcards.
 
 ## About
