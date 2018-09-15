@@ -1,6 +1,4 @@
-<h1 align=center>
-<img src="Logo/horizontal.png" width=70%>
-</h1>
+<img src="Logo/horizontal.png" width=90%>
 
 ## concards-go
 Turning notes into flashcards. Concards is my ongoing attempt to make flashcards simple and quick to record or embed into a text document. Unlike the overhead of other flashcard applications, Concards accepts a minimal amount of rules. This allows tons of freedom in the way you want to create your own flashcards!
