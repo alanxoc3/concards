@@ -1,13 +1,9 @@
-# concards-go
-
 <h1 align=center>
 <img src="Logo/horizontal.png" width=70%>
 </h1>
 
-Turning notes into flashcards.
-
-## About
-Concards is my ongoing attempt to make flashcards simple and quick to record or embed into a text document. Unlike the overhead of other flashcard applications, Concards accepts a minimal amount of rules. This allows tons of freedom in the way you want to create your own flashcards!
+## concards-go
+Turning notes into flashcards. Concards is my ongoing attempt to make flashcards simple and quick to record or embed into a text document. Unlike the overhead of other flashcard applications, Concards accepts a minimal amount of rules. This allows tons of freedom in the way you want to create your own flashcards!
 
 ## Install
 Install like any other go application.
