@@ -37,15 +37,16 @@ The syntax to embed your flashcards is like this:
     ## group1 GROUP2 group_3
     question1
        answer1 (3 spaces)
+
     question2
     still question2
-       answer1 (3 spaces)
+       answer2 (3 spaces)
 
     ## newgroup
     question 3
 
     question 4
-      But this one has an answer.
+       But this one has an answer. (3 spaces)
     ##
 
     The '##' without a group ends the flashcards. So we can continue our text
