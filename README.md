@@ -32,24 +32,24 @@ flashcard apps (like [Anki](https://apps.ankiweb.net/) or
 
 The syntax to embed your flashcards is like this:
 
-  You can embed flashcards in any textfile. This is text before the flashcards!
+    You can embed flashcards in any textfile. This is text before the flashcards!
 
-  ## group1 GROUP2 group_3
-  question1
-     answer1 (3 spaces)
-  question2
-  still question2
-     answer1 (3 spaces)
+    ## group1 GROUP2 group_3
+    question1
+       answer1 (3 spaces)
+    question2
+    still question2
+       answer1 (3 spaces)
 
-  ## newgroup
-  question 3
+    ## newgroup
+    question 3
 
-  question 4
-    But this one has an answer.
-  ##
+    question 4
+      But this one has an answer.
+    ##
 
-  The '##' without a group ends the flashcards. So we can continue our text
-  file here.
+    The '##' without a group ends the flashcards. So we can continue our text
+    file here. But you can also have more cards later in the document!
 
 <!--
 ## concard_group
