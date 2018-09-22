@@ -1,6 +1,6 @@
 <img src="Logo/horizontal.png" width=90%>
 
-## concards-go
+## concards-go 1.0
 Turning notes into flashcards. Concards is my ongoing attempt to make
 flashcards simple and quick to record or embed into a text document. Unlike the
 overhead of other flashcard applications, Concards accepts a minimal amount of
@@ -62,3 +62,5 @@ Wanna try it out? Run concards on this README.md file!
 ``` bash
 concards README.md
 ```
+
+**Note**, this file format will be deprecated in version 2.0, with cleaner syntax.
