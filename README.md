@@ -2,7 +2,10 @@
 Turning notes into flashcards.
 
 ## About
-Concards is my ongoing attempt to make flashcards simple and quick to record or embed into a text document. Unlike the overhead of other flashcard applications, Concards accepts a minimal amount of rules. This allows tons of freedom in the way you want to create your own flashcards!
+Concards is my ongoing attempt to make flashcards simple and quick to record or
+embed into a text document. Unlike the overhead of other flashcard
+applications, Concards accepts a minimal amount of rules. This allows tons of
+freedom in the way you want to create your own flashcards!
 
 ## Install
 Install like any other go application.
@@ -22,5 +25,8 @@ go build; # Or `./install.sh`
 * And More!!! (I think :)
 
 ## Usage
-The file syntax was designed to be very simple and flexible, allowing anyone to quickly embed flashcards into their text document without extra hassle of other flashcard apps (like [Anki](https://apps.ankiweb.net/) or [Memrise](https://www.memrise.com/)).
+The file syntax was designed to be very simple and flexible, allowing anyone to
+quickly embed flashcards into their text document without extra hassle of other
+flashcard apps (like [Anki](https://apps.ankiweb.net/) or
+[Memrise](https://www.memrise.com/)).
 
