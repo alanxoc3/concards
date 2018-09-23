@@ -39,7 +39,15 @@ CON-19 Show a warning message if you add extra cards when you only have one card
 
 CON-20 A mode that saves the file in a basic format (without any metadata).
 
-CON-22 Better documentation.
+CON-23 Change the format to the new specification.
+	CON-24 Think about how meta data will be formatted.
+	CON-25 Goals for meta data functionality.
+	CON-26 '@> ' or ('@>\t' and '@> ') or '@>'?
+	CON-27 Should @ signs be escaped? How could you embed the text '@g' in a file?
+	CON-28 Go over allowed Markdown syntax for initial release.
+	CON-29 What should we do with @f vs @F? When we rewrite the file, should we format it?
+	CON-30 How about spacing in between the text. Where should we place meta
+	       data? on its own line?
 
 ## Done
 CON-1 Fix character wrapping.
@@ -66,3 +74,7 @@ CON-18 Fix the % MISSING bug.
 
 CON-21 Disable annoying "no cards" error.
 	That was so annoying.
+
+CON-22 Better documentation.
+	For the old format, it is good :)
+
