@@ -4,8 +4,8 @@ package deck
 import (
 	"fmt"
 
-	"github.com/alanxoc3/concards-go/card"
-	"github.com/alanxoc3/concards-go/constring"
+	"github.com/alanxoc3/concards/card"
+	"github.com/alanxoc3/concards/constring"
 )
 
 var counter int = 0

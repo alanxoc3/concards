@@ -6,7 +6,7 @@ import (
 	"os"
 	"os/exec"
 
-	"github.com/alanxoc3/concards-go/card"
+	"github.com/alanxoc3/concards/card"
 )
 
 func min(a, b int) int {

@@ -5,8 +5,8 @@ import (
 	"math/rand"
 	"sort"
 
-	"github.com/alanxoc3/concards-go/card"
-	"github.com/alanxoc3/concards-go/constring"
+	"github.com/alanxoc3/concards/card"
+	"github.com/alanxoc3/concards/constring"
 )
 
 type Deck []*card.Card

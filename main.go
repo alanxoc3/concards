@@ -6,9 +6,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/alanxoc3/concards-go/deck"
-	"github.com/alanxoc3/concards-go/termboxgui"
-	"github.com/alanxoc3/concards-go/termhelp"
+	"github.com/alanxoc3/concards/deck"
+	"github.com/alanxoc3/concards/termboxgui"
+	"github.com/alanxoc3/concards/termhelp"
 )
 
 func main() {

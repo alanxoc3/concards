@@ -5,9 +5,9 @@ import (
 	"io"
 	"strings"
 
-	"github.com/alanxoc3/concards-go/algs"
-	"github.com/alanxoc3/concards-go/deck"
-	"github.com/alanxoc3/concards-go/termhelp"
+	"github.com/alanxoc3/concards/algs"
+	"github.com/alanxoc3/concards/deck"
+	"github.com/alanxoc3/concards/termhelp"
 	"github.com/chzyer/readline"
 )
 

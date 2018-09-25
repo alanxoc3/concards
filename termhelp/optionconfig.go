@@ -2,7 +2,7 @@ package termhelp
 
 import "errors"
 import "fmt"
-import "github.com/alanxoc3/concards-go/constring"
+import "github.com/alanxoc3/concards/constring"
 import "strconv"
 
 type UsageMode int

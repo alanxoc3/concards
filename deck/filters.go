@@ -3,7 +3,7 @@ package deck
 import (
 	"time"
 
-	"github.com/alanxoc3/concards-go/constring"
+	"github.com/alanxoc3/concards/constring"
 )
 
 // Simply truncates to the beginning of the list.

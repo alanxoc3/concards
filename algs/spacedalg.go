@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/alanxoc3/concards-go/constring"
+	"github.com/alanxoc3/concards/constring"
 )
 
 type SpaceAlg struct {

@@ -1,9 +1,9 @@
 package termboxgui
 
 import (
-	"github.com/alanxoc3/concards-go/algs"
-	"github.com/alanxoc3/concards-go/deck"
-	"github.com/alanxoc3/concards-go/termhelp"
+	"github.com/alanxoc3/concards/algs"
+	"github.com/alanxoc3/concards/deck"
+	"github.com/alanxoc3/concards/termhelp"
 	termbox "github.com/nsf/termbox-go"
 )
 

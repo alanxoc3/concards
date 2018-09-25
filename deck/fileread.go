@@ -7,8 +7,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/alanxoc3/concards-go/card"
-	"github.com/alanxoc3/concards-go/constring"
+	"github.com/alanxoc3/concards/card"
+	"github.com/alanxoc3/concards/constring"
 )
 
 // Used for the file parsing.

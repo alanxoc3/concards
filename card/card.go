@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/alanxoc3/concards-go/algs"
-	"github.com/alanxoc3/concards-go/constring"
+	"github.com/alanxoc3/concards/algs"
+	"github.com/alanxoc3/concards/constring"
 )
 
 const SPACES string = "   "
