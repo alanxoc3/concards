@@ -1,4 +1,4 @@
-<img src="logo.png">
+<img src="logo.svg">
 
 ## concards 1.0
 Turning notes into flashcards. Concards is my ongoing attempt to make
