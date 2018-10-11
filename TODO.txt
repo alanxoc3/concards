@@ -1,6 +1,9 @@
 ** Tag your commits with items in this file!
 
 ## Todo
+CON-23 Change the format to the new specification.
+
+## Backlog
 CON-4 Enable ctrl-L (reloads the display).
 
 CON-5 Create a concards lock file.
@@ -39,16 +42,6 @@ CON-19 Show a warning message if you add extra cards when you only have one card
 
 CON-20 A mode that saves the file in a basic format (without any metadata).
 
-CON-23 Change the format to the new specification.
-	CON-24 Think about how meta data will be formatted.
-	CON-25 Goals for meta data functionality.
-	CON-26 '@> ' or ('@>\t' and '@> ') or '@>'?
-	CON-27 Should @ signs be escaped? How could you embed the text '@g' in a file?
-	CON-28 Go over allowed Markdown syntax for initial release.
-	CON-29 What should we do with @f vs @F? When we rewrite the file, should we format it?
-	CON-30 How about spacing in between the text. Where should we place meta
-	       data? on its own line?
-
 ## Done
 CON-1 Fix character wrapping.
 	This includes help and double width characters for question group and
@@ -73,8 +66,26 @@ CON-16 Fix the bug with something staying being memorized. The bug comes from
 CON-18 Fix the % MISSING bug.
 
 CON-21 Disable annoying "no cards" error.
-	That was so annoying.
+   That was so annoying.
 
 CON-22 Better documentation.
-	For the old format, it is good :)
+   For the old format, it is good :)
 
+CON-24 Think about how meta data will be formatted.
+   
+	
+
+CON-25 Goals for meta data functionality.
+
+CON-26 '@> ' or ('@>\t' and '@> ') or '@>'?
+   Optionally be able to backslash a @. And single line cards is not allowed.
+
+CON-27 Should @ signs be escaped? How could you embed the text '@g' in a file?
+   Yes, escaped, but optionally. No groups on own line.
+
+CON-28 Go over allowed Markdown syntax for initial release.
+   
+
+CON-29 What should we do with @f vs @F? When we rewrite the file, should we format it?
+CON-30 How about spacing in between the text. Where should we place meta
+		 data? on its own line?
