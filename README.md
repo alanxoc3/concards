@@ -1,6 +1,5 @@
-<p align="center"> <img src="logo.svg" /> </p>
+# <img src="logo.svg" />
 
-## concards 1.0
 Turning notes into flashcards. Concards is my ongoing attempt to make
 flashcards simple and quick to record or embed into a text document. Unlike the
 overhead of other flashcard applications, Concards accepts a minimal amount of
