@@ -1,4 +1,4 @@
-<img src="Logo/horizontal.png" width=90%>
+<img src="logo.png">
 
 ## concards 1.0
 Turning notes into flashcards. Concards is my ongoing attempt to make
