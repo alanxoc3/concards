@@ -1,46 +1,65 @@
 So below, that is an embedded flash card thing.
 
 @>
-@g Numerical Analysis
-@f Preconditioning
+@g Numerical Analysis, hello, math, shuxue
+@t 2018-10-10@14:31 @m sm2: { 2.70, 3 }
+
+@f Preconditioning @> ONE_LINE
 @b Basically wants to multiply an equation to make the matrices look more like
    the Identity matrix. This tries to save future computation.
 
    Preconditioning is for GMres.
-@m dai: { 2.70, 3, 2018-10-10@14:31 }
 
-@r hello,
-@m dai: { 2.70, 3, 2018-10-10@14:31 }
+@r hello @r you need @r to go @r away
 
-@r you need
-@m dai: { 2.70, 3, 2018-10-10@14:31 }
 
-@r to go
-@m dai: { 2.70, 3, 2018-10-10@14:31 }
-
-@r away
-@m dai: { 2.70, 3, 2018-10-10@14:31 }
-
-@fro hello @bac bye
-@not 
-
-@> 
 @f Jacobi Preconditioning
 @b who doesn't do something like this.
    Does [Preconditioning] by using the diagonal matrix.
 @n You know who. GHOST BUSTERS!
-@m sm2: { 2.70, 3, 2018-10-10@14:31 }
-@m sm2: { 2.70, 5, 2018-10-10@14:31 }
-@<
+@< this specific text here means nothing at all.
 
--------- DEPRECATED --------
+Can the delim start anywhere on the line? That is a question I have asked
+multiple times. If it can, then you can stack things on the same line. Then it
+really comes down to the question of the meta data. Should the meta data by
+default be on its own line?
+
+And can meta data be for a group?
+   If meta data can be owned by a group, then everything in that group is reviewed
+   at the same time, and all the individual meta data's are ignored/deleted for
+   individual cards.
+
+Ok, delimiters can be on the same line, but the parser will overwrite this by
+default. You can pass a parameter at the "@>" delimiter spot. I gotta figure
+out what these delimiters look like.
+
+"@> META_NEWLINE" -> Put a newline before each new meta created. (Default)
+"@> META_INPLACE" -> Don't put a newline before newly created metas.
+"@> META_DISABLE" -> Don't create any new metas.
+"@> PRETTIFY" -> Make the output format really pretty: (Default)
+                 Each card has a blank line in between.
+                 Each delimiter has a newline after it.
+                 * This does not effect the content of a card in any way.
+"@> ONE_LINE"  -> Compactify the output format to all be on only one line.
+
+Okay, let's force everything on it's own line, This means that one cannot have
+whitespace before the cards. But whyshenme!!!? :(. The only way to fix this is
+to not have meta data stored in the note file. If I do this, then there has to
+be a way to make the meta data portable. This really can't be done though.
+
+Can the starting/format delimiter be contained within the actual concard space?
+No. Firstly not within a card, because that presents problems. Secondly just no
+anywhere, because if it can't be within a card, then it doesn't even make
+sense.
+
+-------- DEPRECATED IDEA --------
 Is it really necessarry to have longer abreviations? No! Don't do it!
 @g     @r      @f     @b    @n    @m
 @grp   @rmd    @frt   @bck  @not  @met
 @group @remind @front @back @note @meta
---------    END     --------
+--------       END       --------
 
-links will go by []
+links will go by [] (Probably... This is more of a gui thing.)
 
 lua scripting for algorithms? That would be really cool actually. Or JS for
 algorithms. (if it is in the browser).
