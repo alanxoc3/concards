@@ -33,14 +33,33 @@ Ok, delimiters can be on the same line, but the parser will overwrite this by
 default. You can pass a parameter at the "@>" delimiter spot. I gotta figure
 out what these delimiters look like.
 
-"@> META_NEWLINE" -> Put a newline before each new meta created. (Default)
-"@> META_INPLACE" -> Don't put a newline before newly created metas.
-"@> META_DISABLE" -> Don't create any new metas.
-"@> PRETTIFY" -> Make the output format really pretty: (Default)
-                 Each card has a blank line in between.
-                 Each delimiter has a newline after it.
-                 * This does not effect the content of a card in any way.
-"@> ONE_LINE"  -> Compactify the output format to all be on only one line.
+All these are formatting options for what happens when the file is written.
+I gotta go over these a bit probably.
+
+*@> META_NEWLINE -> Put a newline before each new meta created. (Default)
+_@> META_INPLACE -> Don't put a newline before newly created metas.
+_@> META_DISABLE -> Don't create any new metas. (But can touch)
+_@> META_IGNORE  -> Don't touch any metas (UMM, I don't want this one I think).
+
+*@> DELIM_NEWLINE -> Each thing in the card goes on a new line.
+_@> DELIM_ONELINE -> Compactify each card to only be one line.
+_@> DELIM_IGNORE  -> Don't mess with the concards format at all.
+
+*@> CARDS_SPACED  -> Put 2 newlines in between each card. For prettiness.
+_@> CARDS_NEWLINE -> Put a newline in between each card.
+_@> CARDS_SPACE   -> Just put a space after each card. Don't
+_@> CARDS_IGNORE  -> Don't mess with what is in between each card at all.
+
+*@> CONTENT_IGNORE  -> Don't touch the content of the card.
+_@> CONTENT_ONELINE -> Turns all the content of a thing into a single line.
+                       WARNING, [formatting] data could be lost with this option.
+                      Make the output format really pretty.
+                      Each card has a blank line in between.
+                      Each delimiter has a newline after it.
+*@> DELIM_NICE     -> This does not effect the content of a card in any way.
+
+_@> READONLY = META_IGNORE & DELIM_IGNORE & CONTENT_IGNORE
+_@> PRETTIFY = CARDS_SPACED & DELIM_NEWLINE & META_NEWLINE
 
 Okay, let's force everything on it's own line, This means that one cannot have
 whitespace before the cards. But whyshenme!!!? :(. The only way to fix this is
