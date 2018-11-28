@@ -1,0 +1,102 @@
+So below, that is an embedded flash card thing.
+
+@>
+@g Numerical Analysis
+@f Preconditioning
+@b Basically wants to multiply an equation to make the matrices look more like
+   the Identity matrix. This tries to save future computation.
+
+   Preconditioning is for GMres.
+@m dai: { 2.70, 3, 2018-10-10@14:31 }
+
+@r hello,
+@m dai: { 2.70, 3, 2018-10-10@14:31 }
+
+@r you need
+@m dai: { 2.70, 3, 2018-10-10@14:31 }
+
+@r to go
+@m dai: { 2.70, 3, 2018-10-10@14:31 }
+
+@r away
+@m dai: { 2.70, 3, 2018-10-10@14:31 }
+
+@fro hello @bac bye
+@not 
+
+@> 
+@f Jacobi Preconditioning
+@b who doesn't do something like this.
+   Does [Preconditioning] by using the diagonal matrix.
+@n You know who. GHOST BUSTERS!
+@m sm2: { 2.70, 3, 2018-10-10@14:31 }
+@m sm2: { 2.70, 5, 2018-10-10@14:31 }
+@<
+
+-------- DEPRECATED --------
+Is it really necessarry to have longer abreviations? No! Don't do it!
+@g     @r      @f     @b    @n    @m
+@grp   @rmd    @frt   @bck  @not  @met
+@group @remind @front @back @note @meta
+--------    END     --------
+
+links will go by []
+
+lua scripting for algorithms? That would be really cool actually. Or JS for
+algorithms. (if it is in the browser).
+
+Yeah, Lua scripting, but I'm not assuming the website. Maybe if a browser just
+starts up, then that is good enough. Then that can be built off of in the
+future. Even the things .... ?
+
+So how will it look like in LUA for the creation of new algorithms? Either just
+have global functions, or add the function to an array. Yeah... just global
+functions is fine.
+
+Are the default algorithms built into Go? That is another good question.
+
+Pros: If the file is deleted, the program still works, Makes it easier for
+people to use the program.
+
+Cons: Kind of enforces a limitation
+
+Or what if we just copy a Lua file to the correct location. No, there should be
+a default location. There should be a default algorithm. I can copy the anki
+algorithm.
+
+Also, should there be a way to say, "I know this card".
+Well, that could be just a "I know this" algorithm. Or just change the date to
+some arbitrary time in the future. Actually, you never "know" something. You
+should just move the date to 10 years from then. Nevermind, there could just be
+a "known" algorithm.
+
+I just have to assume that the "streak" and "next day to review" are not global
+to every algorithm.
+
+I will have to provide some API things for lua. Including date manipulation.
+That will be important. Yeah, the Lua needs to have the current date. Dates are
+just strings.
+
+So the lua API includes string and math modules plus this date one:
+```lua
+-- if any of these have an error, then null is returned.
+-- a "date" is just a string with a date and a time.
+-- Returns the current date.
+function date.today() end
+
+-- if anything is larger than what it should be, then that adds to the date.
+function date.create(year, month, day, hour, min) end
+
+-- this returns all values as a table
+-- { year=2018, month=6, day=16, hour=6, min=41 }
+function date.parse() end
+
+```
+
+And a function would look like this:
+
+function sm2(params, card)
+
+end
+
+There should
