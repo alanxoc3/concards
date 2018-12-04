@@ -1,3 +1,28 @@
+DESIGN TODO:
+   - Format of .concards directory.
+   - All commandline parameters.
+   - Refactor delimiters.
+   - The specific process of extracting a card.
+
+
+
+@> new-wave-questions
+@q What are valid group names?
+@a letters, unicode (oh no, I forgot). So, anything besides spaces. But commas
+   are really weird. 
+
+@q Are group names case sensitive?
+@a Yes, because unicode can be there...
+
+@q What about formatting for a card on the same line?
+@a 
+@<
+
+Topic    <-> Comment.
+Front    <-> Back.
+Question <-> Answer
+
+
 So below, that is an embedded flash card thing.
 
 So now the program will parse cards out of the file. Then store the cards in
