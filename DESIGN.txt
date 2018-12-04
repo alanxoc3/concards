@@ -1,8 +1,97 @@
 So below, that is an embedded flash card thing.
 
-@>
-@g Numerical Analysis, hello, math, shuxue
-@t 2018-10-10@14:31 @m sm2: { 2.70, 3 }
+So now the program will parse cards out of the file. Then store the cards in
+the .concards directory.
+
+There will be an option to keep the card in a note file. But the default will
+not do that. All the parsing rules could be commandline parameters. So I will
+have to reform my commandline rules next.
+
+I was thinking there is a file/directory in the user's home folder that
+contains lua addons. By default, this will have the basic algorithms. Then
+maybe some more. Also, the same file might exist in /etc if the user's doesn't
+exist.
+
+This would be card embedded in a lua comment. It would be nice if groups could
+be declared before hand.
+
+What if a group could be declared earlier in the file?
+Ok, I really don't want a group tag.
+
+So no parsing things metadata. yeah, no.
+
+Okay, what if the flashcards are parsed out of the files? That actually might
+not be a bad idea. Then the flashcards could be stored more efficiently in the
+.concards directory
+
+There could be only 2 parsing groups.
+-- @> group1 group2 @q test @a yes @m sm2(2.70,3), 2018-10-10@14:31 @<
+
+It would be really nice if the group could be after the @>. But then what
+happens to the options?
+
+If the parsing was just smart enough to parse correctly, then I wouldn't need
+all this stuff. Or if all new lines were preceded by another @q or whatever.
+No, that's a bad idea.
+
+So smarter parsing... How would I accomplish that?
+I could tell that the cards are being preceded by something common.
+
+@> concard-s questions_are_cool
+@> yes
+@m sm2(2.50,0), 2018-10-10@14:31
+
+@q Is there an alternative way to embedding a flashcard in a single line
+   comment?
+@a Umm, no.
+
+@q Can a flashcard in a single line get by without being in a group?
+@a This would take away from a parsing block being flexible.
+
+@q What happens if the lua config file doesn't exist in the home directory?
+@a Then the file will be created for you.
+
+@> mommy
+@q What will the config file be called/look like?
+@a A lua file called "~/.concards/algs.lua". So all your configuration will go in
+   this file. There is no directory.
+
+@q Can groups be declared in the same line with commas?
+@a No, because I want to be complient with unicode, there would be too much to
+   think about that would be allowed/not allowed. So I will go with everything
+   is allowed, up until the next @delimiter.
+
+@q Well, what if there is a newline in the group 'name'?
+   Do I just get rid of extra white space?
+   Do I parse by words?
+@a I get rid of the extra whitespace. So I parse by words.
+
+@q There can be multiple answers. Answers in succession.
+   But, can there be multiple questions?
+   Are question/answers really the best thing to call this?
+   Is front/back even applicable anymore?
+   Will the UI have a front/back, or outline format?
+@a No, not multiple questions. If you have another question, then you can
+   either make a new card, or make it an answer.
+@a Q/A and F/B are both fine to call it.
+
+@q Can a card have multiple different fronts/backs?
+@a An answer can actually have multiple parts:
+@a    One:   there is a bug
+@a    Two:   there is a snake
+@a    Three: on the willow tree
+@n If yes, then a different delimiter would have to be used for reminders.
+@n If no,  then no different delimiters, and a card could have progressions.
+@n A progression could be like a prerequisite.
+@<
+
+
+file doesn't 
+
+@> DEF(sm2), MN(hello), DR, O, N
+@> Numerical Analysis, hello, math, shuxue
+@m sm2(2.70,3), 2018-10-10@14:31
+@m sm2, 2018-10-10@14:31
 
 @f Preconditioning @> ONE_LINE
 @b Basically wants to multiply an equation to make the matrices look more like
@@ -11,7 +100,6 @@ So below, that is an embedded flash card thing.
    Preconditioning is for GMres.
 
 @r hello @r you need @r to go @r away
-
 
 @f Jacobi Preconditioning
 @b who doesn't do something like this.
@@ -36,30 +124,23 @@ out what these delimiters look like.
 All these are formatting options for what happens when the file is written.
 I gotta go over these a bit probably.
 
-*@> META_NEWLINE -> Put a newline before each new meta created. (Default)
-_@> META_INPLACE -> Don't put a newline before newly created metas.
-_@> META_DISABLE -> Don't create any new metas. (But can touch)
-_@> META_IGNORE  -> Don't touch any metas (UMM, I don't want this one I think).
+Ooooh, it sorted out nicely here :).
 
-*@> DELIM_NEWLINE -> Each thing in the card goes on a new line.
-_@> DELIM_ONELINE -> Compactify each card to only be one line.
-_@> DELIM_IGNORE  -> Don't mess with the concards format at all.
+*@> MN, META_NEWLINE  -> Put a newline before each new meta created. (Default)
+_@> MO, META_ONELINE  -> Don't put a newline before newly created metas.
+_@> MR, META_READONLY -> Don't touch meta data at all. (New or change).
 
-*@> CARDS_SPACED  -> Put 2 newlines in between each card. For prettiness.
-_@> CARDS_NEWLINE -> Put a newline in between each card.
-_@> CARDS_SPACE   -> Just put a space after each card. Don't
-_@> CARDS_IGNORE  -> Don't mess with what is in between each card at all.
+*@> DN, DELIM_NEWLINE  -> Each thing in the card goes on a new line.
+_@> DO, DELIM_ONELINE  -> Compactify each card to only be one line.
+_@> DR, DELIM_READONLY -> Don't mess with the concards format at all.
 
-*@> CONTENT_IGNORE  -> Don't touch the content of the card.
-_@> CONTENT_ONELINE -> Turns all the content of a thing into a single line.
-                       WARNING, [formatting] data could be lost with this option.
-                      Make the output format really pretty.
-                      Each card has a blank line in between.
-                      Each delimiter has a newline after it.
-*@> DELIM_NICE     -> This does not effect the content of a card in any way.
+*@> CN, CARDS_NEWLINE  -> Put 2 newlines in between each card. For prettiness.
+_@> CO, CARDS_ONELINE  -> Put cards on on the same line.
+_@> CR, CARDS_READONLY -> Don't mess with what is in between each card at all.
 
-_@> READONLY = META_IGNORE & DELIM_IGNORE & CONTENT_IGNORE
-_@> PRETTIFY = CARDS_SPACED & DELIM_NEWLINE & META_NEWLINE
+*@> N, NEWLINE  = META_NEWLINE  & DELIM_NEWLINE  & CARDS_NEWLINE
+_@> O, ONELINE  = META_ONELINE  & DELIM_ONELINE  & CARDS_ONELINE
+_@> R, READONLY = META_READONLY & DELIM_READONLY & CARDS_READONLY
 
 Okay, let's force everything on it's own line, This means that one cannot have
 whitespace before the cards. But whyshenme!!!? :(. The only way to fix this is
@@ -71,11 +152,13 @@ No. Firstly not within a card, because that presents problems. Secondly just no
 anywhere, because if it can't be within a card, then it doesn't even make
 sense.
 
+And make sure about my meta data thing.
+
 -------- DEPRECATED IDEA --------
 Is it really necessarry to have longer abreviations? No! Don't do it!
-@g     @r      @f     @b    @n    @m
-@grp   @rmd    @frt   @bck  @not  @met
-@group @remind @front @back @note @meta
+@>     @r      @f     @b    @n    @m
+       @rmd    @frt   @bck  @not  @met
+       @remind @front @back @note @meta
 --------       END       --------
 
 links will go by [] (Probably... This is more of a gui thing.)
@@ -119,15 +202,23 @@ So the lua API includes string and math modules plus this date one:
 ```lua
 -- if any of these have an error, then null is returned.
 -- a "date" is just a string with a date and a time.
--- Returns the current date.
+-- Returns the current date (a table)
 function date.today() end
 
 -- if anything is larger than what it should be, then that adds to the date.
-function date.create(year, month, day, hour, min) end
+-- takes in a table:
+-- { year=2018, month=6, day=16, hour=6, min=41 }
+-- nil values are ignored.
+function date.stringify(date) end
+
+-- returns the date, but makes sure all the values are valid. if nils are
+-- found, then those become the base value. (a nil year would be the lowest
+-- year (19something).
+function date.balance(date) end
 
 -- this returns all values as a table
 -- { year=2018, month=6, day=16, hour=6, min=41 }
-function date.parse() end
+function date.parse(str) end
 
 ```
 
