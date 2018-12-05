@@ -1,15 +1,108 @@
 DESIGN TODO:
-   - Format of .concards directory.
-   - All commandline parameters.
-   - Refactor delimiters.
-   - The specific process of extracting a card.
+   1.) Format of .concards directory.
+   2.) All commandline parameters.
+   3.) Refactor delimiters.
+   4.) The specific process of extracting a card.
+   5.) Concards directory having version control.
+
+1. Format of '~/.concards/'.
 
 
+Should an @i and @o be added?
 
+Oh, when you edit a card, the id could be stored.
+
+Are questions/answers trimmed?
+   Questions/Answers can be a trimmed array of lines.
+
+   They also need to remember if there is a line afterwards or not.
+
+   Each card can have the original text contained within. Putting those
+   together will give the original group.
+
+   I don't need any original text for the default prettifying thing. But for
+   the ignore option, each Gk
+
+What happens if an algorithm doesn't exist.
+   
+
+If multiple algs are on the same day, then they are treated as separate cards.
+
+If multiple questions have the same exact name, then what?
+   - 1: Keep the multiple questions?
+   - 2: Combine the questions with answers.
+   
+   I pick keep the multiple questions.
+
+Display can keep track of extra whitespace. The parsing knows nothing about
+that.
+
+What about sub-group syntax?
+   NONE
+
+Need a binding to never review a card again.
+
+group inference is allowed
+
+
+@> @q @a @n @m
+
+below the only anomoly is the @a.
+@a goes with the last question.
+@ after the start of a group though.
+   Can either be ignored or treated as a question.
+   Weird to treat as a question
+   An answer for every single card in the group?
+
+All possibilities:
+
+@> @> combine groups
+@> @q > then q
+@> @a a for all cards in group
+@> @n n for all cards in group
+@> @m m for all cards in group
+@> @< > then < (nothing)
+      
+@q @> q then g
+@q @q different questions
+@q @a q then a
+@q @n q then n
+@q @m q then m
+@q @< q then <
+      
+@a @> a then g
+@a @q a then q
+@a @a multiple answers
+@a @n a then n
+@a @m a then m
+@a @< a then <
+      
+@n @> n then g
+@n @q n then q
+@n @a q/> then a
+@n @n multiple notes
+@n @m n then m
+@n @< n then <
+      
+@m @> m then g
+@m @q m then q
+@m @a q/> then a
+@m @n m then n
+@m @m multiple metas
+@m @< m then <
+      
+These really have no/little meaning:
+@< @> end then start
+@< @q nothing
+@< @a nothing
+@< @n nothing
+@< @m nothing
+@< @< nothing
+      
 @> new-wave-questions
 @q What are valid group names?
-@a letters, unicode (oh no, I forgot). So, anything besides spaces. But commas
-   are really weird. 
+@a first thing
+@a second thing
 
 @q Are group names case sensitive?
 @a Yes, because unicode can be there...
@@ -111,11 +204,16 @@ I could tell that the cards are being preceded by something common.
 @<
 
 
+
+
 file doesn't 
 
 @> DEF(sm2), MN(hello), DR, O, N
 @> Numerical Analysis, hello, math, shuxue
-@m sm2(2.70,3), 2018-10-10@14:31
+
+@m sm2: 2018-10-10@14:31,2.70,3
+@m sm2(2018-10-10@14:31,2.70,3)
+
 @m sm2, 2018-10-10@14:31
 
 @f Preconditioning @> ONE_LINE
@@ -124,7 +222,7 @@ file doesn't
 
    Preconditioning is for GMres.
 
-@r hello @r you need @r to go @r away
+@q hello @q you need @q to go @q away
 
 @f Jacobi Preconditioning
 @b who doesn't do something like this.
@@ -181,9 +279,20 @@ And make sure about my meta data thing.
 
 -------- DEPRECATED IDEA --------
 Is it really necessarry to have longer abreviations? No! Don't do it!
-@>     @r      @f     @b    @n    @m
-       @rmd    @frt   @bck  @not  @met
-       @remind @front @back @note @meta
+@>     @q      @f     @b    @n    @m
+       @qmd    @frt   @bck  @not  @met
+       @qemind @front @back @note @meta
+
+Shortest SM2:
+@> a @q b @m sm2(2018-10-10@14:31,2,3.10) @<
+
+@m sm2(2018-10-10@14:31,2,3.10) 
+@m fin(2018-10-10@14:31)
+
+@m sm2()
+@> @q a @<
+
+@> a @q b @a c @n d sm2(2018-10-10@14:31,2,3.10) @<
 --------       END       --------
 
 links will go by [] (Probably... This is more of a gui thing.)
