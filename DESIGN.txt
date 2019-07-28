@@ -8,7 +8,15 @@ DESIGN TODO:
 1. Format of '~/.concards/'.
 
 
+Will all algorithms have a date. Or will they have a function instead.
+If there is a function, then that computation will have to be performed on
+every card for filtering. Also a function will be hard to read.
+
 Should an @i and @o be added?
+   @o would be options
+   @i would be umm.. I forget
+   Yeah.... nah. The data of the questions/answers will not be altered, but
+   Everything else is prone to change.
 
 Oh, when you edit a card, the id could be stored.
 
