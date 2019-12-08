@@ -9,9 +9,8 @@ flashcards!
 ## Install
 Install like any other go application.
 ``` bash
-go get github.com/alanxoc3/concards;
-cd $GOPATH/src/github.com/alanxoc3/concards;
-go build; # Or `./install.sh`
+go install github.com/alanxoc3/concards
+~/$GOPATH/bin/concards --help
 ```
 
 ## Features
