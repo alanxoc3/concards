@@ -1,3 +1,9 @@
+New ideas:
+   What if cards edited through the interface are preserved, but cards edited
+   manually are checksummed. If the checksum changes, then that card must be
+   reviewed again. Hmm... That could be really interesting. Then files don't
+   have to be touched... :D
+
 DESIGN TODO:
    1.) Format of .concards directory.
    2.) All commandline parameters.
@@ -6,7 +12,7 @@ DESIGN TODO:
    5.) Concards directory having version control.
 
 1. Format of '~/.concards/'.
-
+Or ./config/concards/
 
 Will all algorithms have a date. Or will they have a function instead.
 If there is a function, then that computation will have to be performed on
