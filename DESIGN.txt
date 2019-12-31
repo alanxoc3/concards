@@ -1,8 +1,84 @@
+Let's use a bolt database.
+Bolt database: https://github.com/boltdb/bolt
+
+
+If a card has multiple groups?
+
+Bolting it away
+
+Cards are written on keystroke.
+
+Multiple concards cannot be run at the same time. Well, they can on different
+databases.
+
+Metadata file is locked.
+
+
+
+
+
+concards:
+   group1 group3:
+      what is the goal?:
+         answers:
+            There is no goal
+            There is a goal
+            Everything
+         notes:
+            This note is cool
+            This note is also cool
+            And this one of course
+         algorithms:
+            sm2:
+               data: 2.5 10
+               timestamp: 2019-09-09@10:51
+            monthly:
+               data:
+               timestamp: 2019-09-09@10:51
+
+All possible meta data things for 1.0:
+   @> @! @q @a @n @m <@
+
 New ideas:
    What if cards edited through the interface are preserved, but cards edited
    manually are checksummed. If the checksum changes, then that card must be
    reviewed again. Hmm... That could be really interesting. Then files don't
    have to be touched... :D
+
+I want markdown support in some way!
+
+Yeah... Markdown embedding is possible. Checksums could take care of spaced
+repetition.
+
+Checksum of groups and question.
+
+Way to parse out meta data. Or keep meta data. Meta data is ignored if the hash
+already exists.
+
+If this was an online thing, people would be able to add new questions/groups.
+If it already exists, you can add an answer to the existing ones. Everything
+existing is static, but you can vote on things and flag things.
+
+Timestamp support?
+
+@> 2019-03-27
+What is the purpose of life?
+   I know, but don't want to tell you.
+
+Okay...
+
+
+@> @! These are word exclusions <@
+
+@> @! @q @a @n @m <@
+
+@q What is this:
+@a - Yes
+   - No
+   - Maybe
+/* @> @! */ /* <@ */
+
+@> group <@
 
 DESIGN TODO:
    1.) Format of .concards directory.
@@ -58,6 +134,7 @@ Need a binding to never review a card again.
 
 group inference is allowed
 
+Wait a sec... What is the point of notes if this is embedded?
 
 @> @q @a @n @m
 
@@ -76,6 +153,8 @@ All possibilities:
 @> @n n for all cards in group
 @> @m m for all cards in group
 @> @< > then < (nothing)
+@> @! Global ignores
+@> @t Default timestamp for all cards and all algorithms in group.
       
 @q @> q then g
 @q @q different questions
@@ -83,6 +162,8 @@ All possibilities:
 @q @n q then n
 @q @m q then m
 @q @< q then <
+@q @! Global ignores
+@q @t Default timestamp for all meta data in question
       
 @a @> a then g
 @a @q a then q
@@ -90,6 +171,8 @@ All possibilities:
 @a @n a then n
 @a @m a then m
 @a @< a then <
+@a @! Global ignores
+@a @t Default timestamp for all meta data for the answer
       
 @n @> n then g
 @n @q n then q
@@ -97,6 +180,8 @@ All possibilities:
 @n @n multiple notes
 @n @m n then m
 @n @< n then <
+@n @! Global ignores
+@n @t Default timestamp for all meta data for the note.
       
 @m @> m then g
 @m @q m then q
@@ -104,6 +189,8 @@ All possibilities:
 @m @n m then n
 @m @m multiple metas
 @m @< m then <
+@m @! Global ignores
+@m @t Default timestamp for all meta data below this.
       
 These really have no/little meaning:
 @< @> end then start
@@ -157,7 +244,13 @@ not be a bad idea. Then the flashcards could be stored more efficiently in the
 .concards directory
 
 There could be only 2 parsing groups.
--- @> group1 group2 @q test @a yes @m sm2(2.70,3), 2018-10-10@14:31 @<
+@> group1 group2 @!
+   @q test
+   @a yes
+   @n This is just a test card. Real ones are coming soon.
+   @t 2019-09-09@10:00
+   @m sm2 2.70 3 @m monthly
+@<
 
 It would be really nice if the group could be after the @>. But then what
 happens to the options?
@@ -169,13 +262,16 @@ No, that's a bad idea.
 So smarter parsing... How would I accomplish that?
 I could tell that the cards are being preceded by something common.
 
-@> concard-s questions_are_cool
+-- @> concards questions_are_cool @q Why why why. @a Why why why. @q Why why why. @a Why why why. <@
+// @> concards questions_are_cool @q Why why why. @a Why why why. @q Why why why. @a Why why why. <@
+/* @> concards questions_are_cool @q Why why why. @a Why why why. @q Why why why. @a Why why why. <@ */
+
 @> yes
 @m sm2(2.50,0), 2018-10-10@14:31
 
 @q Is there an alternative way to embedding a flashcard in a single line
    comment?
-@a Umm, no.
+@a Umm, yes.
 
 @q Can a flashcard in a single line get by without being in a group?
 @a This would take away from a parsing block being flexible.
@@ -371,9 +467,3 @@ function date.parse(str) end
 ```
 
 And a function would look like this:
-
-function sm2(params, card)
-
-end
-
-There should

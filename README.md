@@ -1,3 +1,9 @@
+<!-- The group for all flashcards in this file: @> concards <@ -->
+<!-- Below sets concards as the group. Ignoring HTML comments -->
+<!-- @@> Question: Answer: --> <!-- <@ -->
+
+<!-- @> @! --> <!-- * ## <@ -->
+
 # <img src="logo.svg" />
 
 Turning notes into flashcards. Concards is my ongoing attempt to make
@@ -12,15 +18,22 @@ Install like any other go application.
 go install github.com/alanxoc3/concards
 ~/$GOPATH/bin/concards --help
 ```
-
+<!-- @> thing -->
 ## Features
 * Implements the [SM2](https://www.supermemo.com/english/ol/sm2.htm) Repetition Algorithm.
-* Beautiful terminal gui.
-* Supports UTF-8!
-* Reading in from multiple files.
-* Undoing/Redoing
-* Easily editing a card while reviewing your cards.
-* And More!!! (I think :)
+
+Shortest card:
+@> @q h <@
+@> practice @q hello-world @a yes mom <@
+
+<!-- @> thing @q -->
+## Feature 2
+* Beautiful terminal gui. <!-- @a -->
+* Supports UTF-8! <!-- @a -->
+* Reading in from multiple files. <!-- @a -->
+* Undoing/Redoing <!-- @a -->
+* Easily editing a card while reviewing your cards. <!-- @a -->
+* And More!!! (I think :) <!-- <@ -->
 
 ## Usage
 The file syntax was designed to be very simple and flexible, allowing anyone to
