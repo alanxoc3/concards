@@ -13,10 +13,6 @@ databases.
 
 Metadata file is locked.
 
-
-
-
-
 concards:
    group1 group3:
       what is the goal?:
@@ -467,3 +463,84 @@ function date.parse(str) end
 ```
 
 And a function would look like this:
+
+
+How do I store the data, while keeping the questions secure.
+
+Here is an idea:
+
+db:
+   cards:
+      THIS15TH3UUID:
+         question: "What is the question?"
+         answer: Bucket? (Maybe a marshalled array instead)
+            1: "Answer #1"
+            2: "Answer #2"
+            3: "Answer #3"
+            4: "..."
+         note: Bucket? (Maybe a marshalled array instead)
+            1: "Note #1"
+            2: "Note #2"
+            3: "Note #3"
+            4: "..."
+         timestamp: 2019-09-09@10:51
+         algorithm-type: sm2
+         algorithm-data: (Maybe marshalled array instead)
+            1: 2.5
+            2: 10
+         groups:
+            group1: nil
+            group2: nil
+            group3: nil
+   groups:
+      group1:
+         THIS15TH3UUID: nil
+         THIS15TH3UUID: nil
+         THIS15TH3UUID: nil
+         THIS15TH3UUID: nil
+      group2:
+         THIS15TH3UUID: nil
+      group3:
+         THIS15TH3UUID: nil
+
+
+Max sizes for answers, notes, groups names, questions, algorithm name, algorithm parameters
+
+
+
+Are answers included as part of the hash? Well, there probably shouldn't be
+duplicate answers. That is already taken care of. Same with duplicate notes.
+
+
+And the final question for today. Why do I want both the database format and
+the input format?
+
+- One mode is consuming into database.
+- One mode is copying into database.
+- I don't want to write in-place, because that leads to some parsing problems.
+- But a problem with consuming is that the actual file is changed (flashcards
+  are deleted). Sooo...
+
+The database file is more like all your memory (or your future memory).
+Text files with flashcards are like new pieces of knowledge that you should put
+into your future memory.
+
+The only way for you to screw something up is if you edit a card, then try to
+import it again later. If you edit the question, then I'll assume you want to
+just make a new card, because you want to re-learn old data that you messed up.
+
+If there is a conflict, then there would be a problem. Ok. If the conflict is
+with the meta data, we should reload the meta data from the file, because you
+want to reset your mind. Same with notes. We will assume that you want to reset
+all your notes for that card. And timestamp too.
+
+I take that back. There should be a flag that allows you to rewrite your memory.
+
+And if you rename a card in a template file. You can get all the cards for a
+file and manage them.
+
+You can also convert a database file into a readable file. You can do this with
+a group filter, or you can do this with everything in the database. The way to
+cleanup your global database file would be to move all your cards to a file.
+This keeps the time stamps and algorithms. Then you would delete those cards,
+manage them, then add them back in.

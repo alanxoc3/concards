@@ -1,0 +1,99 @@
+# Database format
+db:
+   cards:
+      TH15154CH3CKSUM:
+         question: "What is the question?"
+         answer: Bucket? (Maybe a marshalled array instead)
+            1: "Answer #1"
+            2: "Answer #2"
+            3: "Answer #3"
+            4: "..."
+         note: Bucket? (Maybe a marshalled array instead)
+            1: "Note #1"
+            2: "Note #2"
+            3: "Note #3"
+            4: "..."
+         timestamp: 2019-09-09@10:51
+         algorithm-type: sm2
+         algorithm-data: (Maybe marshalled array instead)
+            1: 2.5
+            2: 10
+         groups:
+            group1: nil
+            group2: nil
+            group3: nil
+   groups:
+      group1:
+         TH15154CH3CKSUM: nil
+      group2:
+         TH15154CH3CKSUM: nil
+      group3:
+         TH15154CH3CKSUM: nil
+
+- @a, @n, @q all have a max character size of 2048.
+- groups, alg names, and alg parameters all have a max character size of 64
+- TH15154CH3CKSUM is a checksum of the question.
+   - Whitespace is Whitespace is changed to a single space for the hash. But the whitespace is preserved for actually storing the card.
+
+How should the time work?
+   Time is always in the Greenwich timezone, RFC-3339, or it can be part of it.
+   The reasoning to this is that people will rarely look at that. If they want
+   control over it, then they need to understand it.
+
+# File format:
+All possible meta data things for 1.0:
+```
+   @> @! @q @a @n @m @t <@
+```
+
+## "@>"
+Used to start the concards section. You MUST specify the group afterwards.
+
+## "<@"
+Ends the concards section. Concards will not interpret anything after this
+until it encounters another section "@>".
+
+## "@!"
+Pass it a list of space separated strings, and those strings will be ignored
+for the remainder of the concards section.
+
+## "@q"
+The question for a card. It uses the groups specified from "@>".
+
+## "@a"
+An answer for a card. It uses the groups specified from "@a". Multiple per
+question.
+
+## "@t"
+The timestamp for a card. Only one per question.
+
+## "@m"
+One meta data per question.
+
+## "@n"
+Multiple notes per question.
+
+@m, and @t on @>?
+   They will give defaults to everything.
+
+@a, and @n on @>?
+   These give a default list of answers and notes to the next cards. If the
+   card has any notes or answers, then these will be overridden.
+
+Example with only one card:
+```
+@> group1 group2 @!
+   @q Who was the first man to walk on the moon?
+   @a Neil Armstrong
+   @n Also, that was in the year 1969
+   @t 2019-09-09 10:00:01Z
+   @m sm2 2.70 3
+@<
+```
+
+Options for duplicates:
+- Ignore the duplicate. (Default)
+- Overwrite your memory.
+- Merge notes.
+
+## File format verbose.
