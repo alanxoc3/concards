@@ -97,3 +97,13 @@ Options for duplicates:
 - Merge notes.
 
 ## File format verbose.
+# Concard Files
+## ~/.config/concards/db.bolt
+This is the default filepath for your flashcard database.
+
+## ~/.config/concards/config.yaml
+This is the configuration file location. Use this to override defaults.
+
+## ~/.config/concards/algs/
+This is where new algorithms will be placed. Concards looks for any "*.lua"
+file, compiles them, and adds appropriate new algorithms to concards.
