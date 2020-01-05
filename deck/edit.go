@@ -57,7 +57,7 @@ func EditDeck(editor string, d Deck) error {
 		return fmt.Errorf("Error: The editor returned an error code.")
 	}
 
-	if dc, err := Open(tempFile.Name()); err != nil {
+	if dc, err := OpenNewFormat(tempFile.Name()); err != nil {
 		return err
 	} else {
 		copyDeckContents(&d, &dc.Deck)

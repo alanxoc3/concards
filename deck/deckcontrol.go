@@ -44,6 +44,14 @@ func (d *DeckControl) AddGroups(gps *[]string) {
 	}
 }
 
+func (d *DeckControl) AddGroupsSet(groups *map[string]bool) {
+   for k := range *groups {
+		if !constring.IsInStrList(d.Groups, k) {
+			d.Groups = append(d.Groups, k)
+		}
+	}
+}
+
 // These are what adds cards. The main decks should have ids.
 func (d *DeckControl) addCardWithoutId(c *card.Card) {
 	counter += 1

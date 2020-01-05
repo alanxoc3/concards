@@ -60,7 +60,7 @@ func OpenDecks(filenames []string) (DeckControls, error) {
 	var dcks DeckControls
 
 	for _, filename := range filenames {
-		d, err := Open(filename)
+		d, err := OpenNewFormat(filename)
 		if err != nil {
 			return nil, err
 		} else {

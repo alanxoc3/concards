@@ -14,6 +14,8 @@ db:
             3: "Note #3"
             4: "..."
          timestamp: 2019-09-09@10:51
+         date-created: 2019-09-09@10:51
+         date-edited: 2019-09-09@10:51
          algorithm-type: sm2
          algorithm-data: (Maybe marshalled array instead)
             1: 2.5
