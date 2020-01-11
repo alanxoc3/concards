@@ -1,4 +1,4 @@
-package deck
+package file
 
 import (
 	"fmt"
@@ -7,6 +7,7 @@ import (
 	"os/exec"
 
 	"github.com/alanxoc3/concards/card"
+	"github.com/alanxoc3/concards/deck"
 )
 
 func min(a, b int) int {
@@ -18,7 +19,7 @@ func min(a, b int) int {
 }
 
 // Assumes the deck is sorted how you want it to be sorted.
-func EditDeck(editor string, d Deck) error {
+func EditDeck(editor string, d deck.Deck) error {
 	message := "You may ONLY EDIT the cards here.\nREARRANGING, DELETING, or ADDING cards WILL CORRUPT your files."
 
 	env := editor
@@ -44,7 +45,7 @@ func EditDeck(editor string, d Deck) error {
 	// It doesn't really matter if there is an error removing the temp file.
 	defer os.Remove(tempFile.Name())
 
-	err = WriteDeck(&d, tempFile.Name(), message)
+	err = WriteDeckToFile(&d, tempFile.Name(), message)
 	if err != nil {
 		return fmt.Errorf("Error: Couldn't write to a temporary file for editing.\n")
 	}
@@ -57,25 +58,23 @@ func EditDeck(editor string, d Deck) error {
 		return fmt.Errorf("Error: The editor returned an error code.")
 	}
 
-	if dc, err := OpenNewFormat(tempFile.Name()); err != nil {
+	if dc, err := ReadToDeck(tempFile.Name()); err != nil {
 		return err
 	} else {
-		copyDeckContents(&d, &dc.Deck)
+		copyDeckContents(&d, &dc)
 	}
 
 	return nil
 }
 
-func copyDeckContents(dst, src *Deck) {
+func copyDeckContents(dst, src *deck.Deck) {
 	for i := 0; i < min(len(*src), len(*dst)); i++ {
-		tmpId := (*dst)[i].Id
 		*(*dst)[i] = *(*src)[i]
-		(*dst)[i].Id = tmpId
 	}
 }
 
 func EditCard(editor string, c *card.Card) error {
-	var d Deck
+	var d deck.Deck
 	d = append(d, c)
 	return EditDeck(editor, d)
 }

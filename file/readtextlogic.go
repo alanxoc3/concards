@@ -2,10 +2,10 @@ package file
 
 func greaterthan_logic(info *parseinfo) {
    switch info.prevState {
-      case OnNothing: // reset the info
+      case OnNothing: fallthrough
+      case OnGroup:
          resetGroup(info)
          resetCard(info)
-      case OnGroup: break // continue adding to the group.
       case OnQuestion: info.shouldCreateCard = true
    }
 }

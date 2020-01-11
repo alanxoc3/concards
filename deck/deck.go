@@ -1,12 +1,10 @@
 package deck
 
 import (
-	"fmt"
 	"math/rand"
 	"sort"
 
 	"github.com/alanxoc3/concards/card"
-	"github.com/alanxoc3/concards/constring"
 )
 
 type Deck []*card.Card
@@ -16,7 +14,7 @@ func (cards Deck) Len() int {
 }
 
 func (cards Deck) Less(i, j int) bool {
-	return cards[i].Id < cards[j].Id
+   return cards[i].Question < cards[j].Question
 }
 
 func (cards Deck) Swap(i, j int) {
@@ -27,40 +25,12 @@ func (cards Deck) Sort() {
 	sort.Sort(cards)
 }
 
-// includes the group markers
-func (cards Deck) ToString() string {
-	// do groups stuff
-	str := ""
-	var curGroups []string
-
-	for _, c := range cards {
-		if !constring.StringListsIdentical(curGroups, c.Groups) {
-			curGroups = c.Groups
-			str += constring.GroupListToString(curGroups) + "\n"
-		}
-
-		str += c.FormatFile() + "\n\n"
-	}
-
-	return str
-}
-
 // fisher-yates shuffle
 func (cards Deck) Shuffle() {
 	// start at the end of the deck, go down.
 	for i := len(cards) - 1; i > 0; i-- {
 		swapPlace := rand.Intn(i + 1) // The plus one is to enable the card to remain in the same place.
 		cards.Swap(i, swapPlace)
-	}
-}
-
-// Prints out the cards in the deck, for debugging purposes.
-func (cards Deck) Print() {
-	count := 0
-	for _, c := range cards {
-		count += 1
-		fmt.Printf("Card %d\n", count)
-		c.Print()
 	}
 }
 

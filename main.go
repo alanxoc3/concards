@@ -54,7 +54,7 @@ func main() {
 				do_err(err)
 			} else if cfg.Usage == termhelp.PRINTMODE {
 				deck.Sort()
-				fmt.Print(deck.ToString())
+				fmt.Print(file.WriteDeckToString(&deck))
 			}
 		}
 	}

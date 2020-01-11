@@ -119,3 +119,12 @@ Now, I think the database will manage the group problem. And also the id
 problem. So I don't think I need cards to have an id. Well maybe the
 checksum... And I don't need a deck control anymore. Let's remove the deck
 control now and make it compile.
+
+Do I need 
+
+What packages do I need?
+- file
+- termgui
+- deck
+- main
+- 

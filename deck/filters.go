@@ -2,8 +2,6 @@ package deck
 
 import (
 	"time"
-
-	"github.com/alanxoc3/concards/constring"
 )
 
 // Trims a deck to only have this many cards in it.
@@ -19,11 +17,11 @@ func (cards Deck) FilterNumber(param int) Deck {
 func (cards Deck) FilterGroups(param []string) Deck {
 	var list Deck
 
-	for _, c := range cards {
-		if constring.ListHasOtherList(c.Groups, param) {
-			list = append(list, c)
-		}
-	}
+	// for _, c := range cards {
+		// if constring.ListHasOtherList(c.Groups, param) {
+			// list = append(list, c)
+		// }
+	// }
 
 	return list
 }
