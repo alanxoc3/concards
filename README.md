@@ -27,7 +27,7 @@ Shortest card:
 @> practice @q hello-world @a yes mom <@
 
 <!-- @> thing @q -->
-## Feature 2
+## Feature 2 <!-- @a -->
 * Beautiful terminal gui. <!-- @a -->
 * Supports UTF-8! <!-- @a -->
 * Reading in from multiple files. <!-- @a -->
