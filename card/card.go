@@ -29,11 +29,11 @@ func NewNewCard(
    question []string,
    answers [][]string,
    notes [][]string,
-   meta []string,
-   timestamp []string) (c *Card, err error) {
+   timestamp []string,
+   meta []string) (c *Card) {
 	c = &Card{}
    c.Question = strings.Join(question, " ")
-   c.Answer = strings.Join(answers[len(answers)-1], " ")
+   // c.Answer = strings.Join(answers[len(answers)-1], " ")
    return
 }
 

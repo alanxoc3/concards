@@ -6,7 +6,7 @@ import (
 	"github.com/alanxoc3/concards/constring"
 )
 
-// Simply truncates to the beginning of the list.
+// Trims a deck to only have this many cards in it.
 func (cards Deck) FilterNumber(param int) Deck {
 	if param > 0 && len(cards) > param {
 		return cards[0:param]
@@ -15,6 +15,7 @@ func (cards Deck) FilterNumber(param int) Deck {
 	}
 }
 
+// Trims a deck to only contain these groups in it.
 func (cards Deck) FilterGroups(param []string) Deck {
 	var list Deck
 
@@ -27,12 +28,14 @@ func (cards Deck) FilterGroups(param []string) Deck {
 	return list
 }
 
+// Trims a deck to only contain these groups in it.
 func (cards Deck) FilterGroup(param string) Deck {
 	var groups []string
 	groups = append(groups, param)
 	return cards.FilterGroups(groups)
 }
 
+// idk
 func (cards Deck) FilterGroupsAdd(param []string) Deck {
 	var list Deck
 

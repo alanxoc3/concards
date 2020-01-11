@@ -109,3 +109,13 @@ This is the configuration file location. Use this to override defaults.
 ## ~/.config/concards/algs/
 This is where new algorithms will be placed. Concards looks for any "*.lua"
 file, compiles them, and adds appropriate new algorithms to concards.
+
+
+# scratch
+Originally, a deck is just a list of cards. Every card has an id. And a deck
+control is a deck, file contents, file name, and groups.
+
+Now, I think the database will manage the group problem. And also the id
+problem. So I don't think I need cards to have an id. Well maybe the
+checksum... And I don't need a deck control anymore. Let's remove the deck
+control now and make it compile.
