@@ -2,6 +2,7 @@ package card
 
 import (
 	"errors"
+	"strings"
 	"fmt"
 
 	"github.com/alanxoc3/concards/algs"
@@ -20,6 +21,20 @@ type Card struct {
 	Id       int
 	File     string
 	Deleted  bool
+}
+
+// TODO: Use the note.
+func NewNewCard(
+   groups map[string]bool,
+   question []string,
+   answers [][]string,
+   notes [][]string,
+   meta []string,
+   timestamp []string) (c *Card, err error) {
+	c = &Card{}
+   c.Question = strings.Join(question, " ")
+   c.Answer = strings.Join(answers[len(answers)-1], " ")
+   return
 }
 
 // Parses and validates block of text as card.
