@@ -6,10 +6,10 @@ import (
 	"os"
 	"time"
 
-	// "github.com/alanxoc3/concards/deck"
-	// "github.com/alanxoc3/concards/termboxgui"
 	"github.com/alanxoc3/concards/termhelp"
+	"github.com/alanxoc3/concards/termboxgui"
 	"github.com/alanxoc3/concards/file"
+	"github.com/alanxoc3/concards/deck"
 )
 
 func main() {
@@ -30,8 +30,12 @@ func main() {
 
 	//cfg.Print()
 
-	deck, err := file.ReadToDeck(cfg.Files[0])
-	do_err(err)
+   cards := deck.Deck{}
+   for _, f := range cfg.Files {
+      d, err := file.ReadToDeck(f)
+      do_err(err)
+      cards = append(cards, d...)
+   }
 
 	writeFunc := func() {
 		// err := decks.Write()
@@ -42,19 +46,19 @@ func main() {
 		writeFunc()
 
 	} else {
-		if len(deck) > 0 {
+		if len(cards) > 0 {
 			if cfg.Usage == termhelp.VIEWMODE {
-				// err := termboxgui.TermBoxRun(session, cfg, decks)
+				err := termboxgui.TermBoxRun(cards, cfg)
+				do_err(err)
 				// writeFunc()
-				// do_err(err)
 			} else if cfg.Usage == termhelp.EDITMODE {
-				deck.Sort()
+				cards.Sort()
 				// err := deck.EditDeck(cfg.Editor, deck)
 				writeFunc()
 				do_err(err)
 			} else if cfg.Usage == termhelp.PRINTMODE {
-				deck.Sort()
-				fmt.Print(file.WriteDeckToString(&deck))
+				cards.Sort()
+				fmt.Print(file.WriteDeckToString(&cards))
 			}
 		}
 	}

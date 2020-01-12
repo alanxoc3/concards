@@ -2,6 +2,7 @@ package termboxgui
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/alanxoc3/concards/algs"
 	"github.com/alanxoc3/concards/card"
@@ -101,10 +102,10 @@ func tbvertical(x int, color termbox.Attribute) {
 
 // print question, returns final
 func tbprint_gq(c *card.Card, color termbox.Attribute) (int, int) {
-	grps := c.FormatGroups()
+	grps := strings.Join(c.Groups.ToArray(), " ")
 	_, y := tbprintwrap(0, 0, termbox.ColorCyan, coldef, grps)
 
-	ques := c.FormatQuestion()
+	ques := c.Question
 	return tbprintwrap(0, y+2, color, coldef, ques)
 }
 
@@ -112,7 +113,7 @@ func tbprint_gq(c *card.Card, color termbox.Attribute) (int, int) {
 func tbprint_gqa(c *card.Card) {
 	_, y := tbprint_gq(c, termbox.ColorCyan)
 
-	ans := c.FormatAnswer()
+	ans := strings.Join(c.Answers, "\n\n")
 	tbprintwrap(3, y+2, termbox.ColorWhite, coldef, ans)
 }
 
@@ -182,14 +183,14 @@ func tbprint_stat_msg() {
 
 func update_stat_msg_and_card(c *card.Card, k algs.Know) {
 	if k == algs.NO {
-		c.Metadata.Execute(algs.NO)
+      c.Metadata.Exec(c.Metadata, algs.NO)
 		update_stat_msg("Not a clue, card put to the back of the pile.", termbox.ColorRed)
 	} else if k == algs.IDK {
-		c.Metadata.Execute(algs.IDK)
+      c.Metadata.Exec(c.Metadata, algs.IDK)
 		update_stat_msg("Sounds familiar, card put to the back of the pile.", termbox.ColorYellow)
 	} else if k == algs.YES {
-		c.Metadata.Execute(algs.YES)
-		time := c.Metadata.Next.Format("Mon Jan 2, 2006 @ 15:04")
+      c.Metadata.Exec(c.Metadata, algs.YES)
+		time := c.Metadata.Next.Format("Mon 2 Jan 2006 @ 15:04")
 		update_stat_msg(fmt.Sprintf("I know it! Next review is %s.", time), termbox.ColorCyan)
 	}
 }

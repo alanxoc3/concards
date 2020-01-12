@@ -50,14 +50,6 @@ func note_logic(info *parseinfo) {
    }
 }
 
-func timestamp_logic(info *parseinfo) {
-   switch info.prevState {
-      case OnNothing: break
-      case OnGroup: break // TODO: meta for group in future?
-      case OnQuestion: info.timestamp = []string{}
-   }
-}
-
 func meta_logic(info *parseinfo) {
    switch info.prevState {
       case OnNothing: break

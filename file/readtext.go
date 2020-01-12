@@ -17,7 +17,6 @@ const (
    OnQuestion = iota
    OnAnswer = iota
    OnNote = iota
-   OnTime = iota
    OnMeta = iota
 )
 
@@ -28,7 +27,6 @@ type parseinfo struct {
    answers [][]string
    notes [][]string
    meta []string
-   timestamp []string
    state int
    prevState int
    shouldCreateCard bool
@@ -41,7 +39,6 @@ func newInfo() *parseinfo {
       question: []string{},
       answers: [][]string{},
       notes: [][]string{},
-      timestamp: []string{},
       meta: []string{},
       state: OnNothing,
       prevState: OnNothing }
@@ -55,7 +52,6 @@ func resetCard(info *parseinfo) {
    info.question = []string{}
    info.answers = [][]string{}
    info.notes = [][]string{}
-   info.timestamp = []string{}
    info.meta = []string{}
    info.shouldCreateCard = false
 }
@@ -73,7 +69,6 @@ var ParseValues = map[string]int{
    "@q": OnQuestion, "@Q": OnQuestion,
    "@a": OnAnswer,   "@A": OnAnswer,
    "@n": OnNote,     "@N": OnNote,
-   "@t": OnTime,     "@T": OnTime,
    "@m": OnMeta,     "@M": OnMeta }
 
 func UpdatePrevState(info *parseinfo) {
@@ -123,12 +118,11 @@ func ReadToDeck(filename string) (d deck.Deck, err error) {
                case OnQuestion: question_logic(info)
                case OnAnswer: answer_logic(info)
                case OnNote: note_logic(info)
-               case OnTime: timestamp_logic(info)
                case OnMeta: meta_logic(info)
             }
 
             if info.shouldCreateCard {
-               d = append(d, card.New(info.groups, info.question, info.answers, info.notes, info.timestamp, info.meta))
+               d = append(d, card.New(info.groups, info.question, info.answers, info.notes, info.meta))
                resetCard(info)
             }
          } else {
@@ -141,13 +135,13 @@ func ReadToDeck(filename string) (d deck.Deck, err error) {
                } else if info.state == OnQuestion {
                   info.question = append(info.question, t)
                } else if info.state == OnAnswer {
-                  i := len(info.answers)-1
-                  info.answers[i] = append(info.answers[i], t)
+                  if i := len(info.answers)-1; i > 0 {
+                     info.answers[i] = append(info.answers[i], t)
+                  }
                } else if info.state == OnNote {
-                  i := len(info.notes)-1
-                  info.notes[i] = append(info.notes[i], t)
-               } else if info.state == OnTime {
-                  info.timestamp = append(info.timestamp, t)
+                  if i := len(info.notes)-1; i > 0 {
+                     info.notes[i] = append(info.notes[i], t)
+                  }
                } else if info.state == OnMeta {
                   info.meta = append(info.meta, t)
                }

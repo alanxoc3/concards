@@ -33,7 +33,7 @@ concards:
                timestamp: 2019-09-09@10:51
 
 All possible meta data things for 1.0:
-   @> @! @q @a @n @m <@
+   \@> @! @q @a @n @m <@
 
 New ideas:
    What if cards edited through the interface are preserved, but cards edited
@@ -57,24 +57,24 @@ existing is static, but you can vote on things and flag things.
 
 Timestamp support?
 
-@> 2019-03-27
+\@> 2019-03-27
 What is the purpose of life?
    I know, but don't want to tell you.
 
 Okay...
 
 
-@> @! These are word exclusions <@
+\@> @! These are word exclusions <@
 
-@> @! @q @a @n @m <@
+\@> @! @q @a @n @m <@
 
 @q What is this:
 @a - Yes
    - No
    - Maybe
-/* @> @! */ /* <@ */
+/* \@> @! */ /* <@ */
 
-@> group <@
+\@> group <@
 
 DESIGN TODO:
    1.) Format of .concards directory.
@@ -132,7 +132,7 @@ group inference is allowed
 
 Wait a sec... What is the point of notes if this is embedded?
 
-@> @q @a @n @m
+\@> @q @a @n @m
 
 below the only anomoly is the @a.
 @a goes with the last question.
@@ -143,16 +143,16 @@ below the only anomoly is the @a.
 
 All possibilities:
 
-@> @> combine groups
-@> @q > then q
-@> @a a for all cards in group
-@> @n n for all cards in group
-@> @m m for all cards in group
-@> @< > then < (nothing)
-@> @! Global ignores
-@> @t Default timestamp for all cards and all algorithms in group.
-      
-@q @> q then g
+\@> \@> combine groups
+\@> @q > then q
+\@> @a a for all cards in group
+\@> @n n for all cards in group
+\@> @m m for all cards in group
+\@> @< > then < (nothing)
+\@> @! Global ignores
+\@> @t Default timestamp for all cards and all algorithms in group.
+
+@q \@> q then g
 @q @q different questions
 @q @a q then a
 @q @n q then n
@@ -160,8 +160,8 @@ All possibilities:
 @q @< q then <
 @q @! Global ignores
 @q @t Default timestamp for all meta data in question
-      
-@a @> a then g
+
+@a \@> a then g
 @a @q a then q
 @a @a multiple answers
 @a @n a then n
@@ -170,7 +170,7 @@ All possibilities:
 @a @! Global ignores
 @a @t Default timestamp for all meta data for the answer
       
-@n @> n then g
+@n \@> n then g
 @n @q n then q
 @n @a q/> then a
 @n @n multiple notes
@@ -179,7 +179,7 @@ All possibilities:
 @n @! Global ignores
 @n @t Default timestamp for all meta data for the note.
       
-@m @> m then g
+@m \@> m then g
 @m @q m then q
 @m @a q/> then a
 @m @n m then n
@@ -189,14 +189,14 @@ All possibilities:
 @m @t Default timestamp for all meta data below this.
       
 These really have no/little meaning:
-@< @> end then start
+@< \@> end then start
 @< @q nothing
 @< @a nothing
 @< @n nothing
 @< @m nothing
 @< @< nothing
       
-@> new-wave-questions
+\@> new-wave-questions
 @q What are valid group names?
 @a first thing
 @a second thing
@@ -240,7 +240,7 @@ not be a bad idea. Then the flashcards could be stored more efficiently in the
 .concards directory
 
 There could be only 2 parsing groups.
-@> group1 group2 @!
+\@> group1 group2 @!
    @q test
    @a yes
    @n This is just a test card. Real ones are coming soon.
@@ -248,7 +248,7 @@ There could be only 2 parsing groups.
    @m sm2 2.70 3 @m monthly
 @<
 
-It would be really nice if the group could be after the @>. But then what
+It would be really nice if the group could be after the \@>. But then what
 happens to the options?
 
 If the parsing was just smart enough to parse correctly, then I wouldn't need
@@ -258,11 +258,11 @@ No, that's a bad idea.
 So smarter parsing... How would I accomplish that?
 I could tell that the cards are being preceded by something common.
 
--- @> concards questions_are_cool @q Why why why. @a Why why why. @q Why why why. @a Why why why. <@
-// @> concards questions_are_cool @q Why why why. @a Why why why. @q Why why why. @a Why why why. <@
-/* @> concards questions_are_cool @q Why why why. @a Why why why. @q Why why why. @a Why why why. <@ */
+-- \@> concards questions_are_cool @q Why why why. @a Why why why. @q Why why why. @a Why why why. <@
+// \@> concards questions_are_cool @q Why why why. @a Why why why. @q Why why why. @a Why why why. <@
+/* \@> concards questions_are_cool @q Why why why. @a Why why why. @q Why why why. @a Why why why. <@ */
 
-@> yes
+\@> yes
 @m sm2(2.50,0), 2018-10-10@14:31
 
 @q Is there an alternative way to embedding a flashcard in a single line
@@ -275,7 +275,7 @@ I could tell that the cards are being preceded by something common.
 @q What happens if the lua config file doesn't exist in the home directory?
 @a Then the file will be created for you.
 
-@> mommy
+\@> mommy
 @q What will the config file be called/look like?
 @a A lua file called "~/.concards/algs.lua". So all your configuration will go in
    this file. There is no directory.
@@ -314,15 +314,15 @@ I could tell that the cards are being preceded by something common.
 
 file doesn't 
 
-@> DEF(sm2), MN(hello), DR, O, N
-@> Numerical Analysis, hello, math, shuxue
+\@> DEF(sm2), MN(hello), DR, O, N
+\@> Numerical Analysis, hello, math, shuxue
 
 @m sm2: 2018-10-10@14:31,2.70,3
 @m sm2(2018-10-10@14:31,2.70,3)
 
 @m sm2, 2018-10-10@14:31
 
-@f Preconditioning @> ONE_LINE
+@f Preconditioning \@> ONE_LINE
 @b Basically wants to multiply an equation to make the matrices look more like
    the Identity matrix. This tries to save future computation.
 
@@ -347,7 +347,7 @@ And can meta data be for a group?
    individual cards.
 
 Ok, delimiters can be on the same line, but the parser will overwrite this by
-default. You can pass a parameter at the "@>" delimiter spot. I gotta figure
+default. You can pass a parameter at the "\@>" delimiter spot. I gotta figure
 out what these delimiters look like.
 
 All these are formatting options for what happens when the file is written.
@@ -355,21 +355,21 @@ I gotta go over these a bit probably.
 
 Ooooh, it sorted out nicely here :).
 
-*@> MN, META_NEWLINE  -> Put a newline before each new meta created. (Default)
-_@> MO, META_ONELINE  -> Don't put a newline before newly created metas.
-_@> MR, META_READONLY -> Don't touch meta data at all. (New or change).
+*\@> MN, META_NEWLINE  -> Put a newline before each new meta created. (Default)
+_\@> MO, META_ONELINE  -> Don't put a newline before newly created metas.
+_\@> MR, META_READONLY -> Don't touch meta data at all. (New or change).
 
-*@> DN, DELIM_NEWLINE  -> Each thing in the card goes on a new line.
-_@> DO, DELIM_ONELINE  -> Compactify each card to only be one line.
-_@> DR, DELIM_READONLY -> Don't mess with the concards format at all.
+*\@> DN, DELIM_NEWLINE  -> Each thing in the card goes on a new line.
+_\@> DO, DELIM_ONELINE  -> Compactify each card to only be one line.
+_\@> DR, DELIM_READONLY -> Don't mess with the concards format at all.
 
-*@> CN, CARDS_NEWLINE  -> Put 2 newlines in between each card. For prettiness.
-_@> CO, CARDS_ONELINE  -> Put cards on on the same line.
-_@> CR, CARDS_READONLY -> Don't mess with what is in between each card at all.
+*\@> CN, CARDS_NEWLINE  -> Put 2 newlines in between each card. For prettiness.
+_\@> CO, CARDS_ONELINE  -> Put cards on on the same line.
+_\@> CR, CARDS_READONLY -> Don't mess with what is in between each card at all.
 
-*@> N, NEWLINE  = META_NEWLINE  & DELIM_NEWLINE  & CARDS_NEWLINE
-_@> O, ONELINE  = META_ONELINE  & DELIM_ONELINE  & CARDS_ONELINE
-_@> R, READONLY = META_READONLY & DELIM_READONLY & CARDS_READONLY
+*\@> N, NEWLINE  = META_NEWLINE  & DELIM_NEWLINE  & CARDS_NEWLINE
+_\@> O, ONELINE  = META_ONELINE  & DELIM_ONELINE  & CARDS_ONELINE
+_\@> R, READONLY = META_READONLY & DELIM_READONLY & CARDS_READONLY
 
 Okay, let's force everything on it's own line, This means that one cannot have
 whitespace before the cards. But whyshenme!!!? :(. The only way to fix this is
@@ -385,20 +385,20 @@ And make sure about my meta data thing.
 
 -------- DEPRECATED IDEA --------
 Is it really necessarry to have longer abreviations? No! Don't do it!
-@>     @q      @f     @b    @n    @m
+\@>     @q      @f     @b    @n    @m
        @qmd    @frt   @bck  @not  @met
        @qemind @front @back @note @meta
 
 Shortest SM2:
-@> a @q b @m sm2(2018-10-10@14:31,2,3.10) @<
+\@> a @q b @m sm2(2018-10-10@14:31,2,3.10) @<
 
 @m sm2(2018-10-10@14:31,2,3.10) 
 @m fin(2018-10-10@14:31)
 
 @m sm2()
-@> @q a @<
+\@> @q a @<
 
-@> a @q b @a c @n d sm2(2018-10-10@14:31,2,3.10) @<
+\@> a @q b @a c @n d sm2(2018-10-10@14:31,2,3.10) @<
 --------       END       --------
 
 links will go by [] (Probably... This is more of a gui thing.)

@@ -3,6 +3,7 @@ package file
 import (
 	"fmt"
 	"strings"
+	"time"
 	"io/ioutil"
 
 	"github.com/alanxoc3/concards/deck"
@@ -13,11 +14,15 @@ func WriteCardToString(c *card.Card) (str string) {
    str = "@> " + strings.Join(c.Groups.ToArray(), " ")
 	str += "\n@q " + c.Question
 
-   for _, a := range c.Answers {
-		str += "\n@a " + a
+   for _, x := range c.Answers {
+		str += "\n@a " + x
    }
 
-   str += "\n@m " + c.Metadata.ToString()
+   for _, x := range c.Notes {
+		str += "\n@n " + x
+   }
+
+   str += fmt.Sprintf("\n@m %s %s %d %s", c.Metadata.Name, c.Metadata.Next.Format(time.RFC3339), c.Metadata.Streak, strings.Join(c.Metadata.Params, " "))
 
 	return str
 }

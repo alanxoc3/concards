@@ -31,13 +31,11 @@ type Card struct {
 	Deleted  bool
 }
 
-// TODO: Use the note.
 func New(
    groups map[string]bool,
    question []string,
    answers [][]string,
    notes [][]string,
-   timestamp []string,
    meta []string) (c *Card) {
 	c = &Card{}
    c.Question = strings.Join(question, " ")
@@ -54,5 +52,11 @@ func New(
 		c.Notes = append(c.Notes, strings.Join(x, " "))
 	}
 
+   c.Metadata = algs.New(meta)
+
    return
+}
+
+func (c *Card) HasAnswer() bool {
+   return len(c.Answers) > 0
 }

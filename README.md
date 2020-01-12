@@ -23,7 +23,7 @@ go install github.com/alanxoc3/concards
 * Implements the [SM2](https://www.supermemo.com/english/ol/sm2.htm) Repetition Algorithm.
 
 Shortest card:
-@q h <@
+@q h @n This is a complex card    heh. <@
 @> practice @q hello-world @a yes mom <@
 
 <!-- @> thing @q -->

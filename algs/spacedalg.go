@@ -1,70 +1,73 @@
 package algs
 
 import (
-	"errors"
-	"fmt"
 	"strconv"
-	"strings"
 	"time"
-
-	"github.com/alanxoc3/concards/constring"
 )
 
+type Know uint16
+
+const (
+	NO  Know = iota
+	IDK      = iota
+	YES      = iota
+)
+
+type Exec func(s SpaceAlg, input Know) SpaceAlg
+
 type SpaceAlg struct {
-	Next   time.Time
-	Streak int
-	Rank   float32
+   Next time.Time
+   Name string
+   Streak int
+   Params []string
+   Exec Exec
 }
 
-func (s *SpaceAlg) ToString() string {
-	next := constring.DateToString(s.Next)
-
-	str := fmt.Sprintf("%s, %d, %.2f", next, s.Streak, s.Rank)
-	return str
+func intOrDefault(str string, def int) int {
+   if x, err := strconv.Atoi(str); err != nil {
+      return def
+   } else {
+      return x
+   }
 }
 
-func New(str string) (*SpaceAlg, error) {
-	// Split the string into bins, then put the bins in the correct spots.
-	space := SpaceAlg{Next: time.Now(), Streak: 0, Rank: 2.5}
-
-	bins := strings.Split(str, ",")
-	binsLen := len(bins)
-
-	// trim the bins
-	for i := 0; i < binsLen; i++ {
-		bins[i] = constring.Trim(bins[i])
-	}
-
-	if binsLen > 0 && !constring.IsEmpty(bins[0]) { // NEXT
-		x, err := constring.StrToDate(bins[0])
-		if err != nil {
-			return nil, err //errors.New("Problem parsing meta data.")
-		}
-		space.Next = x
-	}
-
-	if binsLen > 1 && !constring.IsEmpty(bins[1]) { // STREAK
-		x, err := strconv.Atoi(bins[1])
-		if err != nil {
-			return nil, errors.New("Problem parsing meta data.")
-		}
-		space.Streak = x
-	}
-
-	if binsLen > 2 && !constring.IsEmpty(bins[2]) { // STREAK
-		x, err := strconv.ParseFloat(bins[2], 32)
-		if err != nil {
-			return nil, errors.New("Problem parsing meta data.")
-		}
-		space.Rank = float32(x)
-	}
-
-	return &space, nil
+func floatOrDefault(str string, def float32) float32 {
+   if x, err := strconv.ParseFloat(str, 32); err != nil {
+      return def
+   } else {
+      return float32(x)
+   }
 }
 
-/*
-	Spaced algorithm has these values.
-	Next date - Next time algorithm should be used
-	Streak    - how many times you've gotten it right.
-	Rank    - a number specific to the algorithm.
-*/
+func timeOrToday(str string) time.Time {
+   if x, err := time.Parse(time.RFC3339, str); err != nil {
+      return time.Now()
+   } else {
+      return x
+   }
+}
+
+func New(words []string) (space SpaceAlg) {
+	space = SpaceAlg{}
+   space.Streak = 0
+   space.Next = time.Now()
+   space.Params = []string{};
+
+   for i, v := range words {
+      switch i {
+         case 0: space.Name = v
+         case 1: space.Next = timeOrToday(v)
+         case 2: space.Streak = intOrDefault(v, 0)
+         case 3: space.Params = words[2:]
+      }
+   }
+
+   switch space.Name {
+      case "sm2": space.Exec = sm2Exec()
+      default:
+         space.Name = "sm2"
+         space.Exec = sm2Exec()
+   }
+
+	return
+}

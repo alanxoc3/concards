@@ -7,7 +7,7 @@ import (
 	termbox "github.com/nsf/termbox-go"
 )
 
-func TermBoxRun(d deck.Deck, cfg *termhelp.Config, ctrl deck.DeckControls) error {
+func TermBoxRun(d deck.Deck, cfg *termhelp.Config) error {
 	err := termbox.Init()
 	if err != nil {
 		return err
@@ -44,7 +44,7 @@ func TermBoxRun(d deck.Deck, cfg *termhelp.Config, ctrl deck.DeckControls) error
 			} else if inp == "h" {
 				help_mode = !help_mode
 			} else if inp == "w" {
-				err = ctrl.Write()
+				//err = ctrl.Write()
 				if err != nil {
 					update_stat_msg(err.Error(), termbox.ColorRed)
 				} else {
@@ -78,7 +78,7 @@ func TermBoxRun(d deck.Deck, cfg *termhelp.Config, ctrl deck.DeckControls) error
 					card_shown = false
 					save(d)
 				} else if inp == "e" {
-					err := deck.EditCard(cfg.Editor, d.Top())
+					// err := deck.EditCard(cfg.Editor, d.Top())
 
 					if err != nil {
 						update_stat_msg(err.Error(), termbox.ColorRed)

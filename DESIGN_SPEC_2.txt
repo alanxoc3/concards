@@ -88,8 +88,7 @@ Example with only one card:
    @q Who was the first man to walk on the moon?
    @a Neil Armstrong
    @n Also, that was in the year 1969
-   @t 2019-09-09 10:00:01Z
-   @m sm2 2.70 3
+   @m sm2 2019-09-09T10:00:01Z 3 2.70
 @<
 ```
 
@@ -128,3 +127,11 @@ What packages do I need?
 - deck
 - main
 - 
+
+# lua example
+```
+   algs = {sm2}
+   function sm2(time, param1, param2,...)
+      return time, param1, param2...
+   end
+```
