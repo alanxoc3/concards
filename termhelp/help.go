@@ -16,9 +16,7 @@ const (
 )
 
 func Usage() (ret string) {
-	ret += "Usage:\n"
-	ret += "   concards [OPTIONS...] FILE1\n"
-	ret += "   concards [OPTIONS...] FILE1 FILE2...\n"
+	ret += "Usage: concards [OPTION]... [FILE]...\n"
 	return
 }
 

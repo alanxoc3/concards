@@ -37,7 +37,7 @@ func EditDeck(editor string, d deck.Deck) error {
 		return fmt.Errorf("Error: \"%s\" is not installed on this machine.", editor)
 	}
 
-	tempFile, err := ioutil.TempFile("", "concards")
+	tempFile, err := ioutil.TempFile("", "concards-*.txt")
 	if err != nil {
 		return fmt.Errorf("Error: Couldn't create a temporary file for editing.\n")
 	}

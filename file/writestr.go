@@ -22,7 +22,10 @@ func WriteCardToString(c *card.Card) (str string) {
 		str += "\n@n " + x
    }
 
-   str += fmt.Sprintf("\n@m %s %s %d %s", c.Metadata.Name, c.Metadata.Next.Format(time.RFC3339), c.Metadata.Streak, strings.Join(c.Metadata.Params, " "))
+   str += fmt.Sprintf("\n@m %s %s %d", c.Metadata.Name, c.Metadata.Next.Format(time.RFC3339), c.Metadata.Streak)
+   for _, v := range c.Metadata.Params {
+      str += " " + v
+   }
 
 	return str
 }

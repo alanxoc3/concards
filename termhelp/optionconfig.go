@@ -1,9 +1,14 @@
 package termhelp
 
-import "errors"
-import "fmt"
-import "github.com/alanxoc3/concards/constring"
-import "strconv"
+import (
+   "os"
+   "os/user"
+   "log"
+   "errors"
+   "fmt"
+   "github.com/alanxoc3/concards/constring"
+   "strconv"
+)
 
 type UsageMode int
 
@@ -29,6 +34,9 @@ type Config struct {
 
 	UpdateMode bool // Just writes files.
 	Editor     string
+	ConfigFolder string
+   DatabasePath string
+   ConfigFile string
 
 	// The variable options passed in.
 	Number      int
@@ -192,11 +200,33 @@ type parseConfig struct {
 	waitForGroup, waitForNum, waitForEditor bool
 }
 
+func CreateDirIfNotExists(dir string) {
+   if _, err := os.Stat(dir); !os.IsNotExist(err) {
+      return
+   }
+
+   if err := os.MkdirAll(dir, 0755); err != nil {
+      panic(err)
+   }
+}
+
 // Set the defaults for the config
 func configInit() *Config {
 	// Everything besides these are set to false or 0
 	var cfg Config
 	cfg.Editor = ""
+
+   if usr, err := user.Current(); err != nil {
+      log.Fatal( err )
+      cfg.ConfigFolder = "."
+   } else {
+      cfg.ConfigFolder = usr.HomeDir + "/.concards"
+   }
+
+   cfg.DatabasePath = cfg.ConfigFolder + "/cards.db"
+   cfg.ConfigFile = cfg.ConfigFolder + "/config.yaml"
+   CreateDirIfNotExists(cfg.ConfigFolder)
+
 	cfg.Groups = make(map[string]bool)
 	return &cfg
 }

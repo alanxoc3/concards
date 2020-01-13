@@ -135,3 +135,18 @@ What packages do I need?
       return time, param1, param2...
    end
 ```
+
+3 strategies for conflicting names:
+- Ignore
+- Merge
+- Replace
+
+Program lifecycle:
+- Read CLI arguments.
+- If there are no files, read all from the database.
+- If there are files, read files, ignore ones that are already in the database (or use different merge strategy)
+- Filter the cards based on CLI arguments.
+
+Ways to manage cards.
+- You can read in from a bolt database, or from a text file. Or both.
+- You can merge bolt databases intto

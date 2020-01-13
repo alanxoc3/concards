@@ -10,6 +10,7 @@ import (
 	"github.com/alanxoc3/concards/termboxgui"
 	"github.com/alanxoc3/concards/file"
 	"github.com/alanxoc3/concards/deck"
+	"github.com/alanxoc3/concards/deckdb"
 )
 
 func main() {
@@ -28,7 +29,11 @@ func main() {
 		os.Exit(0)
 	}
 
-	//cfg.Print()
+   println(cfg.ConfigFolder)
+   println(cfg.DatabasePath)
+   println(cfg.ConfigFile)
+
+   deckdb.OpenDb(cfg.DatabasePath)
 
    cards := deck.Deck{}
    for _, f := range cfg.Files {
@@ -53,9 +58,9 @@ func main() {
 				// writeFunc()
 			} else if cfg.Usage == termhelp.EDITMODE {
 				cards.Sort()
-				// err := deck.EditDeck(cfg.Editor, deck)
-				writeFunc()
+				err := file.EditDeck(cfg.Editor, cards)
 				do_err(err)
+				// writeFunc()
 			} else if cfg.Usage == termhelp.PRINTMODE {
 				cards.Sort()
 				fmt.Print(file.WriteDeckToString(&cards))

@@ -122,7 +122,9 @@ func ReadToDeck(filename string) (d deck.Deck, err error) {
             }
 
             if info.shouldCreateCard {
-               d = append(d, card.New(info.groups, info.question, info.answers, info.notes, info.meta))
+               if c, err := card.New(info.groups, info.question, info.answers, info.notes, info.meta); err == nil {
+                  d = append(d, c)
+               }
                resetCard(info)
             }
          } else {

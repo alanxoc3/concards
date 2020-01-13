@@ -2,6 +2,7 @@ package card
 
 import (
 	"strings"
+	"fmt"
 	"sort"
 
 	"github.com/alanxoc3/concards/algs"
@@ -36,20 +37,28 @@ func New(
    question []string,
    answers [][]string,
    notes [][]string,
-   meta []string) (c *Card) {
+   meta []string) (c *Card, err error) {
 	c = &Card{}
-   c.Question = strings.Join(question, " ")
+   if len(question) > 0 {
+      c.Question = strings.Join(question, " ")
+   } else {
+      return nil, fmt.Errorf("Question is empty.")
+   }
 
    c.Groups = groups
 
    c.Answers = []string{}
 	for _, x := range answers {
-		c.Answers = append(c.Answers, strings.Join(x, " "))
+      if len(x) > 0 {
+         c.Answers = append(c.Answers, strings.Join(x, " "))
+      }
 	}
 
    c.Notes = []string{}
 	for _, x := range notes {
-		c.Notes = append(c.Notes, strings.Join(x, " "))
+      if len(x) > 0 {
+         c.Notes = append(c.Notes, strings.Join(x, " "))
+      }
 	}
 
    c.Metadata = algs.New(meta)
