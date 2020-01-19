@@ -4,36 +4,10 @@ import (
 	"log"
 	"time"
 	"fmt"
-   "crypto/sha256"
    "encoding/json"
 	"github.com/boltdb/bolt"
 	"github.com/alanxoc3/concards/card"
 )
-
-/*
-func OpenDb(file string) {
-   db, err := bolt.Open(file, 0600, &bolt.Options{Timeout: 1 * time.Second})
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
-
-   db.Update(func(tx *bolt.Tx) error {
-      root, err := tx.CreateBucketIfNotExists([]byte("DB"))
-      if err != nil {
-         return fmt.Errorf("could not create root bucket: %v", err)
-      }
-
-      _, err = root.CreateBucketIfNotExists([]byte("CARDS"))
-      if err != nil {
-         return fmt.Errorf("could not create root bucket: %v", err)
-      }
-
-      return nil
-   })
-}
-*/
 
 func dbInit(db *bolt.DB) (err error) {
    err = db.Update(func(tx *bolt.Tx) error {
@@ -67,7 +41,7 @@ func dbInit(db *bolt.DB) (err error) {
 }
 
 func insertCard(b *bolt.Bucket, c *card.Card) {
-   sum := sha256.Sum256([]byte(c.Question))
+   sum := c.Hash()
    cardBucket, err := b.CreateBucketIfNotExists(sum[:])
    if err != nil {
       panic(err)

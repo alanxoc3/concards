@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"sort"
 
+   "crypto/sha256"
 	"github.com/alanxoc3/concards/algs"
 )
 
@@ -68,4 +69,12 @@ func New(
 
 func (c *Card) HasAnswer() bool {
    return len(c.Answers) > 0
+}
+
+func (c *Card) KeyText() string {
+   return fmt.Sprintf("@> %s @q %s", strings.Join(c.Groups.ToArray(), " "), c.Question)
+}
+
+func (c *Card) Hash() [sha256.Size]byte {
+   return sha256.Sum256([]byte(c.KeyText()))
 }
