@@ -13,8 +13,10 @@ type Groups map[string]bool
 
 func (g Groups) ToArray() (keys []string) {
    keys = make([]string, 0, len(g))
-   for key := range g {
-      keys = append(keys, key)
+   for k, v := range g {
+      if v {
+         keys = append(keys, key)
+      }
    }
    sort.Strings(keys)
    return

@@ -16,13 +16,6 @@ func dbInit(db *bolt.DB) (err error) {
          return err
       }
 
-      _, err = tx.CreateBucketIfNotExists([]byte("groups"))
-      if err != nil {
-         return err
-      }
-
-      b.Put([]byte("alan"), []byte("rocks"))
-
       if c, err := card.New(
          map[string]bool{},
          []string{"THIS_IS_A_QUESTION"},
@@ -38,6 +31,36 @@ func dbInit(db *bolt.DB) (err error) {
    })
 
    return
+}
+
+func insertGroups(cardBucket *bolt.Bucket, groups *card.Groups) {
+   // Reset the groups to be new values.
+   if err := cardBucket.DeleteBucket([]byte("@>")); err != nil {
+      // The bucket either does not exist, or is not a bucket.
+   }
+
+   gb, err := cardBucket.CreateBucket([]byte("@>"))
+   if err != nil {
+      // The key already exists.
+      panic(err)
+   }
+
+
+
+   err := cardBucket.DeleteBucket("@>")
+   cardBucket.DeleteBucket("@>")
+
+
+   cardBucket.Put([]byte("@q")
+   sum := c.Hash()
+   cardBucket, err := b.CreateBucketIfNotExists(sum[:])
+   if err != nil {
+      panic(err)
+   }
+
+   cardBucket.Put([]byte("@q"), []byte(c.Question))
+   answers, _ := json.Marshal(c.Answers)
+   cardBucket.Put([]byte("@a"), answers)
 }
 
 func insertCard(b *bolt.Bucket, c *card.Card) {

@@ -1,4 +1,4 @@
-<!-- @> cnc @ concards <@ -->
+<!-- @> concards @ Console Cards @ A cool + simple flashcard app. <@ -->
 # <img src="logo.svg" />
 
 Turning notes into flashcards. Concards is my ongoing attempt to make
@@ -37,13 +37,13 @@ The syntax to embed your flashcards is like this:
 
 Wanna try it out? Run concards on this README.md file!
 ``` bash
-cnc README.md
+concards README.md
 ```
 
 ### Help Output
 ```
 Usage:
-  cnc [OPTION]... [FILE|FOLDER]...
+  concards [OPTION]... [FILE|FOLDER]...
 
 Options:
   -r  --review    Show cards available to be reviewed.
@@ -110,10 +110,10 @@ sha256sum                        | review timestamp      | streak | alg | data
 8525b45f883c05eec46b4f7a88e7f7ef | 2020-01-01T00:00:00Z  | 0      | sm2 | 2.5
 ```
 
-This file is saved in "$CNC_HOME/.cnc-meta". If there is a git repository
+This file is saved in "$CONCARDS_HOME/.concards-meta". If there is a git repository
 available, this file will be committed every time concards updates it.
 
 ### The Config File
-This file is located in "$CNC_HOME/.cnc-config".
+This file is located in "$CONCARDS_HOME/.concards-config".
 
 This is a YAML file.
