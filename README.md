@@ -1,9 +1,4 @@
-<!-- The group for all flashcards in this file: @> concards <@ -->
-<!-- Below sets concards as the group. Ignoring HTML comments -->
-<!-- @@> Question: Answer: --> <!-- <@ -->
-
-<!-- @> @! --> <!-- * ## <@ -->
-
+<!-- Ignore comments for concards... !> --> <!-- * ## <@ -->
 # <img src="logo.svg" />
 
 Turning notes into flashcards. Concards is my ongoing attempt to make
@@ -18,22 +13,16 @@ Install like any other go application.
 go install github.com/alanxoc3/concards
 ~/$GOPATH/bin/concards --help
 ```
-<!-- @> thing -->
-## Features
-* Implements the [SM2](https://www.supermemo.com/english/ol/sm2.htm) Repetition Algorithm.
 
-Shortest card:
-@q h @n This is a complex card    heh. <@
-@> practice @q hello-world @a yes mom <@
-
-<!-- @> thing @q -->
-## Feature 2 <!-- @a -->
-* Beautiful terminal gui. <!-- @a -->
-* Supports UTF-8! <!-- @a -->
-* Reading in from multiple files. <!-- @a -->
-* Undoing/Redoing <!-- @a -->
-* Easily editing a card while reviewing your cards. <!-- @a -->
-* And More!!! (I think :) <!-- <@ -->
+<!-- @> Secret Card!!! Name all the Concards -->
+## Features <!-- @ -->
+* Implements the [SM2](https://www.supermemo.com/english/ol/sm2.htm) Repetition Algorithm. <!-- @ -->
+* Beautiful terminal gui. <!-- @ -->
+* Supports UTF-8! <!-- @ -->
+* Reading in from multiple files. <!-- @ -->
+* Undoing/Redoing <!-- @ -->
+* Easily editing a card while reviewing your cards. <!-- @ -->
+* And More!!! <!-- <@ -->
 
 ## Usage
 The file syntax was designed to be very simple and flexible, allowing anyone to
@@ -42,36 +31,12 @@ flashcard apps (like [Anki](https://apps.ankiweb.net/) or
 [Memrise](https://www.memrise.com/)).
 
 The syntax to embed your flashcards is like this:
-
-    You can embed flashcards in any textfile. This is text before the flashcards!
-
-    ## group1 GROUP2 group_3
-    question1
-       answer1 (3 spaces)
-
-    question2
-    still question2
-       answer2 (3 spaces)
-
-    ## newgroup
-    question 3
-
-    question 4
-       But this one has an answer. (3 spaces)
-    ##
-
-    The '##' without a group ends the flashcards. So we can continue our text
-    file here. But you can also have more cards later in the document!
-
-<!--
-## concard_group
-Why do you love flashcards?
-	Because I wanna learn stuff!
--->
+```
+@> What is the answer?
+ @ This is the answer! <@
+```
 
 Wanna try it out? Run concards on this README.md file!
 ``` bash
 concards README.md
 ```
-
-**Note**, this file format will be deprecated in version 2.0, with cleaner syntax.

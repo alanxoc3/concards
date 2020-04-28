@@ -1,37 +1,303 @@
-# Database format
-db:
-   cards:
-      TH15154CH3CKSUM:
-         @q: "What is the question?"
-         @a: Bucket? (Maybe a marshalled array instead)
-            1: "Answer #1"
-            2: "Answer #2"
-            3: "Answer #3"
-            4: "..."
-         @n: Bucket? (Maybe a marshalled array instead)
-            1: "Note #1"
-            2: "Note #2"
-            3: "Note #3"
-            4: "..."
-         @t: 2019-09-09@10:51
-         # date-created: 2019-09-09@10:51
-         da te-edited: 2019-09-09@10:51
-         algorithm-type: sm2
-         algorithm-data: (Maybe marshalled array instead)
-            1: 2.5
-            2: 10
-         @g:
-            group1: nil
-            group2: nil
-            group3: nil
-   groups:
-      group1:
-         TH15154CH3CKSUM: nil
-      group2:
-         TH15154CH3CKSUM: nil
-      group3:
-         TH15154CH3CKSUM: nil
+Concards output:
+```
+Usage:
+  conc [OPTION]... [FILE|FOLDER]...
 
+Options:
+  -r  --review    Show cards available to be reviewed.
+  -m  --memorize  Show cards available to be memorized.
+  -d  --done      Show cards not available to be reviewed or memorized.
+  -n  --number #  Limit the number of cards in the program to "#".
+  -e  --edit      Edit the cards, updating used references.
+  -p  --print     Prints all cards, slightly formatted.
+  -h  --help      If you need assistance.
+  -v  --version   Which version are you on again?
+      --editor e  Defaults to $EDITOR
+
+For more details, read the fine man page.
+```
+
+
+I'm positive now. I don't want to be able to edit a card. For "editing", I will just open the file instead.
+
+
+
+New idea.
+
+Get rid of groups. Metadata is *usually* stored in a separate file.
+
+The syntax is much more simple.
+
+Only 4 delimiters. !> #> @> <@
+
+@#0 the question is...
+ @ the answer
+ @ is @ this! 
+
+Some ideas for files.
+Be able to save cards and metadata in only one file? No.
+Be able to write cards to separate file?
+Review cards from piping/streaming.
+
+_3dda75cb@> the question is...
+
+@> @# 1525b45f883c05eec46b4f7a88e7f7ef Just a question?
+ @ answer
+<@
+
+@> Just a question? @ answer
+@> Just a question? @ answer
+@> Just a question? @ answer
+@> Just a question? @ answer
+@> Just a question? @ answer
+--------------------------------------------------------------- <!@
+
+@> cnc
+ @ A console flashcard program
+ @ Or is it?
+<@
+
+cnc-config
+   Is it saved in git?
+   Don't need that! I can just check if it is in a git repo.
+
+.concards/.cnc-config
+.concards/.cnc-meta
+.concards/.git
+.concards/.gitignore
+.concards/folders
+.concards/files
+
+Yes. I think I have figured everything out!
+
+!> @> #> <@
+
+!> ----------------- <@
+
+I don't care about editing cards to keep old checksum!
+Now I can think more about version control!
+
+If your user data file is stored under version control and certain conditions
+It's just good practice to version control your note files, though not necessary.
+
+Notes are sought for in the $CONCARDS_HOME folder. Your user data file is
+stored there too.
+
+Take my user cart.
+
+
+----------------------------------------------------------------------------------------------
+The order of the batches is what determines what you've edited.
+This is for file: dude.txt
+
+New cards have some options:
+- It is brand new.
+- They look familiar.
+- You know it already.
+On new cards, they either look familiar, 
+
+Here is where we do important stuff.
+
+Edit could just take you to the file. Then the flashcards are reloaded from the
+file. You just have to lose your progress. I'm fine with losing my progress.
+
+Be able to toggle file context.
+
+So editing cards...
+Umm. Yeah... Cool?
+
+I cannot preserve history. Edited cards are fundamentally different so the
+meta-data should not be preserved.
+
+This is geared towards super users.
+
+So how do I deter the frustration of resetting my progress?
+
+Hmm. What if progress is on recorded git history? By default, concards will go
+through every git revision and update the metadata to match the current to try and match the history.
+
+Concards will update the meta-data to match current revisions.
+
+Concards will.
+
+git revision.
+
+Hash: 3dda75cb44ed447186834541475f32e2
+!> --------------------------------------
+@> A question is cool. @ An answer could be cooler.
+-------------------------------------- <@
+
+Hash: 3dda75cb44ed447186834541475f32e2
+--------------------------------------
+@> A question is cool. @ An answer could be cooler. <@
+
+Hash: 3dda75cb44ed447186834541475f32e2
+!> -------- @> A question is cool. @ An answer could be cooler.
+!> -------- @> A question is cool. @ An answer could be cooler.
+!> -------- @> A question is cool. @ An answer could be cooler.
+!> -------- @> A question is cool. @ An answer could be cooler.
+!> -------- @> A question is cool. @ An answer could be cooler.
+!> -------- @> A question is cool. @ An answer could be cooler. <@
+
+----------------------------------------------------------------------------------------------
+
+# this is a comment !>
+# @> A question
+#  @ An answer
+#  @ Another solution <@
+
+<!-- concard @!> --> <!-- <@ exclude -->
+
+<!-- @> A question     -->
+<!--  @ an answer      -->
+<!--  @ an 1 answer    -->
+<!--  @ an 1 answer <@ -->
+
+# !>
+# @> Question
+#  @ Answer
+#  @ Answer #2
+#  @ Answer #3
+
+// !> // <!
+-- !> -- <!
+# !> # <!
+<!-- !> --> <!-- <! -->
+
+// @> hello @ hi @ hi <@
+
+jj
+
+// @> Question
+//  @ Answer
+//  @ Answer #2 <@
+
+!>
+@>
+#>
+
+Metadata file.
+   @> hello @ answer
+
+// !> ----------------------------------------------------------------
+// #> 8425b45f883c05eec46b4f7a88e7f7ef 2019-09-09T10:51:12Z 0 sm2 2.5
+// #> 8425b45f883c05eec46b4f7a88e7f7ef 2019-09-09T10:51:12Z 0 sm2 2.5
+// #> 8425b45f883c05eec46b4f7a88e7f7ef 2019-09-09T10:51:12Z 0 sm2 2.5
+// ------------------------------------------------------------------- <@
+
+// #> 8425b45f883c05eec46b4f7a88e7f7ef <#
+
+!> ---------------------------------------------------------------
+@> 3dda75cb44ed447186834541475f32e2 2019-09-09T10:51:12Z 0 sm2 2.5
+@> 3dda75cb44ed447186834541475f32e2 2019-09-09T10:51:12Z 0 sm2 2.5
+@> 8525b45f883c05eec46b4f7a88e7f7ef 2019-09-09T10:51:12Z 0 sm2 2.5
+@> 8325b45f883c05eec46b4f7a88e7f7ef 2019-09-09T10:51:12Z 0 sm2 2.5
+@> 8425b45f883c05eec46b4f7a88e7f7ef 2019-09-09T10:51:12Z 0 sm2 2.5
+@> 8925b45f883c05eec46b4f7a88e7f7ef 2019-09-09T10:51:12Z 0 sm2 2.5
+--------------------------------------------------------------- <@
+
+@> 3dda75cb44ed447186834541475f32e2 hello world I am cool @ answer 1 @ answer 2
+@> 3dda75cb44ed447186834541475f32e2 hello world I am cool @ answer 1 @ answer 2
+
+
+@> What is the answer?   @@ hello @2 no
+@> What is the question? @@ umm   @2 hi <@
+
+@> Concards
+= A cool flashcard program.
+
+@.> What? . Cool . Cooly . Coolie . Coolios <.@
+
+@>! Exclude <@
+@>~ Title <@
+@># Hash <@
+
+@testing@
+@> Question = Answer = Answer <@
+
+@>> Stuff
+
+@> Question
+@= Answer #1.
+@= Answer #2.
+@~ Note 1.
+
+@> Next Question
+@= An answer.
+@~ A note.
+
+<<@
+
+Yeah. Maybe no groups. You are shown cards that are located in close proximity
+to each other. We assume that you are grouping related cards in the same file.
+Well, maybe no. Cards within the same block should be related to each other.
+
+
+What is the answer?   @answer hello @2 no
+
+@~ Title @! Ignore @# Hash @@
+
+@> Who said "To be or not to be"? @= William Shakespeare
+@> Who said "To be or not to be"?
+   @= William Shakespeare
+   @= Allen Moan
+   @= Shoe Yang You
+   @= 
+@> Who said "To be or not to be"?
+@- William Shakespeare
+<@
+
+@~ The Story of Zeldo
+@! -------------------------------------------------------------------
+@> What is the question? @1 umm @2 hi <@
+
+aoeu89aoheu89ahoe89uahoe9u83uhau 2019-09-09T10:51:12Z 0 sm2 2.5
+
+@q What is Alan's fav color?
+@a Red
+@a And Orange
+@n Note, these aren't actually his fav colors.
+@n These colors represent fire. Yellow does too.
+@n https://www.supermemo.com/en/archives1990-2015/articles/20rules
+<@
+
+What flashcards look like when you write it:
+\@> alan colors @!
+-----------------------------------------------------
+@q When in doubt, follow your heart.
+-----------------------------------------------------
+@q What is Alan's fav color? @a Red @a And Orange
+@n Note, these aren't actually his fav colors.
+@n These colors represent fire. Yellow does too.
+@n https://www.supermemo.com/en/archives1990-2015/articles/20rules
+----------------------------------------------------- \<@
+
+
+
+
+
+@q Question
+@a Answer
+@n Note
+@t Timestamp
+@s Streak
+@m Method
+@d Data
+@> Group
+@g Group
+
+\@> group @s 12 @t 2018-10-10 @m sm2
+
+@n @a... Do those make sense for a group?
+
+@t, @s, and @m only take in a single value. All values after the first word are
+ignored. If there is an error parsing one of them, the default value is instead
+used. Or an error is returned.
+
+If an alg doesn't exist
+
+Hash is:
+   @> group1 group2 @q What is the question?
 - @a, @n, @q all have a max character size of 2048.
 - groups, alg names, and alg parameters all have a max character size of 64
 - TH15154CH3CKSUM is a checksum of the question.

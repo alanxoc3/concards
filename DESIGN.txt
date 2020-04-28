@@ -13,27 +13,32 @@ databases.
 
 Metadata file is locked.
 
+2 files.
+Metadata file.
+Card checksum lookup file.
+
+
+
 concards:
-   group1 group3:
-      what is the goal?:
-         answers:
-            There is no goal
-            There is a goal
-            Everything
-         notes:
-            This note is cool
-            This note is also cool
-            And this one of course
-         algorithms:
-            sm2:
-               data: 2.5 10
-               timestamp: 2019-09-09@10:51
-            monthly:
-               data:
-               timestamp: 2019-09-09@10:51
+   what is the goal?:
+      There is no goal
+      There is a goal
+      Everything
+
+
+
+      algorithms:
+         sm2:
+            data: 2.5 10
+            timestamp: 2019-09-09@10:51
+         monthly:
+            data:
+            timestamp: 2019-09-09@10:51
 
 All possible meta data things for 1.0:
    \@> @! @q @a @n @m <@
+
+   !> @> #> <@
 
 New ideas:
    What if cards edited through the interface are preserved, but cards edited
