@@ -37,13 +37,13 @@ The syntax to embed your flashcards is like this:
 
 Wanna try it out? Run concards on this README.md file!
 ``` bash
-concards README.md
+cnc README.md
 ```
 
 ### Help Output
 ```
 Usage:
-  conc [OPTION]... [FILE|FOLDER]...
+  cnc [OPTION]... [FILE|FOLDER]...
 
 Options:
   -r  --review    Show cards available to be reviewed.
