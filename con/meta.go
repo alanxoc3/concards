@@ -2,6 +2,7 @@ package con
 
 import "time"
 import "fmt"
+import "strings"
 
 type Know uint16
 
@@ -32,4 +33,26 @@ func (m Meta) Exec(input Know) (Meta, error) {
       case "sm2": return sm2Exec(m, input), nil
       default: return m, fmt.Errorf("Algorithm doesn't exist")
    }
+}
+
+func (m Meta) NextStr() string {
+   return m.Next.Format(time.RFC3339)
+}
+
+func (m Meta) ParamsStr() string {
+   return strings.Join(m.Params, " ")
+}
+
+func (m Meta) String() (s string) {
+   if !m.Next.IsZero() {
+      s = fmt.Sprintf("%s %d", m.NextStr(), m.Streak)
+
+      if m.Name != "" {
+         s += " " + m.Name
+         if ps := m.ParamsStr(); ps != "" {
+            s += " " + ps
+         }
+      }
+   }
+   return
 }

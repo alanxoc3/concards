@@ -13,11 +13,10 @@ func (d Deck) SortByQuestion() {
    sort.Sort(d)
 }
 
-// fisher-yates shuffle
 func (d Deck) Shuffle() {
-   // start at the end of the deck, go down.
+   // fisher-yates shuffle
    for i := d.Len() - 1; i > 0; i-- {
-      swapPlace := rand.Intn(i + 1) // The plus one is to enable the card to remain in the same place.
+      swapPlace := rand.Intn(i + 1)
       d.Swap(i, swapPlace)
    }
 }

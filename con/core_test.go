@@ -42,4 +42,5 @@ func TestDeck(t *testing.T) {
    d := NewDeck().AddFacts(facts)
    if d.GetCard(0).GetQuestion() != "hello there" { t.Fail() }
    if !d.GetCard(0).HasAnswer() { t.Fail() }
+   if !d.GetMeta(0).Next.IsZero() { t.Fail() }
 }
