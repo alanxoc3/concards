@@ -10,7 +10,6 @@ import (
 	"github.com/alanxoc3/concards/termboxgui"
 	"github.com/alanxoc3/concards/file"
 	"github.com/alanxoc3/concards/deck"
-	"github.com/alanxoc3/concards/deckdb"
 
     "crypto/sha256"
 )
@@ -37,8 +36,6 @@ func main() {
 
    sum := sha256.Sum256([]byte("THIS_IS_A_QUESTION"))
 	fmt.Printf("%x\n", sum)
-
-   deckdb.OpenDb(cfg.DatabasePath)
 
    cards := deck.Deck{}
    for _, f := range cfg.Files {

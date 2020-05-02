@@ -3,7 +3,7 @@ package termhelp
 import "fmt"
 
 // Returns nil as Config if the program finished from this method. That would
-// happend with an error, help, or version.
+// happen with an error, help, or version.
 func ValidateAndParseConfig(args []string) (*Config, error) {
 	cfg, err := ParseConfig(args)
 

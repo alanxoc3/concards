@@ -117,3 +117,25 @@ available, this file will be committed every time concards updates it.
 This file is located in "$CONCARDS_HOME/.concards-config".
 
 This is a YAML file.
+
+## Current Design
+This section is under construction.
+https://en.wikipedia.org/wiki/Leitner_system
+
+This app has a focus on short, specific, text-based cards.
+- There can be some recognition on tokens, but not on multiple tokens.
+- Think twitter + tinycards, but no images.
+
+Save the files in a directory.
+A history of recently used files could I should also have a history.
+
+Using the concards directory should be forceful.
+
+If you are forced to use the concards directory, then we could draw some cool
+conclusions:
+- Guaranteed to be using git.
+- Don't read hidden files.
+- A way to sync your cards.
+- Could make it impossible to store a card without the git hash.
+
+Ok. I do like the idea of a home directory.
