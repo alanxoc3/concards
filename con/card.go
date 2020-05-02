@@ -37,12 +37,12 @@ func (c Card) GetQuestion() string {
    }
 }
 
-func (c Card) KeyText() string {
+func (c Card) String() string {
    return strings.Join(c, " @ ")
 }
 
 func (c Card) Hash() [sha256.Size]byte {
-   return sha256.Sum256([]byte(c.KeyText()))
+   return sha256.Sum256([]byte(c.String()))
 }
 
 func (c Card) HashStr() string {

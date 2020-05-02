@@ -31,6 +31,11 @@ func (d Deck) AddFacts(facts [][]string) Deck {
    return d
 }
 
+func (d Deck) AddMeta(h string, m Meta) Deck {
+   d.mmap[h] = m
+   return d
+}
+
 func (d Deck) Len() int {
    return len(d.refs)
 }

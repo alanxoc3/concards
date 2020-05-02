@@ -19,13 +19,17 @@ type Meta struct {
    Params []string
 }
 
-func NewAlg(ts string, streak string, name string, params []string) (m Meta) {
-   m = Meta{}
-   m.Name = name
-   m.Next = timeOrNow(ts)
-   m.Streak = intOrDefault(streak, 0)
-   m.Params = params
-   return
+func NewMeta(ts string, streak string, name string, params []string) Meta {
+   return Meta{
+      Next: timeOrNow(ts),
+      Streak: intOrDefault(streak, 0),
+      Name: name,
+      Params: params,
+   }
+}
+
+func (m Meta) IsZero() bool {
+   return m.Next.IsZero() && m.Name == "" && m.Streak == 0 && len(m.Params) == 0
 }
 
 func (m Meta) Exec(input Know) (Meta, error) {
@@ -44,7 +48,7 @@ func (m Meta) ParamsStr() string {
 }
 
 func (m Meta) String() (s string) {
-   if !m.Next.IsZero() {
+   if !m.IsZero() {
       s = fmt.Sprintf("%s %d", m.NextStr(), m.Streak)
 
       if m.Name != "" {
@@ -54,5 +58,6 @@ func (m Meta) String() (s string) {
          }
       }
    }
+
    return
 }
