@@ -6,7 +6,7 @@ import (
 )
 
 func (d *Deck) Less(i, j int) bool {
-   return d.cmap[d.refs[i]].GetQuestion() < d.cmap[d.refs[j]].GetQuestion()
+   return d.Cmap[d.refs[i]].GetQuestion() < d.Cmap[d.refs[j]].GetQuestion()
 }
 
 func (d *Deck) SortByQuestion() {

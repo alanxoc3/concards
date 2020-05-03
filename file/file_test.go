@@ -37,3 +37,15 @@ func TestReadCardsToDeck(t *testing.T) {
 	}
 }
 
+// TODO: Do this.
+func TestWriteMetasToString(t *testing.T) {
+   d := ReadCardsToDeckHelper(strings.NewReader(f2))
+
+   for i := 0; i < d.Len(); i++ {
+      _, c, _ := d.Get(i)
+      switch i {
+         case 0: if c.GetQuestion() != "hi" { t.Fail() }
+         case 1: if c.GetQuestion() != "yoyo man go" { t.Fail() }
+      }
+	}
+}

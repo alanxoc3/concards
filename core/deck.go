@@ -5,24 +5,24 @@ func removeIndex(s []string, index int) []string {
 }
 
 // refs contains checksums.
-// cmap maps checksums to cards.
-// mmap maps checksums to cards.
+// Cmap maps checksums to cards.
+// Mmap maps checksums to cards.
 type Deck struct {
-   cmap  map[string]*Card // This should be a pointer!
-   mmap  map[string]*Meta // This should be a pointer!
    refs  []string // This should be a byte array instead of a string!
+   Cmap  map[string]*Card
+   Mmap  map[string]*Meta
 }
 
 func NewDeck() *Deck {
    return &Deck{
-      cmap: map[string]*Card{},
-      mmap: map[string]*Meta{},
+      Cmap: map[string]*Card{},
+      Mmap: map[string]*Meta{},
       refs: []string{},
    }
 }
 
 func (d *Deck) Forget(i int) {
-   delete(d.mmap, d.refs[i])
+   delete(d.Mmap, d.refs[i])
 }
 
 func (d *Deck) DelCard(i int) {
@@ -31,7 +31,7 @@ func (d *Deck) DelCard(i int) {
 
 func (d *Deck) AddCard(c *Card) {
    hash := c.HashStr()
-   d.cmap[hash] = c
+   d.Cmap[hash] = c
    d.refs = append(d.refs, hash)
 }
 
@@ -41,8 +41,8 @@ func (d *Deck) AddFacts(facts [][]string) {
    }
 }
 
-func (d *Deck) AddMeta(h string, m Meta) {
-   d.mmap[h] = &m
+func (d *Deck) AddMeta(h string, m *Meta) {
+   d.Mmap[h] = m
 }
 
 func (d *Deck) Len() int {
@@ -56,8 +56,8 @@ func (d *Deck) Swap(i, j int) {
 func (d *Deck) Get(i int) (h string, c *Card, m *Meta) {
    if i >= 0 && i < d.Len() {
       h = d.refs[i]
-      c = d.cmap[h]
-      m = d.mmap[h]
+      c = d.Cmap[h]
+      m = d.Mmap[h]
    }
    return
 }

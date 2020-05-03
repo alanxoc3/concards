@@ -1,6 +1,6 @@
 package core
 
-// Trims a deck to only have this many d in it.
+// Basically truncates a deck.
 func (d Deck) FilterNumber(param int) Deck {
 	if param > 0 && d.Len() > param {
       d.refs = d.refs[0:param]

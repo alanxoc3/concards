@@ -6,7 +6,7 @@ import (
 )
 
 // Implementing the SM2 algorithm.
-func sm2Exec(s Meta, input Know) Meta {
+func sm2Exec(s Meta, input Know) *Meta {
    // Input defaults.
    var rank float32 = 2.5
    if len(s.Params) > 0 {
@@ -65,5 +65,5 @@ func sm2Exec(s Meta, input Know) Meta {
    }
 
    s.Params = []string{fmt.Sprintf("%.2f", rank)}
-   return s
+   return &s
 }

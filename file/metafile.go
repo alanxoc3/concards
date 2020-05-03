@@ -3,6 +3,8 @@ package file
 import (
    "bufio"
    "strings"
+   "io/ioutil"
+   "sort"
    "fmt"
    "io"
    "os"
@@ -42,4 +44,38 @@ func ReadMetasToDeckHelper(r io.Reader, d *core.Deck) *core.Deck {
    }
 
    return d
+}
+
+func WriteMetasToString(d *core.Deck) (file_str string) {
+   // Copy keys
+   keys := make([]string, len(d.Mmap))
+
+   i := 0
+   for k := range d.Mmap {
+       keys[i] = k
+       i++
+   }
+
+   // Sort keys
+   sort.Strings(keys)
+
+   // Create string
+   for _, k := range keys {
+      m := d.Mmap[k]
+      if m != nil && m.String() != "" {
+         file_str += m.String() + "\n"
+      }
+   }
+
+   return
+}
+
+func WriteMetasToFile(d *core.Deck, filename string) error {
+	str := []byte(WriteMetasToString(d))
+	err := ioutil.WriteFile(filename, str, 0644)
+	if err != nil {
+		return fmt.Errorf("Error: Writing to \"%s\" failed.", filename)
+	}
+
+	return nil
 }
