@@ -2,8 +2,8 @@ package file
 
 import (
    "bufio"
-   "fmt"
    "io"
+   "fmt"
    "os"
    "path/filepath"
 
@@ -12,23 +12,40 @@ import (
 
 // Open opens filename and loads cards into new deck
 func ReadCardsToDeck(filename string, d *core.Deck) error {
-   filename, _ = filepath.Abs(filename)
-   if f, fe := os.Open(filename); fe != nil {
-      return fmt.Errorf("Error: Unable to open file \"%s\"", filename)
-   } else if s, se := os.Lstat(filename); se != nil {
-      return fmt.Errorf("Error: Unable to open file \"%s\"", filename)
-   } else if s.IsDir() {
-      return fmt.Errorf("Error: Unable to open folder \"%s\"", filename)
-   } else {
-      ReadCardsToDeckHelper(f, d, filename)
+   err := filepath.Walk(filename, func(path string, info os.FileInfo, e error) error {
+      if e != nil {
+         return e
+      }
+
+      n := info.Name()
+      is_hidden := len(n) > 1 && string(n[0]) == "." && n != ".."
+      is_dir := info.IsDir()
+
+      if is_dir && is_hidden {
+         return filepath.SkipDir
+      } else if is_hidden || is_dir {
+         return nil
+      }
+
+      abs_path, _ := filepath.Abs(path)
+      if f, fe := os.Open(abs_path); fe != nil {
+         return fmt.Errorf("Error: Unable to open file \"%s\"", filename)
+      } else {
+         defer f.Close()
+         ReadCardsToDeckHelper(f, d, abs_path)
+      }
+
       return nil
-   }
+   })
+
+   return err
 }
 
 func ReadCardsToDeckHelper(r io.Reader, d *core.Deck, f string) {
    // Initialization.
    facts := [][]string{}
    state := false
+   var td *core.Deck
 
    // Scan by words.
    scanner := bufio.NewScanner(r)
@@ -41,10 +58,13 @@ func ReadCardsToDeckHelper(r io.Reader, d *core.Deck, f string) {
          if t == "@" {
             facts = append(facts, []string{})
          } else if t == "@>" {
-            d.AddFacts(facts, f)
+            td.AddFacts(facts, f)
             facts = [][]string{{}}
          } else if t == "<@" {
-            d.AddFacts(facts, f)
+            td.AddFacts(facts, f)
+            for i := 0; i < td.Len(); i++ {
+               d.AddCard(td.GetCard(i))
+            }
             state = false
          } else {
             if i := len(facts)-1; i >= 0 {
@@ -52,6 +72,8 @@ func ReadCardsToDeckHelper(r io.Reader, d *core.Deck, f string) {
             }
          }
       } else if t == "@>" {
+         // create td
+         td = core.NewDeck()
          state = true
          facts = [][]string{{}}
       }

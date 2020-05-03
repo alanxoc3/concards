@@ -2,8 +2,6 @@ package file
 
 import "testing"
 import "strings"
-import "os"
-import "path/filepath"
 import "github.com/alanxoc3/concards/core"
 
 const f1 = "@> hello there @ i'm a beard <@"
@@ -60,11 +58,15 @@ func TestWriteMetasToString(t *testing.T) {
    if a[2] != b[1] { t.Fail() }
 }
 
-func TestThing(t *testing.T) {
-   f, _ := os.Open(".")
-   s, _ := f.Readdir(0)
-   for _, x := range s {
-      p, _ := filepath.Abs(x.Name())
-      println(p)
-   }
+/*
+// This is a manual test.
+func TestFile(t *testing.T) {
+   d := core.NewDeck()
+   ReadCardsToDeck("../", d)
+
+   for i := 0; i < d.Len(); i++ {
+      _, c, _ := d.Get(i)
+      println(c.String())
+	}
 }
+*/

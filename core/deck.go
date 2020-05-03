@@ -1,5 +1,7 @@
 package core
 
+import "fmt"
+
 func removeIndex(s []string, index int) []string {
     return append(s[:index], s[index+1:]...)
 }
@@ -21,24 +23,42 @@ func NewDeck() *Deck {
    }
 }
 
-func (d *Deck) Forget(i int) {
-   delete(d.Mmap, d.refs[i])
-}
-
-func (d *Deck) DelCard(i int) {
-   d.refs = removeIndex(d.refs, i)
-}
-
-func (d *Deck) AddCard(c *Card) {
-   hash := c.HashStr()
-   d.Cmap[hash] = c
-   d.refs = append(d.refs, hash)
-}
-
-func (d *Deck) AddFacts(facts [][]string, file string) {
-   if c, err := NewCard(facts, file); err == nil {
-      d.AddCard(c)
+func (d *Deck) Forget(i int) error {
+   if i >= 0 && i < len(d.refs) {
+      delete(d.Mmap, d.refs[i])
+      return nil
+   } else {
+      return fmt.Errorf("Can't forget. Index is out of bounds.")
    }
+}
+
+func (d *Deck) DelCard(i int) error {
+   if i >= 0 && i < len(d.refs) {
+      delete(d.Cmap, d.refs[i])
+      d.refs = removeIndex(d.refs, i)
+      return nil
+   } else {
+      return fmt.Errorf("Can't delete. Index is out of bounds.")
+   }
+}
+
+func (d *Deck) AddCard(c *Card) error {
+   hash := c.HashStr()
+   _, exists := d.Cmap[hash]
+   if !exists {
+      d.Cmap[hash] = c
+      d.refs = append(d.refs, hash)
+      return nil
+   } else {
+      return fmt.Errorf("Card already exists in deck")
+   }
+}
+
+func (d *Deck) AddFacts(facts [][]string, file string) error {
+   if c, err := NewCard(facts, file); err == nil {
+      return d.AddCard(c)
+   }
+   return nil
 }
 
 func (d *Deck) AddMeta(h string, m *Meta) {

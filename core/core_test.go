@@ -43,7 +43,7 @@ func TestCard(t *testing.T) {
 
 func TestDeck(t *testing.T) {
    d := NewDeck()
-   d.AddFacts(facts, "")
+   d.AddFacts(facts, "afile")
    if d.GetCard(0).GetQuestion() != "hello there" { t.Fail() }
    if !d.GetCard(0).HasAnswer() { t.Fail() }
    if d.GetMeta(0) != nil { t.Fail() }
@@ -59,6 +59,13 @@ func TestDeck(t *testing.T) {
    d.Forget(0)
    if d.GetMeta(0) != nil { t.Fail() }
    if !d.GetCard(0).HasAnswer() { t.Fail() }
+   d.AddFacts(facts, "nofile")
+   if d.Len() != 1 { t.Fail() }
+   if d.GetCard(0).File != "afile" { t.Fail() }
+   d.FilterOutFile("nofile")
+   if d.Len() != 1 { t.Fail() }
+   d.FilterOutFile("afile")
+   if d.Len() != 0 { t.Fail() }
    d.DelCard(0)
    if d.GetCard(0) != nil { t.Fail() }
 }

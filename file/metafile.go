@@ -23,8 +23,9 @@ func oe(arr []string, i int) string {
 // Open opens filename and loads cards into new deck
 func ReadMetasToDeck(filename string, d *core.Deck) error {
    if f, err := os.Open(filename); err != nil {
-      return fmt.Errorf("Error: Unable to open file \"%s\"", filename)
+      return fmt.Errorf("Error: Unable to open meta file \"%s\"", filename)
    } else {
+      defer f.Close()
       ReadMetasToDeckHelper(f, d)
       return nil
    }
