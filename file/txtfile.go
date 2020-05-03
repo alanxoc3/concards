@@ -10,17 +10,17 @@ import (
 )
 
 // Open opens filename and loads cards into new deck
-func ReadCardsToDeck(filename string) (*core.Deck, error) {
+func ReadCardsToDeck(filename string, d *core.Deck) error {
    if f, err := os.Open(filename); err != nil {
-      return nil, fmt.Errorf("Error: Unable to open file \"%s\"", filename)
+      return fmt.Errorf("Error: Unable to open file \"%s\"", filename)
    } else {
-      return ReadCardsToDeckHelper(f), nil
+      ReadCardsToDeckHelper(f, d)
+      return nil
    }
 }
 
-func ReadCardsToDeckHelper(r io.Reader) (d *core.Deck) {
+func ReadCardsToDeckHelper(r io.Reader, d *core.Deck) {
    // Initialization.
-   d = core.NewDeck()
    facts := [][]string{}
    state := false
 

@@ -21,15 +21,16 @@ func oe(arr []string, i int) string {
 }
 
 // Open opens filename and loads cards into new deck
-func ReadMetasToDeck(filename string, d *core.Deck) (*core.Deck, error) {
+func ReadMetasToDeck(filename string, d *core.Deck) error {
    if f, err := os.Open(filename); err != nil {
-      return nil, fmt.Errorf("Error: Unable to open file \"%s\"", filename)
+      return fmt.Errorf("Error: Unable to open file \"%s\"", filename)
    } else {
-      return ReadMetasToDeckHelper(f, d), nil
+      ReadMetasToDeckHelper(f, d)
+      return nil
    }
 }
 
-func ReadMetasToDeckHelper(r io.Reader, d *core.Deck) *core.Deck {
+func ReadMetasToDeckHelper(r io.Reader, d *core.Deck) {
    // Scan by words.
    line_scanner := bufio.NewScanner(r)
    line_scanner.Split(bufio.ScanLines)
@@ -42,8 +43,6 @@ func ReadMetasToDeckHelper(r io.Reader, d *core.Deck) *core.Deck {
          d.AddMeta(strs[0], core.NewMeta(oe(strs, 1), oe(strs, 2), oe(strs, 3), strs[4:]))
       }
    }
-
-   return d
 }
 
 func WriteMetasToString(d *core.Deck) (file_str string) {
@@ -63,7 +62,7 @@ func WriteMetasToString(d *core.Deck) (file_str string) {
    for _, k := range keys {
       m := d.Mmap[k]
       if m != nil && m.String() != "" {
-         file_str += m.String() + "\n"
+         file_str += k + " " + m.String() + "\n"
       }
    }
 
