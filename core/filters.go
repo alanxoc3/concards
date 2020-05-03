@@ -1,4 +1,4 @@
-package con
+package core
 
 // Trims a deck to only have this many d in it.
 func (d Deck) FilterNumber(param int) Deck {

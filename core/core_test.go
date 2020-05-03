@@ -1,4 +1,4 @@
-package con
+package core
 
 import "testing"
 import "strings"
@@ -55,4 +55,10 @@ func TestDeck(t *testing.T) {
    if len(md) != 3 { t.Fail() }
    if md[1] != "0" { t.Fail() }
    if md[2] != "sm2" { t.Fail() }
+
+   d.Forget(0)
+   if !d.GetMeta(0).IsZero() { t.Fail() }
+   if !d.GetCard(0).HasAnswer() { t.Fail() }
+   d = d.DelCard(0)
+   if d.GetCard(0).HasAnswer() { t.Fail() }
 }

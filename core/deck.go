@@ -1,12 +1,16 @@
-package con
+package core
+
+func removeIndex(s []string, index int) []string {
+    return append(s[:index], s[index+1:]...)
+}
 
 // refs contains checksums.
 // cmap maps checksums to cards.
 // mmap maps checksums to cards.
 type Deck struct {
-   cmap  map[string]Card
-   mmap  map[string]Meta
-   refs  []string
+   cmap  map[string]Card // This should be a pointer!
+   mmap  map[string]Meta // This should be a pointer!
+   refs  []string // This should be a byte array instead of a string!
 }
 
 func NewDeck() (Deck) {
@@ -15,6 +19,16 @@ func NewDeck() (Deck) {
       mmap: map[string]Meta{},
       refs: []string{},
    }
+}
+
+func (d Deck) Forget(i int) Deck {
+   delete(d.mmap, d.refs[i])
+   return d
+}
+
+func (d Deck) DelCard(i int) Deck {
+   d.refs = removeIndex(d.refs, i)
+   return d
 }
 
 func (d Deck) AddCard(c Card) Deck {

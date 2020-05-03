@@ -6,21 +6,21 @@ import (
    "io"
    "os"
 
-   "github.com/alanxoc3/concards/con"
+   "github.com/alanxoc3/concards/core"
 )
 
 // Open opens filename and loads cards into new deck
-func ReadToDeck(filename string) (con.Deck, error) {
+func ReadCardsToDeck(filename string) (core.Deck, error) {
    if f, err := os.Open(filename); err != nil {
-      return nil, fmt.Errorf("Error: Unable to open file \"%s\"", filename)
+      return core.Deck{}, fmt.Errorf("Error: Unable to open file \"%s\"", filename)
    } else {
-      return ReadToDeckHelper(f)
+      return ReadCardsToDeckHelper(f), nil
    }
 }
 
-func ReadToDeckHelper(r io.Reader) (d con.Deck, err error) {
+func ReadCardsToDeckHelper(r io.Reader) (d core.Deck) {
    // Initialization.
-   d = con.NewDeck()
+   d = core.NewDeck()
    facts := [][]string{}
    state := false
 
@@ -35,9 +35,10 @@ func ReadToDeckHelper(r io.Reader) (d con.Deck, err error) {
          if t == "@" {
             facts = append(facts, []string{})
          } else if t == "@>" {
-            d = d.AppendCard(facts)
+            d = d.AddFacts(facts)
+            facts = [][]string{{}}
          } else if t == "<@" {
-            d = d.AppendCard(facts)
+            d = d.AddFacts(facts)
             state = false
          } else {
             if i := len(facts)-1; i >= 0 {
