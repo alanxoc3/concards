@@ -28,7 +28,7 @@ func TestParse(t *testing.T) {
 }
 
 func TestCard(t *testing.T) {
-   c, err := NewCard(facts)
+   c, err := NewCard(facts, "")
    if err != nil { t.FailNow() }
 
    txt := c.String()
@@ -43,7 +43,7 @@ func TestCard(t *testing.T) {
 
 func TestDeck(t *testing.T) {
    d := NewDeck()
-   d.AddFacts(facts)
+   d.AddFacts(facts, "")
    if d.GetCard(0).GetQuestion() != "hello there" { t.Fail() }
    if !d.GetCard(0).HasAnswer() { t.Fail() }
    if d.GetMeta(0) != nil { t.Fail() }

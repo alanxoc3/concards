@@ -9,19 +9,21 @@ import (
 
 // A card is a list of facts. Usually, but not limited to, Q&A format.
 type Card struct {
-   file  string
-   facts []string
+   File  string
+   Facts []string
 }
 
-func NewCard(facts [][]string) (*Card, error) {
+// Assumes a "cleaned" file string.
+func NewCard(facts [][]string, file string) (*Card, error) {
    c := Card{}
+   c.File = file
 	for _, x := range facts {
       if len(x) > 0 {
-         c.facts = append(c.facts, strings.Join(x, " "))
+         c.Facts = append(c.Facts, strings.Join(x, " "))
       }
 	}
 
-   if len(c.facts) > 0 {
+   if len(c.Facts) > 0 {
       return &c, nil
    } else {
       return nil, fmt.Errorf("Question not provided.")
@@ -29,19 +31,19 @@ func NewCard(facts [][]string) (*Card, error) {
 }
 
 func (c *Card) HasAnswer() bool {
-   return len(c.facts) > 1
+   return len(c.Facts) > 1
 }
 
 func (c *Card) GetQuestion() string {
-   if len(c.facts) > 0 {
-      return c.facts[0]
+   if len(c.Facts) > 0 {
+      return c.Facts[0]
    } else {
       return ""
    }
 }
 
 func (c *Card) String() string {
-   return strings.Join(c.facts, " @ ")
+   return strings.Join(c.Facts, " @ ")
 }
 
 func (c *Card) Hash() [sha256.Size]byte {

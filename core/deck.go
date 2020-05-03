@@ -35,8 +35,8 @@ func (d *Deck) AddCard(c *Card) {
    d.refs = append(d.refs, hash)
 }
 
-func (d *Deck) AddFacts(facts [][]string) {
-   if c, err := NewCard(facts); err == nil {
+func (d *Deck) AddFacts(facts [][]string, file string) {
+   if c, err := NewCard(facts, file); err == nil {
       d.AddCard(c)
    }
 }
