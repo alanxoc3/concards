@@ -19,15 +19,15 @@ func oe(arr []string, i int) string {
 }
 
 // Open opens filename and loads cards into new deck
-func ReadMetasToDeck(filename string, d core.Deck) (core.Deck, error) {
+func ReadMetasToDeck(filename string, d *core.Deck) (*core.Deck, error) {
    if f, err := os.Open(filename); err != nil {
-      return d, fmt.Errorf("Error: Unable to open file \"%s\"", filename)
+      return nil, fmt.Errorf("Error: Unable to open file \"%s\"", filename)
    } else {
       return ReadMetasToDeckHelper(f, d), nil
    }
 }
 
-func ReadMetasToDeckHelper(r io.Reader, d core.Deck) core.Deck {
+func ReadMetasToDeckHelper(r io.Reader, d *core.Deck) *core.Deck {
    // Scan by words.
    line_scanner := bufio.NewScanner(r)
    line_scanner.Split(bufio.ScanLines)

@@ -42,23 +42,23 @@ func TestCard(t *testing.T) {
 }
 
 func TestDeck(t *testing.T) {
-   d := NewDeck().AddFacts(facts)
+   d := NewDeck()
+   d.AddFacts(facts)
    if d.GetCard(0).GetQuestion() != "hello there" { t.Fail() }
    if !d.GetCard(0).HasAnswer() { t.Fail() }
-   if !d.GetMeta(0).IsZero() { t.Fail() }
-   if !d.GetMeta(0).Next.IsZero() { t.Fail() }
+   if d.GetMeta(0) != nil { t.Fail() }
 
    testmeta := NewMeta("", "", "sm2", []string{})
    d.AddMeta(d.GetHash(0), testmeta)
    if d.GetMeta(0).IsZero() { t.Fail() }
-   md := strings.Split(d.GetMeta(0).String(), " ")
+   md := strings.Fields(d.GetMeta(0).String())
    if len(md) != 3 { t.Fail() }
    if md[1] != "0" { t.Fail() }
    if md[2] != "sm2" { t.Fail() }
 
    d.Forget(0)
-   if !d.GetMeta(0).IsZero() { t.Fail() }
+   if d.GetMeta(0) != nil { t.Fail() }
    if !d.GetCard(0).HasAnswer() { t.Fail() }
-   d = d.DelCard(0)
-   if d.GetCard(0).HasAnswer() { t.Fail() }
+   d.DelCard(0)
+   if d.GetCard(0) != nil { t.Fail() }
 }
