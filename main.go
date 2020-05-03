@@ -1,100 +1,43 @@
 package main
 
 import (
-	"fmt"
-	"math/rand"
-	"os"
-	"time"
-
-	"github.com/alanxoc3/concards/termhelp"
-	"github.com/alanxoc3/concards/termboxgui"
-	"github.com/alanxoc3/concards/file"
-	"github.com/alanxoc3/concards/deck"
-
-    "crypto/sha256"
+   "fmt"
+   "github.com/akamensky/argparse"
+   "os"
 )
 
 func main() {
-	do_err := func(err error) {
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err.Error())
-			os.Exit(1)
-		}
-	}
+   // Create new parser object
+   parser := argparse.NewParser("concards", "Concards is a simple CLI based SRS flashcard app.")
 
-	rand.Seed(time.Now().UTC().UnixNano())
+   // Create flags
+   f_review   := parser.Flag("r", "review",   &argparse.Options{Help: "Show cards available to be reviewed"})
+   f_memorize := parser.Flag("m", "memorize", &argparse.Options{Help: "Show cards available to be memorized"})
+   f_done     := parser.Flag("d", "done",     &argparse.Options{Help: "Show cards not available to be reviewed or memorized"})
+   f_print    := parser.Flag("p", "print",    &argparse.Options{Help: "Prints all cards, one line per card"})
+   f_number   := parser.Int("n", "number",    &argparse.Options{Help: "Limit the number of cards in the program to \"#\""})
+   f_editor   := parser.String("E", "editor", &argparse.Options{Help: "Which editor to use. Defaults to \"$EDITOR\""})
+   f_meta     := parser.String("M", "meta",   &argparse.Options{Help: "Path to meta file. Defaults to \"$CONCARDS_META\" or \"~/.concards-meta\""})
 
-	cfg, err := termhelp.ValidateAndParseConfig(os.Args)
-	do_err(err)
-	if cfg == nil {
-		os.Exit(0)
-	}
+   parser.HelpFunc = func(c *argparse.Command, msg interface{}) string {
+      var help string
+      help += fmt.Sprintf("%s\n\nUsage:\n  %s [OPTIONS]... [FILE|FOLDER]...\n\nOptions:\n", c.GetDescription(), c.GetName())
 
-   println(cfg.ConfigFolder)
-   println(cfg.DatabasePath)
-   println(cfg.ConfigFile)
+      for _, arg := range c.GetArgs() {
+         help += fmt.Sprintf("  -%s  --%-9s %s.\n", arg.GetSname(), arg.GetLname(), arg.GetOpts().Help)
+      }
 
-   sum := sha256.Sum256([]byte("THIS_IS_A_QUESTION"))
-	fmt.Printf("%x\n", sum)
-
-   cards := deck.Deck{}
-   for _, f := range cfg.Files {
-      d, err := file.ReadToDeck(f)
-      do_err(err)
-      cards = append(cards, d...)
+      return help
    }
 
-	writeFunc := func() {
-		// err := decks.Write()
-		// do_err(err)
+   // Parse input
+   err := parser.Parse(os.Args)
+   if err != nil {
+      fmt.Print(parser.Help(nil))
+      os.Exit(1)
 	}
 
-	if cfg.UpdateMode {
-		writeFunc()
-
-	} else {
-		if len(cards) > 0 {
-			if cfg.Usage == termhelp.VIEWMODE {
-				err := termboxgui.TermBoxRun(cards, cfg)
-				do_err(err)
-				// writeFunc()
-			} else if cfg.Usage == termhelp.EDITMODE {
-				cards.Sort()
-				err := file.EditDeck(cfg.Editor, cards)
-				do_err(err)
-				// writeFunc()
-			} else if cfg.Usage == termhelp.PRINTMODE {
-				cards.Sort()
-				fmt.Print(file.WriteDeckToString(&cards))
-			}
-		}
-	}
+   if *f_review || *f_memorize || *f_done || *f_print || f_editor != nil || f_number != nil || f_meta != nil {
+      println("Hello World")
+   }
 }
-
-// func gen_session_deck(cfg *termhelp.Config, decks deck.DeckControls) (session deck.Deck) {
-	// Build Deck
-	// if cfg.Review {
-		// session = append(session, decks.FilterReview()...)
-	// }
-
-	// if cfg.Memorize {
-		// session = append(session, decks.FilterMemorize()...)
-	// }
-
-	// if cfg.Done {
-		// session = append(session, decks.FilterDone()...)
-	// }
-
-	// Filter Deck
-	// if cfg.GroupsEnabled {
-		// session = session.FilterGroupsAdd(cfg.GroupsSlice)
-	// }
-
-	// session.Shuffle()
-
-	// if cfg.NumberEnabled {
-		// session = session.FilterNumber(cfg.Number)
-	// }
-
-	// return
-// }

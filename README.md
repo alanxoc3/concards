@@ -50,11 +50,10 @@ Options:
   -m  --memorize  Show cards available to be memorized.
   -d  --done      Show cards not available to be reviewed or memorized.
   -n  --number #  Limit the number of cards in the program to "#".
-  -e  --edit      Edit the cards, updating used references.
   -p  --print     Prints all cards, slightly formatted.
   -h  --help      If you need assistance.
   -v  --version   Which version are you on again?
-      --editor e  Defaults to $EDITOR
+  -E  --editor e  Defaults to $EDITOR.
 
 For more details, read the fine man page.
 ```

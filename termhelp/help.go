@@ -1,5 +1,9 @@
 package termhelp
 
+func Version() (vers string) {
+	return "concards v1.1"
+}
+
 const (
 	REVIEW   = iota
 	MEMORIZE = iota
@@ -34,23 +38,25 @@ func Help() (ret string) {
 	return ret
 }
 
+
+/*
+  -p  --print     Prints all cards, slightly formatted.
+  -h  --help      If you need assistance.
+  -v  --version   Which version are you on again?
+  */
+
 func genOptions() []*Option {
 	var opts []*Option
 
 	opts = append(opts, newOptionNoParam('r', "review", "Show cards available to be reviewed."))
 	opts = append(opts, newOptionNoParam('m', "memorize", "Show cards available to be memorized."))
 	opts = append(opts, newOptionNoParam('d', "done", "Show cards not available to be reviewed or memorized."))
-	opts = append(opts, newOption('g', "groups", "grps", "Limits the cards to only those a part of one of the groups in \"grps\"."))
-	opts = append(opts, newOption('n', "number", "#", "Limit the number of cards in the program to \"#\"."))
-	opts = append(opts, newOptionNoParam('o', "one", "Limit the number of cards to only one card. Same as \"-n 1\"."))
-
-	opts = append(opts, newOptionNoParam('e', "edit", "Edit the cards with the default editor instead of reviewing them."))
-	opts = append(opts, newOptionNoParam('p', "print", "Print what the combined file of all the cards would be."))
-	opts = append(opts, newOptionNoParam('u', "update", "Simply updates the files to the correct formatting."))
-
-	opts = append(opts, newOptionNoParam('h', "help", "Prints out a usage/help menu."))
-	opts = append(opts, newOptionNoParam('v', "version", "Prints out which version is being used."))
-	opts = append(opts, newOption(0, "editor", "e", "Change the editor \"e\" used when editing. Default is \"$EDITOR\"."))
+	opts = append(opts, newOption('n', "number", "#", "Only process \"#\" cards."))
+	opts = append(opts, newOptionNoParam('p', "print", "Prints all cards, one line per card."))
+	opts = append(opts, newOptionNoParam('h', "help", "If you need assistance."))
+	opts = append(opts, newOptionNoParam('v', "version", "Which concards version is this?"))
+	opts = append(opts, newOption('E', "editor", "e", "Which editor concards should use. Defaults to \"$EDITOR\"."))
+	opts = append(opts, newOption('M', "meta", "f", "Location of concards meta file. Defaults to "$CONCARDS_META" or \"~/.concards-meta\"."))
 
 	return opts
 }

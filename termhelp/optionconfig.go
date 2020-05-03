@@ -10,88 +10,119 @@ import (
    "strconv"
 )
 
-type UsageMode int
-
-const (
-	VIEWMODE  UsageMode = iota
-	EDITMODE            = iota
-	PRINTMODE           = iota
-)
-
 type Config struct {
 	// The various true or false options
-	Review        bool
-	Memorize      bool
-	Done          bool
-	NumberEnabled bool
-	GroupsEnabled bool
+	IsReview   bool
+	IsMemorize bool
+	IsDone     bool
+	IsNumber   bool
+	IsHelp     bool
+	IsVersion  bool
+   IsPrint    bool
+   IsStream   bool
 
-	Help    bool
-	Version bool
-	Color   bool
+   Editor     string
+   Number     int
+   MetaFile   string
+	Files      []string
+}
 
-	Usage UsageMode
+func NewConfig() *Config {
+   cfg := Config{}
 
-	UpdateMode bool // Just writes files.
-	Editor     string
-	ConfigFolder string
-   DatabasePath string
-   ConfigFile string
+   if val, present = os.LookupEnv("CONCARDS_META"); present {
+      cfg.MetaFile = val
+   } else if usr, err := user.Current(); err == nil {
+      cfg.ConfigFolder = usr.HomeDir + "/.concards-meta"
+   } else {
+      cfg.MetaFile = ".concards-meta"
+   }
 
-	// The variable options passed in.
-	Number      int
-	Groups      map[string]bool
-	GroupsSlice []string
-	Files       []string
+   if val, present = os.LookupEnv("EDITOR"); present {
+      cfg.Editor = val
+   } else {
+      cfg.Editor = "vi"
+   }
 
-	Opts []*Option
+	return &cfg
+}
+
+func Help() {
+   println(`Usage:
+  concards [OPTION]... [FILE|FOLDER]...
+
+Options:
+  -r  --review    
+  -m  --memorize  
+  -d  --done      
+  -n  --number #  Limit the number of cards in the program to "#".
+  -p  --print     
+  -h  --help      
+  -E  --editor f  Which editor concards should use. Defaults to "$EDITOR".
+  -M  --meta f    Location of concards meta file. Defaults to "$CONCARDS_META" or ~/.concards-meta.
+
+For more details, read the fine man page.
+`)
+}
+
+func dosomething() {
+   // Create new parser object
+   parser := argparse.NewParser("concards", "A CLI simple based flashcard parser.")
+
+   // Create flags
+   f_review   := parser.Flag("r", "review",   &argparse.Options{Help: "Show cards available to be reviewed."})
+   f_memorize := parser.Flag("m", "memorize", &argparse.Options{Help: "Show cards available to be memorized."})
+   f_done     := parser.Flag("d", "done",     &argparse.Options{Help: "Show cards not available to be reviewed or memorized."})
+   f_print    := parser.Flag("p", "print",    &argparse.Options{Help: "Prints all cards, one line per card."})
+   f_help     := parser.Flag("h", "help",     &argparse.Options{Help: "If you need assistance."})
+
+   // Parse input
+   err := parser.Parse(os.Args)
+   if err != nil {
+      // In case of error print error and print usage
+      // This can also be done by passing -h or --help flags
+      fmt.Print(parser.Usage(err))
+      os.Exit(1)
+   }
 }
 
 // Parses through the given arguments and returns a generated config.
 func ParseConfig(args []string) (*Config, error) {
+   waitForNum = false
+   waitForEditor = false
+   waitForMeta = false
+
+   args = args [1:]
 	cfg := configInit()
 	cfg.Opts = genOptions()
-
-	argsNoProg := args[1:]
-	curLen := 0
 	var tmpArg string // Used in the for loop, for the options passed.
 
 	pc := parseConfig{}
 
-	for _, arg := range argsNoProg {
-		curLen = len(arg)
+	for _, arg := range args {
+      curLen := len(arg)
 
-		if curLen == 0 {
-			// ERROR empty parameter
-			return nil, errors.New("Error: You entered an empty parameter.")
-		}
-
-		if pc.waitForGroup { // PARSE GROUP STRINGS
-			pc.waitForGroup = false
-			lst := constring.StringToList(arg)
-			if len(*lst) == 0 {
-				return nil, fmt.Errorf("Error: You tried to pass an empty group list.")
-			}
-
-			for _, x := range *lst {
-				if cfg.Groups[x] == false {
-					cfg.Groups[x] = true
-				} else { // ERROR same group
-					return nil, errors.New("Error: You tried to pass the same group multiple times.")
-				}
-			}
-
-		} else if pc.waitForNum { // PARSE NUMBER
-			pc.waitForNum = false
+		if waitForNum {
+			waitForNum = false
 			num, err := strconv.Atoi(arg)
 			if err != nil {
 				return nil, errors.New("Error: You didn't pass a number to the number option.")
 			}
 			cfg.Number = num
-		} else if pc.waitForEditor { // PARSE STRING
-			pc.waitForEditor = false
+		} else if waitForEditor {
+			waitForEditor = false
 			cfg.Editor = arg
+		} else if waitForMeta {
+			waitForMeta = false
+			cfg.MetaFile = arg
 		} else {
+         if arg == '-' {
+
+         } else if arg == '--' {
+
+         }
+         if cur
+         if curLen > 1
 			if arg[0] == '-' {
 				if curLen == 1 {
 					// ERROR, there is an argument with just a dash!
@@ -142,7 +173,6 @@ func (cfg *Config) Print() {
 		cfg.Memorize, cfg.Done, cfg.NumberEnabled, cfg.GroupsEnabled, cfg.Help,
 		cfg.Version)
 	fmt.Printf("VIE - EDI - PRI - UPD\n")
-	fmt.Printf("%t %d\n", cfg.UpdateMode, cfg.Usage)
 
 	fmt.Printf("ED: %s | NUM: %d | GRP %v | FIL %v | GRPSLC %v\n\n", cfg.Editor,
 		cfg.Number, cfg.Groups, cfg.Files, cfg.GroupsSlice)
@@ -166,10 +196,6 @@ func executeCommandWithNumber(num int, pc *parseConfig, cfg *Config) error {
 	case ONE:
 		cfg.Number = 1
 		cfg.NumberEnabled = true
-	case EDIT:
-		cfg.Usage = EDITMODE
-	case PRINT:
-		cfg.Usage = PRINTMODE
 	case UPDATE:
 		cfg.UpdateMode = true
 	case HELP:
