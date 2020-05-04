@@ -1,4 +1,4 @@
-package termhelp
+package file
 
 import (
    "os"
