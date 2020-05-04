@@ -40,24 +40,6 @@ Wanna try it out? Run concards on this README.md file!
 concards README.md
 ```
 
-### Help Output
-```
-Usage:
-  concards [OPTION]... [FILE|FOLDER]...
-
-Options:
-  -r  --review    Show cards available to be reviewed.
-  -m  --memorize  Show cards available to be memorized.
-  -d  --done      Show cards not available to be reviewed or memorized.
-  -n  --number #  Limit the number of cards in the program to "#".
-  -p  --print     Prints all cards, slightly formatted.
-  -h  --help      If you need assistance.
-  -v  --version   Which version are you on again?
-  -E  --editor e  Defaults to $EDITOR.
-
-For more details, read the fine man page.
-```
-
 ### A Simple Concard
 ```
 @> This is a question.

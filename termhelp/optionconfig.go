@@ -3,11 +3,12 @@ package termhelp
 import (
    "os"
    "os/user"
-   "log"
-   "errors"
+   // "log"
+   // "errors"
    "fmt"
-   "github.com/alanxoc3/concards/constring"
-   "strconv"
+   "github.com/alanxoc3/argparse"
+   //"github.com/alanxoc3/concards/constring"
+   // "strconv"
 )
 
 type Config struct {
@@ -15,9 +16,6 @@ type Config struct {
 	IsReview   bool
 	IsMemorize bool
 	IsDone     bool
-	IsNumber   bool
-	IsHelp     bool
-	IsVersion  bool
    IsPrint    bool
    IsStream   bool
 
@@ -27,236 +25,93 @@ type Config struct {
 	Files      []string
 }
 
-func NewConfig() *Config {
-   cfg := Config{}
+// For debugging
+func (c *Config) String() string {
+   return fmt.Sprintf(`IsReview   %t
+IsMemorize %t
+IsDone     %t
+IsPrint    %t
+IsStream   %t
+Editor     "%s"
+Number     %d
+MetaFile   "%s"
+Files      %s`, c.IsReview, c.IsMemorize, c.IsDone, c.IsPrint, c.IsStream, c.Editor, c.Number, c.MetaFile, c.Files)
+}
 
-   if val, present = os.LookupEnv("CONCARDS_META"); present {
-      cfg.MetaFile = val
+func getDefaultEditor() string {
+   if val, present := os.LookupEnv("EDITOR"); present {
+      return val
+   } else {
+      return "vi"
+   }
+}
+
+func getDefaultMeta() string {
+   if val, present := os.LookupEnv("CONCARDS_META"); present {
+      return val
    } else if usr, err := user.Current(); err == nil {
-      cfg.ConfigFolder = usr.HomeDir + "/.concards-meta"
+      return usr.HomeDir + "/.concards-meta"
    } else {
-      cfg.MetaFile = ".concards-meta"
+      return ".concards-meta"
    }
-
-   if val, present = os.LookupEnv("EDITOR"); present {
-      cfg.Editor = val
-   } else {
-      cfg.Editor = "vi"
-   }
-
-	return &cfg
 }
 
-func Help() {
-   println(`Usage:
-  concards [OPTION]... [FILE|FOLDER]...
-
-Options:
-  -r  --review    
-  -m  --memorize  
-  -d  --done      
-  -n  --number #  Limit the number of cards in the program to "#".
-  -p  --print     
-  -h  --help      
-  -E  --editor f  Which editor concards should use. Defaults to "$EDITOR".
-  -M  --meta f    Location of concards meta file. Defaults to "$CONCARDS_META" or ~/.concards-meta.
-
-For more details, read the fine man page.
-`)
-}
-
-func dosomething() {
+func GenConfig() *Config {
    // Create new parser object
-   parser := argparse.NewParser("concards", "A CLI simple based flashcard parser.")
+   parser := argparse.NewParser("concards", "Concards is a simple CLI based SRS flashcard app.")
 
    // Create flags
-   f_review   := parser.Flag("r", "review",   &argparse.Options{Help: "Show cards available to be reviewed."})
-   f_memorize := parser.Flag("m", "memorize", &argparse.Options{Help: "Show cards available to be memorized."})
-   f_done     := parser.Flag("d", "done",     &argparse.Options{Help: "Show cards not available to be reviewed or memorized."})
-   f_print    := parser.Flag("p", "print",    &argparse.Options{Help: "Prints all cards, one line per card."})
-   f_help     := parser.Flag("h", "help",     &argparse.Options{Help: "If you need assistance."})
+   f_version  := parser.Flag("V", "version",  &argparse.Options{Help: "Concards build information."})
+   f_review   := parser.Flag("r", "review",   &argparse.Options{Help: "Show cards available to be reviewed"})
+   f_memorize := parser.Flag("m", "memorize", &argparse.Options{Help: "Show cards available to be memorized"})
+   f_done     := parser.Flag("d", "done",     &argparse.Options{Help: "Show cards not available to be reviewed or memorized"})
+   f_print    := parser.Flag("p", "print",    &argparse.Options{Help: "Prints all cards, one line per card"})
+   f_number   := parser.Int("n", "number",    &argparse.Options{Default: 0, Help: "Limit the number of cards in the program to \"#\""})
+   f_editor   := parser.String("E", "editor", &argparse.Options{Default: getDefaultEditor(), Help: "Which editor to use. Defaults to \"$EDITOR\""})
+   f_meta     := parser.String("M", "meta",   &argparse.Options{Default: getDefaultMeta(), Help: "Path to meta file. Defaults to \"$CONCARDS_META\" or \"~/.concards-meta\""})
+
+   parser.HelpFunc = func(c *argparse.Command, msg interface{}) string {
+      var help string
+      help += fmt.Sprintf("%s\n\nUsage:\n  %s [OPTIONS]... [FILE|FOLDER]...\n\nOptions:\n", c.GetDescription(), c.GetName())
+
+      for _, arg := range c.GetArgs() {
+         help += fmt.Sprintf("  -%s  --%-9s %s.\n", arg.GetSname(), arg.GetLname(), arg.GetOpts().Help)
+      }
+
+      return help
+   }
 
    // Parse input
-   err := parser.Parse(os.Args)
+   files, err := parser.Parse(os.Args)
    if err != nil {
-      // In case of error print error and print usage
-      // This can also be done by passing -h or --help flags
-      fmt.Print(parser.Usage(err))
+      fmt.Print(parser.Help(nil))
       os.Exit(1)
-   }
-}
-
-// Parses through the given arguments and returns a generated config.
-func ParseConfig(args []string) (*Config, error) {
-   waitForNum = false
-   waitForEditor = false
-   waitForMeta = false
-
-   args = args [1:]
-	cfg := configInit()
-	cfg.Opts = genOptions()
-	var tmpArg string // Used in the for loop, for the options passed.
-
-	pc := parseConfig{}
-
-	for _, arg := range args {
-      curLen := len(arg)
-
-		if waitForNum {
-			waitForNum = false
-			num, err := strconv.Atoi(arg)
-			if err != nil {
-				return nil, errors.New("Error: You didn't pass a number to the number option.")
-			}
-			cfg.Number = num
-		} else if waitForEditor {
-			waitForEditor = false
-			cfg.Editor = arg
-		} else if waitForMeta {
-			waitForMeta = false
-			cfg.MetaFile = arg
-		} else {
-         if arg == '-' {
-
-         } else if arg == '--' {
-
-         }
-         if cur
-         if curLen > 1
-			if arg[0] == '-' {
-				if curLen == 1 {
-					// ERROR, there is an argument with just a dash!
-					return nil, errors.New("Error: You entered a dash with no options.")
-				}
-
-				if arg[1] == '-' { // Double Dash (Mario Kart?)
-					if curLen == 2 {
-						// ERROR, there is an argument with just two dashes!
-						return nil, errors.New("Error: You entered two dashes with no options.")
-					}
-					tmpArg = arg[2:]
-					err := executeCommand(&tmpArg, &pc, cfg)
-					if err != nil {
-						// ERROR, the command was not found.
-						return nil, err
-					}
-				} else { // The Single Dash
-					tmpArg = arg[1:]
-					for i := 0; i < len(tmpArg); i++ {
-						if pc.check() {
-							return nil, errors.New("Error: You didn't provide a parameter for one of the options.")
-						}
-						err := executeAlias(tmpArg[i], &pc, cfg)
-						if err != nil {
-							// ERROR, the command was not found.
-							return nil, err
-						}
-					}
-				}
-			} else { // This is a file!
-				cfg.Files = append(cfg.Files, arg)
-			}
-		}
 	}
 
-	if pc.check() {
-		return nil, errors.New("Error: You didn't provide a parameter for one of the options.")
-	}
-
-	return cfg, nil
-}
-
-// For debugging purposes.
-func (cfg *Config) Print() {
-	fmt.Printf("REV - MEM - DON - num - grp - hlp - ver\n")
-	fmt.Printf("%t %t %t %t %t %t %t\n", cfg.Review,
-		cfg.Memorize, cfg.Done, cfg.NumberEnabled, cfg.GroupsEnabled, cfg.Help,
-		cfg.Version)
-	fmt.Printf("VIE - EDI - PRI - UPD\n")
-
-	fmt.Printf("ED: %s | NUM: %d | GRP %v | FIL %v | GRPSLC %v\n\n", cfg.Editor,
-		cfg.Number, cfg.Groups, cfg.Files, cfg.GroupsSlice)
-}
-
-// Helpers...
-func executeCommandWithNumber(num int, pc *parseConfig, cfg *Config) error {
-	switch num {
-	case REVIEW:
-		cfg.Review = true
-	case MEMORIZE:
-		cfg.Memorize = true
-	case DONE:
-		cfg.Done = true
-	case GROUPS:
-		pc.waitForGroup = true
-		cfg.GroupsEnabled = true
-	case NUMBER:
-		pc.waitForNum = true
-		cfg.NumberEnabled = true
-	case ONE:
-		cfg.Number = 1
-		cfg.NumberEnabled = true
-	case UPDATE:
-		cfg.UpdateMode = true
-	case HELP:
-		cfg.Help = true
-	case VERSION:
-		cfg.Version = true
-	case EDITOR:
-		pc.waitForEditor = true
-	default:
-		// It doesn't exist here
-		return errors.New("Error: You have an invalid command-line option.")
-	}
-
-	return nil
-}
-
-func executeCommand(cmd *string, pc *parseConfig, cfg *Config) error {
-	num := optsFindCommand(cfg.Opts, cmd)
-	return executeCommandWithNumber(num, pc, cfg)
-}
-
-func executeAlias(cmd byte, pc *parseConfig, cfg *Config) error {
-	num := optsFindAlias(cfg.Opts, cmd)
-	return executeCommandWithNumber(num, pc, cfg)
-}
-
-type parseConfig struct {
-	waitForGroup, waitForNum, waitForEditor bool
-}
-
-func CreateDirIfNotExists(dir string) {
-   if _, err := os.Stat(dir); !os.IsNotExist(err) {
-      return
+   if *f_version {
+      fmt.Printf("Concards v2.0\n")
+      os.Exit(0)
    }
 
-   if err := os.MkdirAll(dir, 0755); err != nil {
-      panic(err)
+   c := &Config{}
+
+	c.IsReview = *f_review
+	c.IsMemorize = *f_memorize
+	c.IsDone = *f_done
+   c.IsPrint = *f_print
+   c.IsStream = false
+
+   c.Editor = *f_editor
+   c.Number = *f_number
+   c.MetaFile = *f_meta
+	c.Files = files
+
+   if !c.IsReview && !c.IsMemorize && !c.IsDone {
+      c.IsReview = true
+      c.IsMemorize = true
    }
-}
 
-// Set the defaults for the config
-func configInit() *Config {
-	// Everything besides these are set to false or 0
-	var cfg Config
-	cfg.Editor = ""
+   println(c.String())
 
-   if usr, err := user.Current(); err != nil {
-      log.Fatal( err )
-      cfg.ConfigFolder = "."
-   } else {
-      cfg.ConfigFolder = usr.HomeDir + "/.concards"
-   }
-
-   cfg.DatabasePath = cfg.ConfigFolder + "/cards.db"
-   cfg.ConfigFile = cfg.ConfigFolder + "/config.yaml"
-   CreateDirIfNotExists(cfg.ConfigFolder)
-
-	cfg.Groups = make(map[string]bool)
-	return &cfg
-}
-
-func (pc *parseConfig) check() bool {
-	return pc.waitForGroup || pc.waitForNum || pc.waitForEditor
+   return c
 }
