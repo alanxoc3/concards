@@ -1,13 +1,12 @@
 package termboxgui
 
 import (
-	"github.com/alanxoc3/concards/algs"
-	"github.com/alanxoc3/concards/deck"
-	"github.com/alanxoc3/concards/termhelp"
+	"github.com/alanxoc3/concards/core"
+	"github.com/alanxoc3/concards/file"
 	termbox "github.com/nsf/termbox-go"
 )
 
-func TermBoxRun(d deck.Deck, cfg *termhelp.Config) error {
+func TermBoxRun(d *core.Deck, cfg *file.Config) error {
 	err := termbox.Init()
 	if err != nil {
 		return err
@@ -22,13 +21,13 @@ func TermBoxRun(d deck.Deck, cfg *termhelp.Config) error {
 	data = make([]byte, 0, 64)
 	const coldef = termbox.ColorDefault
 
-	card_shown := false
+	card_shown := 1
 	help_mode := false
 	quit_mode := false
 	finished_editing := false
 
 	save(d) // Save at beginning, and end of each editing command.
-	for len(d) > 0 {
+	for d.Len() > 0 {
 		draw_screen(d, help_mode, card_shown, finished_editing)
 		finished_editing = false
 
@@ -52,33 +51,32 @@ func TermBoxRun(d deck.Deck, cfg *termhelp.Config) error {
 				}
 			} else if !help_mode {
 				if inp == "1" {
-					update_stat_msg_and_card(d.Top(), algs.NO)
-					d = append(d[1:], d[0]) // top to bottom
-					card_shown = false
+					update_stat_msg_and_card(d, core.NO)
+					d.DelCard(0)
+					card_shown = 1
 					save(d)
 				} else if inp == "2" {
-					update_stat_msg_and_card(d.Top(), algs.IDK)
-					d = append(d[1:], d[0]) // top to bottom
-					card_shown = false
+					update_stat_msg_and_card(d, core.IDK)
+					d.DelCard(0)
+					card_shown = 1
 					save(d)
 				} else if inp == "3" {
-					update_stat_msg_and_card(d.Top(), algs.YES)
-					d = d[1:]
-					card_shown = false
+					update_stat_msg_and_card(d, core.YES)
+					d.DelCard(0)
+					card_shown = 1
 					save(d)
 				} else if inp == "d" {
-               d.Top().Deleted = true
                update_stat_msg("Deleted.", termbox.ColorYellow)
-					d = d[1:]
-					card_shown = false
+					d.DelCard(0)
+					card_shown = 1
 					save(d)
 				} else if inp == "s" {
                update_stat_msg("Skipped.", termbox.ColorYellow)
-					d = append(d[1:], d[0]) // top to bottom
-					card_shown = false
+					d.DelCard(0)
+					card_shown = 1
 					save(d)
 				} else if inp == "e" {
-					// err := deck.EditCard(cfg.Editor, d.Top())
+					// err := core.EditCard(cfg.Editor, d.Top())
 
 					if err != nil {
 						update_stat_msg(err.Error(), termbox.ColorRed)
@@ -86,7 +84,7 @@ func TermBoxRun(d deck.Deck, cfg *termhelp.Config) error {
 						update_stat_msg("Card was successfully edited.", termbox.ColorYellow)
 					}
 					finished_editing = true
-					card_shown = false
+					card_shown = 1
 					save(d)
 				} else if inp == "u" {
 					td, terr := undo()
@@ -95,7 +93,7 @@ func TermBoxRun(d deck.Deck, cfg *termhelp.Config) error {
 					} else {
 						d = td
 						update_stat_msg("Undo.", termbox.ColorYellow)
-						card_shown = false
+						card_shown = 1
 					}
 				} else if inp == "r" {
 					td, terr := redo()
@@ -104,14 +102,13 @@ func TermBoxRun(d deck.Deck, cfg *termhelp.Config) error {
 					} else {
 						d = td
 						update_stat_msg("Redo.", termbox.ColorCyan)
-						card_shown = false
+						card_shown = 1
 					}
 				} else if inp == " " || inp == "\r" {
-					if d.Top().HasAnswer() {
-						card_shown = !card_shown
-					} else {
-						update_stat_msg("This card has no answer.", termbox.ColorRed)
-					}
+               card_shown++
+               if l := len(d.GetCard(0).Facts); card_shown >= l {
+                  card_shown = 1
+               }
 				}
 			}
 		} else {
@@ -128,7 +125,7 @@ func TermBoxRun(d deck.Deck, cfg *termhelp.Config) error {
 	return nil
 }
 
-func draw_screen(d deck.Deck, help_mode, card_shown, finished_editing bool) {
+func draw_screen(d *core.Deck, help_mode bool, card_shown int, finished_editing bool) {
 	if finished_editing {
 		termbox.Sync()
 	}
@@ -138,7 +135,7 @@ func draw_screen(d deck.Deck, help_mode, card_shown, finished_editing bool) {
 	if help_mode {
 		display_help_mode(termbox.ColorCyan)
 	} else {
-		display_card_mode(d.Top(), card_shown)
+		display_card_mode(d.GetCard(0), card_shown)
 	}
 
 	tbprint_statusbar(d)

@@ -2,11 +2,8 @@ package termboxgui
 
 import (
 	"fmt"
-	"strings"
 
-	"github.com/alanxoc3/concards/algs"
-	"github.com/alanxoc3/concards/card"
-	"github.com/alanxoc3/concards/deck"
+	"github.com/alanxoc3/concards/core"
 	runewidth "github.com/mattn/go-runewidth"
 	termbox "github.com/nsf/termbox-go"
 )
@@ -100,28 +97,22 @@ func tbvertical(x int, color termbox.Attribute) {
 	}
 }
 
-// print question, returns final
-func tbprint_gq(c *card.Card, color termbox.Attribute) (int, int) {
-	grps := strings.Join(c.Groups.ToArray(), " ")
-	_, y := tbprintwrap(0, 0, termbox.ColorCyan, coldef, grps)
+func tbprint_card(c *core.Card, amount int) {
+   y := 0
 
-	ques := c.Question
-	return tbprintwrap(0, y+2, color, coldef, ques)
+   for i := 0; i < len(c.Facts) && i < amount; i++ {
+      color := termbox.ColorCyan
+      if i > 0 { color = termbox.ColorWhite }
+      _, y = tbprintwrap(0, y, color, coldef, c.Facts[i])
+      y++
+   }
 }
 
-// print question and answer
-func tbprint_gqa(c *card.Card) {
-	_, y := tbprint_gq(c, termbox.ColorCyan)
-
-	ans := strings.Join(c.Answers, "\n\n")
-	tbprintwrap(3, y+2, termbox.ColorWhite, coldef, ans)
-}
-
-func tbprint_statusbar(d deck.Deck) {
+func tbprint_statusbar(d *core.Deck) {
 	_, h := termbox.Size()
 	color := termbox.ColorBlue
 	tbhorizontal(h-2, color)
-	msg := fmt.Sprintf("concards - %d cards remain - type \"h\" for help", len(d))
+	msg := fmt.Sprintf("concards - %d cards remain - type \"h\" for help", d.Len())
 
 	tbprint(0, h-2, termbox.ColorWhite|termbox.AttrBold, color, msg)
 }
@@ -161,16 +152,8 @@ func display_help_mode(color termbox.Attribute) {
 	tbprint(x, y, color, coldef, str2)
 }
 
-func display_card_mode(c *card.Card, showAnswer bool) {
-	if showAnswer {
-		tbprint_gqa(c)
-	} else {
-		if c.HasAnswer() {
-			tbprint_gq(c, termbox.ColorWhite)
-		} else {
-			tbprint_gq(c, termbox.ColorYellow)
-		}
-	}
+func display_card_mode(c *core.Card, showAnswer int) {
+   tbprint_card(c, 100)
 }
 
 func tbprint_stat_msg() {
@@ -181,17 +164,23 @@ func tbprint_stat_msg() {
 	tbprint(0, h-1, stat_msg_col, color, stat_msg)
 }
 
-func update_stat_msg_and_card(c *card.Card, k algs.Know) {
-	if k == algs.NO {
-      c.Metadata.Exec(c.Metadata, algs.NO)
-		update_stat_msg("Not a clue, card put to the back of the pile.", termbox.ColorRed)
-	} else if k == algs.IDK {
-      c.Metadata.Exec(c.Metadata, algs.IDK)
-		update_stat_msg("Sounds familiar, card put to the back of the pile.", termbox.ColorYellow)
-	} else if k == algs.YES {
-      c.Metadata.Exec(c.Metadata, algs.YES)
-		time := c.Metadata.Next.Format("Mon 2 Jan 2006 @ 15:04")
-		update_stat_msg(fmt.Sprintf("I know it! Next review is %s.", time), termbox.ColorCyan)
+func update_stat_msg_and_card(d *core.Deck, k core.Know) {
+	if k == core.NO {
+      if m := d.GetMeta(0); m != nil {
+         m.Exec(core.NO)
+      }
+      update_stat_msg("Not a clue, card put to the back of the pile.", termbox.ColorRed)
+	} else if k == core.IDK {
+      if m := d.GetMeta(0); m != nil {
+         m.Exec(core.IDK)
+      }
+      update_stat_msg("Sounds familiar, card put to the back of the pile.", termbox.ColorYellow)
+	} else if k == core.YES {
+      if m := d.GetMeta(0); m != nil {
+         m.Exec(core.YES)
+         time := m.Next.Format("Mon 2 Jan 2006 @ 15:04")
+         update_stat_msg(fmt.Sprintf("I know it! Next review is %s.", time), termbox.ColorCyan)
+      }
 	}
 }
 
