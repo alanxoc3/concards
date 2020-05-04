@@ -96,3 +96,21 @@ func (d *Deck) GetMeta(i int) (m *Meta) {
    _, _, m = d.Get(i)
    return
 }
+
+func (d *Deck) Copy() *Deck {
+   n := NewDeck()
+   for _, v := range d.refs { n.refs = append(n.refs, v) }
+   for k, v := range d.Cmap { n.Cmap[k] = v }
+   for k, v := range d.Mmap { n.Mmap[k] = v }
+   return n
+}
+
+func (d *Deck) Clone(o *Deck) {
+   d.refs = []string{}
+   d.Cmap = map[string]*Card{}
+   d.Mmap = map[string]*Meta{}
+
+   for _, v := range o.refs { d.refs = append(d.refs, v) }
+   for k, v := range o.Cmap { d.Cmap[k] = v }
+   for k, v := range o.Mmap { d.Mmap[k] = v }
+}

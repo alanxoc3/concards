@@ -91,7 +91,7 @@ func TermBoxRun(d *core.Deck, cfg *file.Config) error {
 					if terr != nil {
 						update_stat_msg(terr.Error(), termbox.ColorRed)
 					} else {
-						d = td
+                  d.Clone(td)
 						update_stat_msg("Undo.", termbox.ColorYellow)
 						card_shown = 1
 					}

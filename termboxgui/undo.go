@@ -6,17 +6,17 @@ import (
 	"github.com/alanxoc3/concards/core"
 )
 
-var stack []core.Deck = nil
+var stack []*core.Deck = []*core.Deck{}
 var stack_location = 0
 
 // Saves the deck onto the change stack.
 func save(d *core.Deck) {
-	if stack != nil {
+	if len(stack) > 0 {
 		// Slice is exclusive, hence the +1
 		stack = stack[:stack_location+1]
 	}
 
-	stack = append(stack, *d)
+	stack = append(stack, d.Copy())
 	stack_location = len(stack) - 1
 }
 
@@ -26,7 +26,7 @@ func redo() (*core.Deck, error) {
 		stack_location++
 		d := stack[stack_location]
 
-		return &d, nil
+		return d, nil
 	} else {
 		return nil, fmt.Errorf("Nothing to redo.")
 	}
@@ -38,7 +38,7 @@ func undo() (*core.Deck, error) {
 		stack_location--
 		d := stack[stack_location]
 
-		return &d, nil
+		return d, nil
 	} else {
 		return nil, fmt.Errorf("Nothing to undo.")
 	}
