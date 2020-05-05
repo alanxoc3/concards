@@ -22,7 +22,7 @@ func save(d *core.Deck) {
 
 // Returns the state of the deck, error if there are no more redo operations.
 func redo() (*core.Deck, error) {
-	if stack_location < len(stack) - 1 {
+	if stack_location + 1 < len(stack) {
 		stack_location++
 		d := stack[stack_location]
 
