@@ -94,29 +94,10 @@ sha256sum                        | review timestamp      | streak | alg | data
 This file is saved in "$CONCARDS_HOME/.concards-meta". If there is a git repository
 available, this file will be committed every time concards updates it.
 
-### The Config File
-This file is located in "$CONCARDS_HOME/.concards-config".
-
-This is a YAML file.
-
-## Current Design
-This section is under construction.
-https://en.wikipedia.org/wiki/Leitner_system
-
-This app has a focus on short, specific, text-based cards.
-- There can be some recognition on tokens, but not on multiple tokens.
-- Think twitter + tinycards, but no images.
-
-Save the files in a directory.
-A history of recently used files could I should also have a history.
-
-Using the concards directory should be forceful.
-
-If you are forced to use the concards directory, then we could draw some cool
-conclusions:
-- Guaranteed to be using git.
-- Don't read hidden files.
-- A way to sync your cards.
-- Could make it impossible to store a card without the git hash.
-
-Ok. I do like the idea of a home directory.
+## TODOs
+- TODO: Implement this too: https://en.wikipedia.org/wiki/Leitner_system
+- TODO: Rework the terminal GUI.
+- TODO: Add ability to change algorithm in GUI.
+- TODO: Create a web flashcard front-end too.
+- TODO: Create a man page.
+- TODO: Create my own version of arg parse.
