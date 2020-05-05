@@ -32,7 +32,7 @@ func (d *Deck) Forget(i int) error {
    }
 }
 
-func (d *Deck) DelCard(i int) error {
+func (d *Deck) Del(i int) error {
    if i >= 0 && i < len(d.refs) {
       delete(d.Cmap, d.refs[i])
       d.refs = removeIndex(d.refs, i)
@@ -113,4 +113,29 @@ func (d *Deck) Clone(o *Deck) {
    for _, v := range o.refs { d.refs = append(d.refs, v) }
    for k, v := range o.Cmap { d.Cmap[k] = v }
    for k, v := range o.Mmap { d.Mmap[k] = v }
+}
+
+// Top shortcuts
+func (d *Deck) Top() (string, *Card, *Meta) { return d.Get(0) }
+func (d *Deck) TopHash() string { return d.GetHash(0) }
+func (d *Deck) TopCard() *Card { return d.GetCard(0) }
+func (d *Deck) TopMeta() *Meta { return d.GetMeta(0) }
+func (d *Deck) DelTop() error { return d.Del(0) }
+func (d *Deck) ForgetTop() error { return d.Forget(0) }
+
+func (d *Deck) TopToEnd() {
+   if len(d.refs) > 1 {
+      d.refs = append(d.refs[1:], d.refs[0])
+   }
+}
+
+func (d *Deck) TopTo(i int) {
+   if l:= len(d.refs); i >= l {
+      i = l
+   } else {
+      i++
+   }
+   if i > 1 {
+      d.refs = append(append(d.refs[1:i], d.refs[0]), d.refs[i:]...)
+   }
 }

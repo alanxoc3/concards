@@ -52,27 +52,27 @@ func TermBoxRun(d *core.Deck, cfg *file.Config) error {
 			} else if !help_mode {
 				if inp == "1" {
 					update_stat_msg_and_card(d, core.NO)
-					d.DelCard(0)
+               d.TopTo(3)
 					card_shown = 1
 					save(d)
 				} else if inp == "2" {
 					update_stat_msg_and_card(d, core.IDK)
-					d.DelCard(0)
+               d.TopTo(6)
 					card_shown = 1
 					save(d)
 				} else if inp == "3" {
 					update_stat_msg_and_card(d, core.YES)
-					d.DelCard(0)
+					d.DelTop()
 					card_shown = 1
 					save(d)
 				} else if inp == "d" {
                update_stat_msg("Deleted.", termbox.ColorYellow)
-					d.DelCard(0)
+					d.DelTop()
 					card_shown = 1
 					save(d)
 				} else if inp == "s" {
                update_stat_msg("Skipped.", termbox.ColorYellow)
-					d.DelCard(0)
+               d.TopToEnd()
 					card_shown = 1
 					save(d)
 				} else if inp == "e" {

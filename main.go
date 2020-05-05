@@ -3,6 +3,8 @@ package main
 import (
    "os"
    "fmt"
+   "time"
+   "math/rand"
    "github.com/alanxoc3/concards/file"
    "github.com/alanxoc3/concards/core"
    "github.com/alanxoc3/concards/termboxgui"
@@ -43,6 +45,7 @@ func main() {
       return
    }
 
+   rand.Seed(time.Now().UTC().UnixNano())
    d.Shuffle()
    termboxgui.TermBoxRun(d, c)
 }
