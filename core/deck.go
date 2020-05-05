@@ -54,6 +54,23 @@ func (d *Deck) AddCard(c *Card) error {
    }
 }
 
+// TODO: Error handling here.
+func (d *Deck) InsertCard(c *Card, i int) error {
+   hash := c.HashStr()
+   _, exists := d.Cmap[hash]
+   if !exists {
+      d.Cmap[hash] = c
+
+      d.refs = append(d.refs, "")
+      copy(d.refs[i+1:], d.refs[i:])
+      d.refs[i] = hash
+
+      return nil
+   } else {
+      return fmt.Errorf("Card already exists in deck")
+   }
+}
+
 func (d *Deck) AddFacts(facts [][]string, file string) error {
    if c, err := NewCard(facts, file); err == nil {
       return d.AddCard(c)
@@ -130,12 +147,10 @@ func (d *Deck) TopToEnd() {
 }
 
 func (d *Deck) TopTo(i int) {
-   if l:= len(d.refs); i >= l {
-      i = l
-   } else {
-      i++
-   }
-   if i > 1 {
-      d.refs = append(append(d.refs[1:i], d.refs[0]), d.refs[i:]...)
+   if l:= len(d.refs); l > 1 && i > 0 {
+      if i >= l { i = l-1 }
+      v := d.refs[0]
+      copy(d.refs, d.refs[1:i+1])
+      d.refs[i] = v
    }
 }

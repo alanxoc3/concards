@@ -28,6 +28,15 @@ func NewMeta(ts string, streak string, name string, params []string) *Meta {
    }
 }
 
+func NewDefaultMeta(name string) *Meta {
+   return &Meta{
+      Next: time.Now(),
+      Streak: 0,
+      Name: name,
+      Params: []string{},
+   }
+}
+
 func (m *Meta) IsZero() bool {
    return m.Next.IsZero() && m.Name == "" && m.Streak == 0 && len(m.Params) == 0
 }

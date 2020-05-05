@@ -23,7 +23,7 @@ func main() {
    }
 
    for _, f := range c.Files {
-      if err := file.ReadCardsToDeck(f, d); err != nil {
+      if err := file.ReadCardsToDeck(d, f); err != nil {
          fmt.Printf("Error: File \"%s\" does not exist!\n", f)
          os.Exit(1)
       }
@@ -48,4 +48,5 @@ func main() {
    rand.Seed(time.Now().UTC().UnixNano())
    d.Shuffle()
    termboxgui.TermBoxRun(d, c)
+   _ = file.WriteMetasToFile(d, c.MetaFile)
 }

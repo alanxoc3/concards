@@ -62,7 +62,7 @@ func TestWriteMetasToString(t *testing.T) {
 // This is a manual test.
 func TestFile(t *testing.T) {
    d := core.NewDeck()
-   ReadCardsToDeck("../", d)
+   ReadCardsToDeck(d, "../")
 
    for i := 0; i < d.Len(); i++ {
       _, c, _ := d.Get(i)

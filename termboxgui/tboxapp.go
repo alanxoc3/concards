@@ -43,7 +43,7 @@ func TermBoxRun(d *core.Deck, cfg *file.Config) error {
 			} else if inp == "h" {
 				help_mode = !help_mode
 			} else if inp == "w" {
-				//err = ctrl.Write()
+            err = file.WriteMetasToFile(d, cfg.MetaFile)
 				if err != nil {
 					update_stat_msg(err.Error(), termbox.ColorRed)
 				} else {
@@ -52,31 +52,36 @@ func TermBoxRun(d *core.Deck, cfg *file.Config) error {
 			} else if !help_mode {
 				if inp == "1" {
 					update_stat_msg_and_card(d, core.NO)
-               d.TopTo(3)
 					card_shown = 1
+               d.TopTo(3)
 					save(d)
 				} else if inp == "2" {
 					update_stat_msg_and_card(d, core.IDK)
-               d.TopTo(6)
 					card_shown = 1
+               d.TopTo(6)
 					save(d)
 				} else if inp == "3" {
 					update_stat_msg_and_card(d, core.YES)
-					d.DelTop()
 					card_shown = 1
+					d.DelTop()
 					save(d)
 				} else if inp == "d" {
                update_stat_msg("Deleted.", termbox.ColorYellow)
-					d.DelTop()
 					card_shown = 1
+					d.DelTop()
+					save(d)
+				} else if inp == "f" {
+               update_stat_msg("Forgotten.", termbox.ColorYellow)
+					card_shown = 1
+					d.ForgetTop()
 					save(d)
 				} else if inp == "s" {
                update_stat_msg("Skipped.", termbox.ColorYellow)
-               d.TopToEnd()
 					card_shown = 1
+               d.TopToEnd()
 					save(d)
 				} else if inp == "e" {
-					// err := core.EditCard(cfg.Editor, d.Top())
+					err := file.EditFile(d, cfg)
 
 					if err != nil {
 						update_stat_msg(err.Error(), termbox.ColorRed)
@@ -106,7 +111,7 @@ func TermBoxRun(d *core.Deck, cfg *file.Config) error {
 					}
 				} else if inp == " " || inp == "\r" {
                card_shown++
-               if l := len(d.GetCard(0).Facts); card_shown >= l {
+               if l := len(d.GetCard(0).Facts); card_shown > l {
                   card_shown = 1
                }
 				}
@@ -135,7 +140,7 @@ func draw_screen(d *core.Deck, help_mode bool, card_shown int, finished_editing 
 	if help_mode {
 		display_help_mode(termbox.ColorCyan)
 	} else {
-		display_card_mode(d.GetCard(0), card_shown)
+		display_card_mode(d.TopCard(), card_shown)
 	}
 
 	tbprint_statusbar(d)

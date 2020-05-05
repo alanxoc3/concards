@@ -19,6 +19,13 @@ func (d *Deck) FilterNumber(param int) {
    })
 }
 
+func (d *Deck) FilterOutFileDeck(path string, nd *Deck) {
+   d.filter(func(i int) bool {
+      _, ok := nd.Cmap[d.refs[i]]
+      return d.GetCard(i).File == path && !ok
+   })
+}
+
 func (d *Deck) FilterOutFile(path string) {
    d.filter(func(i int) bool {
       return d.GetCard(i).File == path

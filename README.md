@@ -32,7 +32,7 @@ flashcard apps (like [Anki](https://apps.ankiweb.net/) or
 The syntax to embed your flashcards is like this:
 ```
 @> What is the answer?
- @ This is the answer! <@
+ @ Here is the answer! <@
 ```
 
 Wanna try it out? Run concards on this README.md file!

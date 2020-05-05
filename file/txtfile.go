@@ -11,7 +11,7 @@ import (
 )
 
 // Open opens filename and loads cards into new deck
-func ReadCardsToDeck(filename string, d *core.Deck) error {
+func ReadCardsToDeck(d *core.Deck, filename string) error {
    err := filepath.Walk(filename, func(path string, info os.FileInfo, e error) error {
       if e != nil {
          return e

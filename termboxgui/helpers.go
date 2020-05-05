@@ -123,6 +123,7 @@ func display_help_mode(color termbox.Attribute) {
 		"e, EDIT   - the current card\n" +
 		"d, DELETE - delete the current card\n" +
 		"s, SKIP   - skips the current card\n" +
+		"f, FORGET - removes card's progress\n" +
 		"w, WRITE  - your cards to their files\n" +
 		"q, QUIT   - the program\n" +
 		"h, HELP   - toggle this menu\n" +
@@ -140,7 +141,7 @@ func display_help_mode(color termbox.Attribute) {
 	h = h - 2 // Status bar at the bottom.
 
 	// characters wide, lines tall.
-	lw, lh := 37, 16
+	lw, lh := 37, 17
 
 	x := w/2 - lw/2
 
@@ -153,7 +154,7 @@ func display_help_mode(color termbox.Attribute) {
 }
 
 func display_card_mode(c *core.Card, showAnswer int) {
-   tbprint_card(c, 100)
+   tbprint_card(c, showAnswer)
 }
 
 func tbprint_stat_msg() {
@@ -165,23 +166,24 @@ func tbprint_stat_msg() {
 }
 
 func update_stat_msg_and_card(d *core.Deck, k core.Know) {
+   h, _, m := d.Top()
+   if m == nil {
+      m = core.NewDefaultMeta("sm2")
+   }
+
 	if k == core.NO {
-      if m := d.GetMeta(0); m != nil {
-         m.Exec(core.NO)
-      }
+      m, _ = m.Exec(core.NO)
       update_stat_msg("Not a clue, card put to the back of the pile.", termbox.ColorRed)
 	} else if k == core.IDK {
-      if m := d.GetMeta(0); m != nil {
-         m.Exec(core.IDK)
-      }
+      m, _ = m.Exec(core.IDK)
       update_stat_msg("Sounds familiar, card put to the back of the pile.", termbox.ColorYellow)
 	} else if k == core.YES {
-      if m := d.GetMeta(0); m != nil {
-         m.Exec(core.YES)
-         time := m.Next.Format("Mon 2 Jan 2006 @ 15:04")
-         update_stat_msg(fmt.Sprintf("I know it! Next review is %s.", time), termbox.ColorCyan)
-      }
+      m, _ = m.Exec(core.YES)
+      time := m.Next.Format("Mon 2 Jan 2006 @ 15:04")
+      update_stat_msg(fmt.Sprintf("I know it! Next review is %s.", time), termbox.ColorCyan)
 	}
+
+   d.AddMeta(h, m)
 }
 
 func update_stat_msg(msg string, color termbox.Attribute) {
