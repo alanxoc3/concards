@@ -35,7 +35,7 @@ The syntax to embed your flashcards is like this:
  @ Here is the answer! <@
 ```
 
-Wanna try it out? Run concards on this README.md file!
+Wanna try it out? Run concards on this `README.md` file!
 ``` bash
 concards README.md
 ```
@@ -91,12 +91,14 @@ sha256sum                        | review timestamp      | streak | alg | data
 8525b45f883c05eec46b4f7a88e7f7ef | 2020-01-01T00:00:00Z  | 0      | sm2 | 2.5
 ```
 
-This file is saved in "$CONCARDS_HOME/.concards-meta". If there is a git repository
-available, this file will be committed every time concards updates it.
+This file is saved in `$CONCARDS_META`. If that environment variable doesn't
+exist, then it is saved in `$HOME/.concards-meta`.
 
-## TODOs
-- TODO: Implement this too: https://en.wikipedia.org/wiki/Leitner_system
+## Dev TODOs
+- TODO: Implement the [leitner system](https://en.wikipedia.org/wiki/Leitner_system)
 - TODO: Rework the terminal GUI.
+- TODO: Add file name to the GUI.
+- TODO: Enable CTRL-L (reloads the display).
 - TODO: Add ability to change algorithm in GUI.
 - TODO: Create a web flashcard front-end too.
 - TODO: Create a man page.
