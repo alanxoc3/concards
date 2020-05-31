@@ -82,8 +82,18 @@ func (d *Deck) AddMeta(h string, m *Meta) {
    d.Mmap[h] = m
 }
 
+func (d *Deck) AddMetaIfNil(h string, m *Meta) {
+   if _, ok := d.Mmap[h]; !ok {
+      d.AddMeta(h, m)
+   }
+}
+
 func (d *Deck) Len() int {
    return len(d.refs)
+}
+
+func (d *Deck) IsEmpty() bool {
+   return d.Len() == 0
 }
 
 func (d *Deck) Swap(i, j int) {
