@@ -19,10 +19,17 @@ func (d *Deck) FilterNumber(param int) {
    })
 }
 
-func (d *Deck) FilterOutFileDeck(path string, nd *Deck) {
+func (d *Deck) FileIntersection(path string, other_deck *Deck) {
    d.filter(func(i int) bool {
-      _, ok := nd.Cmap[d.refs[i]]
-      return d.GetCard(i).File == path && !ok
+      _, contains := other_deck.Cmap[d.refs[i]]
+      return d.GetCard(i).File == path && !contains
+   })
+}
+
+func (d *Deck) OuterLeftJoin(other_deck *Deck) {
+   d.filter(func(i int) bool {
+      _, contains := other_deck.Cmap[d.refs[i]]
+      return contains
    })
 }
 
