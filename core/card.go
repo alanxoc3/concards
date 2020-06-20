@@ -41,18 +41,19 @@ func NewCard(file string, sides string) (*Card, error) {
    }
 }
 
-// Assumes the card has a question.
-/*
-func (c *Card) GetSubCards() []Cards {
-   sub_cards := []Cards{}
-   question  := c.GetQuestion()
-   for i := 1; i < len(c.facts); i++ {
-      [][]string{
-      sc := NewCard(c.file)
-      sub_cards = append(sub_cards, 
+func (c *Card) GetSubCards() []*Card {
+   sub_cards := []*Card{}
+   question := c.GetQuestion()
+   answers := c.GetFacts()[1:]
+   for _, answer := range answers {
+      if sc, err := NewCard(c.file, answer + " @ " + question); err == nil {
+         sub_cards = append(sub_cards, sc)
+      } else {
+         panic("Error: Sub card was not created due to bad parent card. This is a logic error and should be fixed.")
+      }
    }
+   return sub_cards
 }
-*/
 
 func (c *Card) HasAnswer() bool {
    return len(c.facts) > 1
