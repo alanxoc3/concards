@@ -2,6 +2,7 @@ package file
 
 import (
    "bufio"
+   "strings"
    "io"
    "fmt"
    "os"
@@ -43,7 +44,7 @@ func ReadCardsToDeck(d *core.Deck, filename string) error {
 
 func ReadCardsToDeckHelper(r io.Reader, d *core.Deck, f string) {
    // Initialization.
-   facts := [][]string{}
+   facts := []string{}
    state := false
    var td *core.Deck
 
@@ -55,27 +56,23 @@ func ReadCardsToDeckHelper(r io.Reader, d *core.Deck, f string) {
       t := scanner.Text()
 
       if state {
-         if t == "@" {
-            facts = append(facts, []string{})
-         } else if t == "@>" {
-            td.AddFacts(facts, f)
-            facts = [][]string{{}}
+         if t == "@>" {
+            td.AddCardFromSides(f, strings.Join(facts, " "))
+            facts = []string{}
          } else if t == "<@" {
-            td.AddFacts(facts, f)
+            td.AddCardFromSides(f, strings.Join(facts, " "))
             for i := 0; i < td.Len(); i++ {
                d.AddCard(td.GetCard(i))
             }
             state = false
          } else {
-            if i := len(facts)-1; i >= 0 {
-               facts[i] = append(facts[i], t)
-            }
+            facts = append(facts, t)
          }
       } else if t == "@>" {
          // create td
          td = core.NewDeck()
          state = true
-         facts = [][]string{{}}
+         facts = []string{}
       }
    }
 

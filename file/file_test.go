@@ -40,7 +40,7 @@ func TestReadCardsToDeck(t *testing.T) {
       _, c, _ := d.Get(i)
       switch i {
          case 0: if c.GetQuestion() != "hi" { t.Fail() }
-                 if c.File != "nihao" { t.Fail() }
+                 if c.GetFile() != "nihao" { t.Fail() }
          case 1: if c.GetQuestion() != "yoyo man go" { t.Fail() }
       }
 	}

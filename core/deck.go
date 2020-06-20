@@ -71,11 +71,12 @@ func (d *Deck) InsertCard(c *Card, i int) error {
    }
 }
 
-func (d *Deck) AddFacts(facts [][]string, file string) error {
-   if c, err := NewCard(facts, file); err == nil {
+func (d *Deck) AddCardFromSides(file string, sides string) error {
+   if c, err := NewCard(file, sides); err == nil {
       return d.AddCard(c)
+   } else {
+      return err
    }
-   return nil
 }
 
 func (d *Deck) AddMeta(h string, m *Meta) {

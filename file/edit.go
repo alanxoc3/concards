@@ -16,7 +16,7 @@ func EditFile(d *core.Deck, cfg *Config) error {
 
    // We need to get information for the top card first.
    cur_hash, cur_card, cur_meta := d.Top()
-   file_name := cur_card.File
+   file_name := cur_card.GetFile()
 
    // Save the contents of the file now.
    deck_before := core.NewDeck()

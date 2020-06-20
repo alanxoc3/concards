@@ -111,7 +111,7 @@ func TermBoxRun(d *core.Deck, cfg *file.Config) error {
 					}
 				} else if inp == " " || inp == "\r" {
                card_shown++
-               if l := len(d.GetCard(0).Facts); card_shown > l {
+               if l := d.GetCard(0).Len(); card_shown > l {
                   card_shown = 1
                }
 				}
