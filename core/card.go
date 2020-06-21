@@ -23,9 +23,11 @@ func NewCard(file string, sides string) (*Card, error) {
    for scanner.Scan() {
       t := scanner.Text()
       if t == "@" {
-         facts = append(facts, fact)
-         fact = []string{}
-      } else {
+         if len(fact) > 0 {
+            facts = append(facts, fact)
+            fact = []string{}
+         }
+      } else if len(t) > 0 {
          fact = append(fact, t)
       }
    }

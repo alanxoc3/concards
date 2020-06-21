@@ -62,7 +62,7 @@ func GenConfig() *Config {
    f_memorize := parser.Flag("m", "memorize", &argparse.Options{Help: "Show cards available to be memorized"})
    f_done     := parser.Flag("d", "done",     &argparse.Options{Help: "Show cards not available to be reviewed or memorized"})
    f_print    := parser.Flag("p", "print",    &argparse.Options{Help: "Prints all cards, one line per card"})
-   f_number   := parser.Int("n", "number",    &argparse.Options{Default: 0, Help: "Limit the number of cards in the program to \"#\""})
+   f_number   := parser.Int("n", "number",    &argparse.Options{Default: 0, Help: "How many cards to review"})
    f_editor   := parser.String("E", "editor", &argparse.Options{Default: getDefaultEditor(), Help: "Which editor to use. Defaults to \"$EDITOR\""})
    f_meta     := parser.String("M", "meta",   &argparse.Options{Default: getDefaultMeta(), Help: "Path to meta file. Defaults to \"$CONCARDS_META\" or \"~/.concards-meta\""})
 
@@ -71,14 +71,18 @@ func GenConfig() *Config {
       help += fmt.Sprintf("%s\n\nUsage:\n  %s [OPTIONS]... [FILE|FOLDER]...\n\nOptions:\n", c.GetDescription(), c.GetName())
 
       for _, arg := range c.GetArgs() {
-         help += fmt.Sprintf("  -%s  --%-9s %s.\n", arg.GetSname(), arg.GetLname(), arg.GetOpts().Help)
+         if arg.IsFlag() {
+            help += fmt.Sprintf("  -%s  --%-9s %s.\n", arg.GetSname(), arg.GetLname(), arg.GetOpts().Help)
+         } else {
+            help += fmt.Sprintf("  -%s  --%-9s %s.\n", arg.GetSname(), arg.GetLname() + " " + arg.GetSname(), arg.GetOpts().Help)
+         }
       }
 
       return help
    }
 
    // Parse input
-   files, err := parser.Parse(os.Args)
+   files, err := parser.ParseReturnArguments(os.Args)
    if err != nil {
       fmt.Print(parser.Help(nil))
       os.Exit(1)

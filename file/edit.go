@@ -8,35 +8,58 @@ import (
    "github.com/alanxoc3/concards/core"
 )
 
+type DeckFunc func(string) (*core.Deck, error)
+
+func ReadCards(filename string) (*core.Deck, error) {
+   d := core.NewDeck()
+   if err := ReadCardsToDeck(d, filename); err != nil {
+      return nil, err
+   }
+   return d, nil
+}
+
+func EditCards(filename string, cfg *Config) (*core.Deck, error) {
+   if cfg == nil { panic("Config was nil when passed to edit function.") }
+
+   // Load the file with your favorite editor.
+   cmd := exec.Command(cfg.Editor, filename)
+   cmd.Stdin = os.Stdin
+   cmd.Stdout = os.Stdout
+
+   if err := cmd.Run(); err != nil {
+      return nil, fmt.Errorf("Error: The editor returned an error code.")
+   }
+
+   return ReadCards(filename)
+}
+
+
+func EditLambda(cfg *Config) DeckFunc {
+   return func(filename string) (*core.Deck, error) {
+      return EditCards(filename, cfg)
+   }
+}
+
 // Assumes the deck is sorted how you want it to be sorted.
-func EditFile(d *core.Deck, cfg *Config) error {
+func EditFile(d *core.Deck, rf DeckFunc, ef DeckFunc) error {
    if d.IsEmpty() {
       return fmt.Errorf("Error: The deck is empty.")
    }
 
    // We need to get information for the top card first.
    cur_hash, cur_card, cur_meta := d.Top()
-   file_name := cur_card.GetFile()
+   filename := cur_card.GetFile()
 
-   // Save the contents of the file now.
-   deck_before := core.NewDeck()
-   ReadCardsToDeck(deck_before, file_name)
+   // Deck before editing.
+   deck_before, e := rf(filename)
+   if e != nil { return e }
 
-   // Then edit the file.
-   cmd := exec.Command(cfg.Editor, file_name)
-   cmd.Stdin = os.Stdin
-   cmd.Stdout = os.Stdout
-
-   if err := cmd.Run(); err != nil {
-      return fmt.Errorf("Error: The editor returned an error code.")
-   }
-
-   // Save the contents of the file after.
-   deck_after := core.NewDeck()
-   ReadCardsToDeck(deck_after, file_name)
+   // Deck after editing.
+   deck_after, e := ef(filename)
+   if e != nil { return e }
 
    // Take out any card that was removed from the file.
-   d.FileIntersection(file_name, deck_after)
+   d.FileIntersection(filename, deck_after)
 
    // Get only the cards that were created in the file.
    deck_after.OuterLeftJoin(deck_before)

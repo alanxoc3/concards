@@ -81,7 +81,7 @@ func TermBoxRun(d *core.Deck, cfg *file.Config) error {
                d.TopToEnd()
 					save(d)
 				} else if inp == "e" {
-					err := file.EditFile(d, cfg)
+					err := file.EditFile(d, file.ReadCards, file.EditLambda(cfg))
 
 					if err != nil {
 						update_stat_msg(err.Error(), termbox.ColorRed)

@@ -56,22 +56,11 @@ concards README.md
 ```
 
 ## All Special Tokens
-All the special tokens that are a part of concards syntax are below. Just add
-"@" signs to escape them!
+All the special tokens that are a part of concards syntax are below.
 ```
 @>   = Starts a concards block. Starts a question.
 <@   = Ends the concards block.
 @    = Separates answers.
-
-@@>  = "@>"
-<@@  = "<@"
-@@   = "@"
-
-@@@> = "@@>"
-<@@@ = "<@@"
-@@@  = "@@"
-
-...
 ```
 
 ## Advanced Usage
@@ -85,7 +74,7 @@ Here is an example meta-data file:
 
 Here is the same file, but annotated:
 ```
-sha256sum                        | review timestamp      | streak | alg | data
+sha256sum cut in half            | review timestamp      | streak | alg | data
 ---------------------------------+-----------------------+--------+-----+-----
 3dda75cb44ed447186834541475f32e2 | 2019-01-01T00:00:00Z  | 0      | sm2 | 2.5
 8525b45f883c05eec46b4f7a88e7f7ef | 2020-01-01T00:00:00Z  | 0      | sm2 | 2.5
