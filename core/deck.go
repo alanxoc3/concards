@@ -56,13 +56,22 @@ func (d *Deck) AddCard(c *Card) error {
 
 func (d *Deck) InsertCard(c *Card, i int) error {
 	hash := c.HashStr()
+
+   if i < 0 {
+      i = 0
+   }
+
 	_, exists := d.Cmap[hash]
 	if !exists {
 		d.Cmap[hash] = c
 
-		d.refs = append(d.refs, "")
-		copy(d.refs[i+1:], d.refs[i:])
-		d.refs[i] = hash
+      if i >= d.Len() {
+         d.refs = append(d.refs, hash)
+      } else {
+         d.refs = append(d.refs, "")
+         copy(d.refs[i+1:], d.refs[i:])
+         d.refs[i] = hash
+      }
 
 		return nil
 	} else {

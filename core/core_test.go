@@ -207,3 +207,27 @@ func TestAddSubCards(t *testing.T) {
 		panic("Sub card doesn't have parent as the answer.")
 	}
 }
+
+func TestInsertCard(t *testing.T) {
+	d := NewDeck()
+	if c, err := NewCard("", f5); err != nil {
+      panic("Should not error new card.")
+   } else {
+      if e := d.InsertCard(c, 5); e != nil    { panic("Should have inserted.") }
+      if d.TopCard().HashStr() != c.HashStr() { panic("Card not inserted.") }
+   }
+
+	if c, err := NewCard("", f3); err != nil {
+      panic("Should not error new card.")
+   } else {
+      if e := d.InsertCard(c, 0); e != nil    { panic("Should have inserted.") }
+      if d.TopCard().HashStr() != c.HashStr() { panic("Card not inserted.") }
+   }
+
+	if c, err := NewCard("", f2); err != nil {
+      panic("Should not error new card.")
+   } else {
+      if e := d.InsertCard(c, -100); e != nil    { panic("Should have inserted.") }
+      if d.TopCard().HashStr() != c.HashStr() { panic("Card not inserted.") }
+   }
+}
