@@ -1,6 +1,9 @@
 <!-- @> concards @ Console Cards @ A cool + simple flashcard app. <@ -->
 # <img src="logo.svg" />
 
+[![Build Status](https://travis-ci.org/alanxoc3/concards.svg?branch=master)](https://travis-ci.org/alanxoc3/concards)
+[![Coverage Status](https://coveralls.io/repos/github/alanxoc3/concards/badge.svg?branch=master)](https://coveralls.io/github/alanxoc3/concards?branch=GH-5-travis)
+
 Turning notes into flashcards. Concards is my ongoing attempt to make
 flashcards simple and quick to record or embed into a text document. Unlike the
 overhead of other flashcard applications, Concards accepts a minimal amount of
