@@ -8,6 +8,8 @@ before_install:
 script:
 - go test -v ./...
 - "$GOPATH/bin/goveralls -service=travis-ci"
+before_deploy:
+- gox -os="linux darwin" -arch="386 amd64 arm" -output "concards.."
 deploy:
   provider: releases
   api_key:
@@ -15,22 +17,9 @@ deploy:
   file:
   - concards_darwin_386
   - concards_darwin_amd64
-  - concards_freebsd_386
-  - concards_freebsd_amd64
-  - concards_freebsd_arm
   - concards_linux_386
   - concards_linux_amd64
   - concards_linux_arm
-  - concards_linux_mips
-  - concards_linux_mips64
-  - concards_linux_mips64le
-  - concards_linux_mipsle
-  - concards_linux_s390x
-  - concards_netbsd_386
-  - concards_netbsd_amd64
-  - concards_netbsd_arm
-  - concards_openbsd_386
-  - concards_openbsd_amd64
   on:
     repo: alanxoc3/concards
     tags: true
