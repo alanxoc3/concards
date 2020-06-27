@@ -16,46 +16,66 @@ b718c81a83d82bb83f82b0a8b18bb82b 2020-01-11T00:00:00Z 27 sm2 .05
 `
 
 func TestReadMetasToDeck(t *testing.T) {
-   d := core.NewDeck()
-   ReadCardsToDeckHelper(strings.NewReader(f1 + f2), d, "", false)
-   ReadMetasToDeckHelper(strings.NewReader(c1), d)
+	d := core.NewDeck()
+	ReadCardsToDeckHelper(strings.NewReader(f1+f2), d, "", false)
+	ReadMetasToDeckHelper(strings.NewReader(c1), d)
 
-   for i := 0; i < d.Len(); i++ {
-      _, c, m := d.Get(i)
-      switch i {
-         case 0:
-            if c.GetQuestion() != "hello there" { t.Fail() }
-            if m.NextStr() != "2020-01-01T00:00:00Z" { t.Fail() }
-            if m.Streak != 3 { t.Fail() }
-         case 1:
-      }
+	for i := 0; i < d.Len(); i++ {
+		_, c, m := d.Get(i)
+		switch i {
+		case 0:
+			if c.GetQuestion() != "hello there" {
+				t.Fail()
+			}
+			if m.NextStr() != "2020-01-01T00:00:00Z" {
+				t.Fail()
+			}
+			if m.Streak != 3 {
+				t.Fail()
+			}
+		case 1:
+		}
 	}
 }
 
 func TestReadCardsToDeck(t *testing.T) {
-   d := core.NewDeck()
-   ReadCardsToDeckHelper(strings.NewReader(f2), d, "nihao", false)
+	d := core.NewDeck()
+	ReadCardsToDeckHelper(strings.NewReader(f2), d, "nihao", false)
 
-   for i := 0; i < d.Len(); i++ {
-      _, c, _ := d.Get(i)
-      switch i {
-         case 0: if c.GetQuestion() != "hi" { t.Fail() }
-                 if c.GetFile() != "nihao" { t.Fail() }
-         case 1: if c.GetQuestion() != "yoyo man go" { t.Fail() }
-      }
+	for i := 0; i < d.Len(); i++ {
+		_, c, _ := d.Get(i)
+		switch i {
+		case 0:
+			if c.GetQuestion() != "hi" {
+				t.Fail()
+			}
+			if c.GetFile() != "nihao" {
+				t.Fail()
+			}
+		case 1:
+			if c.GetQuestion() != "yoyo man go" {
+				t.Fail()
+			}
+		}
 	}
 }
 
 func TestWriteMetasToString(t *testing.T) {
-   d := core.NewDeck()
-   ReadMetasToDeckHelper(strings.NewReader(c3), d)
-   str := WriteMetasToString(d)
-   a := strings.Split(str, "\n")
-   b := strings.Split(c3, "\n")
+	d := core.NewDeck()
+	ReadMetasToDeckHelper(strings.NewReader(c3), d)
+	str := WriteMetasToString(d)
+	a := strings.Split(str, "\n")
+	b := strings.Split(c3, "\n")
 
-   if a[0] != b[0] { t.Fail() }
-   if a[1] != b[2] { t.Fail() }
-   if a[2] != b[1] { t.Fail() }
+	if a[0] != b[0] {
+		t.Fail()
+	}
+	if a[1] != b[2] {
+		t.Fail()
+	}
+	if a[2] != b[1] {
+		t.Fail()
+	}
 }
 
 /*

@@ -43,7 +43,7 @@ func TermBoxRun(d *core.Deck, cfg *file.Config) error {
 			} else if inp == "h" {
 				help_mode = !help_mode
 			} else if inp == "w" {
-            err = file.WriteMetasToFile(d, cfg.MetaFile)
+				err = file.WriteMetasToFile(d, cfg.MetaFile)
 				if err != nil {
 					update_stat_msg(err.Error(), termbox.ColorRed)
 				} else {
@@ -53,12 +53,12 @@ func TermBoxRun(d *core.Deck, cfg *file.Config) error {
 				if inp == "1" {
 					update_stat_msg_and_card(d, core.NO)
 					card_shown = 1
-               d.TopTo(3)
+					d.TopTo(3)
 					save(d)
 				} else if inp == "2" {
 					update_stat_msg_and_card(d, core.IDK)
 					card_shown = 1
-               d.TopTo(6)
+					d.TopTo(6)
 					save(d)
 				} else if inp == "3" {
 					update_stat_msg_and_card(d, core.YES)
@@ -66,19 +66,19 @@ func TermBoxRun(d *core.Deck, cfg *file.Config) error {
 					d.DelTop()
 					save(d)
 				} else if inp == "d" {
-               update_stat_msg("Deleted.", termbox.ColorYellow)
+					update_stat_msg("Deleted.", termbox.ColorYellow)
 					card_shown = 1
 					d.DelTop()
 					save(d)
 				} else if inp == "f" {
-               update_stat_msg("Forgotten.", termbox.ColorYellow)
+					update_stat_msg("Forgotten.", termbox.ColorYellow)
 					card_shown = 1
 					d.ForgetTop()
 					save(d)
 				} else if inp == "s" {
-               update_stat_msg("Skipped.", termbox.ColorYellow)
+					update_stat_msg("Skipped.", termbox.ColorYellow)
 					card_shown = 1
-               d.TopToEnd()
+					d.TopToEnd()
 					save(d)
 				} else if inp == "e" {
 					err := file.EditFile(d, cfg, file.ReadCards, file.EditCards)
@@ -96,7 +96,7 @@ func TermBoxRun(d *core.Deck, cfg *file.Config) error {
 					if terr != nil {
 						update_stat_msg(terr.Error(), termbox.ColorRed)
 					} else {
-                  d.Clone(td)
+						d.Clone(td)
 						update_stat_msg("Undo.", termbox.ColorYellow)
 						card_shown = 1
 					}
@@ -105,15 +105,15 @@ func TermBoxRun(d *core.Deck, cfg *file.Config) error {
 					if terr != nil {
 						update_stat_msg(terr.Error(), termbox.ColorRed)
 					} else {
-                  d.Clone(td)
+						d.Clone(td)
 						update_stat_msg("Redo.", termbox.ColorCyan)
 						card_shown = 1
 					}
 				} else if inp == " " || inp == "\r" {
-               card_shown++
-               if l := d.GetCard(0).Len(); card_shown > l {
-                  card_shown = 1
-               }
+					card_shown++
+					if l := d.GetCard(0).Len(); card_shown > l {
+						card_shown = 1
+					}
 				}
 			}
 		} else {

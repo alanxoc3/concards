@@ -73,12 +73,12 @@ func _tb_print_helper(x, y int, fg, bg termbox.Attribute, msg string, wrap bool)
 
 // ignores tabs, returns the final x and y position.
 func tbprint(x, y int, fg, bg termbox.Attribute, msg string) (int, int) {
-	return _tb_print_helper(x,y,fg,bg,msg,false)
+	return _tb_print_helper(x, y, fg, bg, msg, false)
 }
 
 // returns final x and y position.
 func tbprintwrap(x, y int, fg, bg termbox.Attribute, msg string) (int, int) {
-	return _tb_print_helper(x,y,fg,bg,msg,true)
+	return _tb_print_helper(x, y, fg, bg, msg, true)
 }
 
 func tbhorizontal(y int, color termbox.Attribute) {
@@ -98,14 +98,16 @@ func tbvertical(x int, color termbox.Attribute) {
 }
 
 func tbprint_card(c *core.Card, amount int) {
-   y := 0
+	y := 0
 
-   for i := 0; i < c.Len() && i < amount; i++ {
-      color := termbox.ColorCyan
-      if i > 0 { color = termbox.ColorWhite }
-      _, y = tbprintwrap(0, y, color, coldef, c.GetFact(i))
-      y++
-   }
+	for i := 0; i < c.Len() && i < amount; i++ {
+		color := termbox.ColorCyan
+		if i > 0 {
+			color = termbox.ColorWhite
+		}
+		_, y = tbprintwrap(0, y, color, coldef, c.GetFact(i))
+		y++
+	}
 }
 
 func tbprint_statusbar(d *core.Deck) {
@@ -154,7 +156,7 @@ func display_help_mode(color termbox.Attribute) {
 }
 
 func display_card_mode(c *core.Card, showAnswer int) {
-   tbprint_card(c, showAnswer)
+	tbprint_card(c, showAnswer)
 }
 
 func tbprint_stat_msg() {
@@ -166,24 +168,24 @@ func tbprint_stat_msg() {
 }
 
 func update_stat_msg_and_card(d *core.Deck, k core.Know) {
-   h, _, m := d.Top()
-   if m == nil {
-      m = core.NewDefaultMeta("sm2")
-   }
-
-	if k == core.NO {
-      m, _ = m.Exec(core.NO)
-      update_stat_msg("Not a clue, card put to the back of the pile.", termbox.ColorRed)
-	} else if k == core.IDK {
-      m, _ = m.Exec(core.IDK)
-      update_stat_msg("Sounds familiar, card put to the back of the pile.", termbox.ColorYellow)
-	} else if k == core.YES {
-      m, _ = m.Exec(core.YES)
-      time := m.Next.Format("Mon 2 Jan 2006 @ 15:04")
-      update_stat_msg(fmt.Sprintf("I know it! Next review is %s.", time), termbox.ColorCyan)
+	h, _, m := d.Top()
+	if m == nil {
+		m = core.NewDefaultMeta("sm2")
 	}
 
-   d.AddMeta(h, m)
+	if k == core.NO {
+		m, _ = m.Exec(core.NO)
+		update_stat_msg("Not a clue, card put to the back of the pile.", termbox.ColorRed)
+	} else if k == core.IDK {
+		m, _ = m.Exec(core.IDK)
+		update_stat_msg("Sounds familiar, card put to the back of the pile.", termbox.ColorYellow)
+	} else if k == core.YES {
+		m, _ = m.Exec(core.YES)
+		time := m.Next.Format("Mon 2 Jan 2006 @ 15:04")
+		update_stat_msg(fmt.Sprintf("I know it! Next review is %s.", time), termbox.ColorCyan)
+	}
+
+	d.AddMeta(h, m)
 }
 
 func update_stat_msg(msg string, color termbox.Attribute) {
