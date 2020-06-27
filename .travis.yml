@@ -34,5 +34,4 @@ deploy:
   on:
     repo: alanxoc3/concards
     tags: true
-    condition: $LATEST = true
   skip_cleanup: 'true'
