@@ -8,29 +8,18 @@ before_install:
 script:
 - go test -v ./...
 - "$GOPATH/bin/goveralls -service=travis-ci"
+before_deploy:
+- gox -osarch="linux/386 linux/arm linux/amd64 darwin/386 darwin/amd64" -output "concards.{{.OS}}.{{.Arch}}"
 deploy:
   provider: releases
   api_key:
     secure: Nt790AtDLPLbPXgKpTRtfq/SgGkga173uDsqyry8CYYVGi6ycM6rUBJdAk8jLe9E53nV7FofYVqoftnHPugUo6o9LuqQ30v7JZEc6bAawGC1bMJxLX3T32bAn0wXTnncGRqVU48A10rl2fVsrhEPoMrzeZkF6000U4lP3UXmTJxilZKWaJBH79DK4OaUTxro8qzqGV8jiRvXWSRlRDApTdBYntJHw/hMQLtv0D0ghcRAu4ZNRs3mZhATXk9El5xCnvargdC+FsmmSKuaAu+FYGnvBNP77WRj22GDrkEIXtcvXf4K6oNY5hIb2YQ5IqvzE9s30K7lztiCOo8I7cXsze5dYEkxOnSJXiQLopwkw1uXsCeDAzyKmNnGUfgXgE0ITWUk5QxaEcGZC69Qdr+/wtnL2B2cH+Gi8LZZoq8Mutj5gVrIm3eAlKq9OWx0sXNc/i1qUe1I5xpT0nJMkBaD2g+dUboFjxbDr+c7M5DNrGIMMvu+Z18CPd0mDsQSmEUONGubJjlV+rAq3wlH0iGeUvfNAD23i7m6Poqcxc5mttM1mdfM5kCXuPN5SbVnH0F+N6BwFxWt7wWIuEdNG91A0VkDY4dbX1Pher6WYhDK0O0CGa+NsDumLpNIi3u/G2kws5BElu+JosNU0z5rmPSHPB6CQY84Pe3knDEK+WL0Sps=
   file:
-  - concards_darwin_386
-  - concards_darwin_amd64
-  - concards_freebsd_386
-  - concards_freebsd_amd64
-  - concards_freebsd_arm
-  - concards_linux_386
-  - concards_linux_amd64
-  - concards_linux_arm
-  - concards_linux_mips
-  - concards_linux_mips64
-  - concards_linux_mips64le
-  - concards_linux_mipsle
-  - concards_linux_s390x
-  - concards_netbsd_386
-  - concards_netbsd_amd64
-  - concards_netbsd_arm
-  - concards_openbsd_386
-  - concards_openbsd_amd64
+  - concards.darwin.386
+  - concards.darwin.amd64
+  - concards.linux.386
+  - concards.linux.amd64
+  - concards.linux.arm
   on:
     repo: alanxoc3/concards
     tags: true
