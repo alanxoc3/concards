@@ -23,7 +23,7 @@ func main() {
    }
 
    for _, f := range c.Files {
-      if err := file.ReadCardsToDeck(d, f); err != nil {
+      if err := file.ReadCardsToDeck(d, f, c.IsSides); err != nil {
          fmt.Printf("Error: File \"%s\" does not exist!\n", f)
          os.Exit(1)
       }

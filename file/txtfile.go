@@ -12,7 +12,7 @@ import (
 )
 
 // Open opens filename and loads cards into new deck
-func ReadCardsToDeck(d *core.Deck, filename string) error {
+func ReadCardsToDeck(d *core.Deck, filename string, include_sides bool) error {
    err := filepath.Walk(filename, func(path string, info os.FileInfo, e error) error {
       if e != nil {
          return e
@@ -33,7 +33,7 @@ func ReadCardsToDeck(d *core.Deck, filename string) error {
          return fmt.Errorf("Error: Unable to open file \"%s\"", filename)
       } else {
          defer f.Close()
-         ReadCardsToDeckHelper(f, d, abs_path)
+         ReadCardsToDeckHelper(f, d, abs_path, include_sides)
       }
 
       return nil
@@ -42,7 +42,7 @@ func ReadCardsToDeck(d *core.Deck, filename string) error {
    return err
 }
 
-func ReadCardsToDeckHelper(r io.Reader, d *core.Deck, f string) {
+func ReadCardsToDeckHelper(r io.Reader, d *core.Deck, f string, include_sides bool) {
    // Initialization.
    facts := []string{}
    state := false
@@ -57,10 +57,12 @@ func ReadCardsToDeckHelper(r io.Reader, d *core.Deck, f string) {
 
       if state {
          if t == "@>" {
-            td.AddCardAndSubCardsFromSides(f, strings.Join(facts, " "))
+            td.AddCardFromSides(f, strings.Join(facts, " "), include_sides)
+
             facts = []string{}
          } else if t == "<@" {
-            td.AddCardAndSubCardsFromSides(f, strings.Join(facts, " "))
+            td.AddCardFromSides(f, strings.Join(facts, " "), include_sides)
+
             for i := 0; i < td.Len(); i++ {
                d.AddCard(td.GetCard(i))
             }
