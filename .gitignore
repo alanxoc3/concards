@@ -35,3 +35,8 @@ concards
 
 # not my flashcard test file too!
 test.txt
+
+# Binaries
+*.386
+*.amd64
+*.arm
