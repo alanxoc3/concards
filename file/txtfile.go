@@ -12,28 +12,28 @@ import (
 )
 
 // Open opens filename and loads cards into new deck
-func ReadCardsToDeck(d *core.Deck, filename string, include_sides bool) error {
+func ReadCardsToDeck(d *core.Deck, filename string, includeSides bool) error {
 	err := filepath.Walk(filename, func(path string, info os.FileInfo, e error) error {
 		if e != nil {
 			return e
 		}
 
 		n := info.Name()
-		is_hidden := len(n) > 1 && string(n[0]) == "." && n != ".."
-		is_dir := info.IsDir()
+		isHidden := len(n) > 1 && string(n[0]) == "." && n != ".."
+		isDir := info.IsDir()
 
-		if is_dir && is_hidden {
+		if isDir && isHidden {
 			return filepath.SkipDir
-		} else if is_hidden || is_dir {
+		} else if isHidden || isDir {
 			return nil
 		}
 
-		abs_path, _ := filepath.Abs(path)
-		if f, fe := os.Open(abs_path); fe != nil {
+		absPath, _ := filepath.Abs(path)
+		if f, fe := os.Open(absPath); fe != nil {
 			return fmt.Errorf("Error: Unable to open file \"%s\"", filename)
 		} else {
 			defer f.Close()
-			ReadCardsToDeckHelper(f, d, abs_path, include_sides)
+			ReadCardsToDeckHelper(f, d, absPath, includeSides)
 		}
 
 		return nil
@@ -42,7 +42,7 @@ func ReadCardsToDeck(d *core.Deck, filename string, include_sides bool) error {
 	return err
 }
 
-func ReadCardsToDeckHelper(r io.Reader, d *core.Deck, f string, include_sides bool) {
+func ReadCardsToDeckHelper(r io.Reader, d *core.Deck, f string, includeSides bool) {
 	// Initialization.
 	facts := []string{}
 	state := false
@@ -57,11 +57,11 @@ func ReadCardsToDeckHelper(r io.Reader, d *core.Deck, f string, include_sides bo
 
 		if state {
 			if t == "@>" {
-				td.AddCardFromSides(f, strings.Join(facts, " "), include_sides)
+				td.AddCardFromSides(f, strings.Join(facts, " "), includeSides)
 
 				facts = []string{}
 			} else if t == "<@" {
-				td.AddCardFromSides(f, strings.Join(facts, " "), include_sides)
+				td.AddCardFromSides(f, strings.Join(facts, " "), includeSides)
 
 				for i := 0; i < td.Len(); i++ {
 					d.AddCard(td.GetCard(i))

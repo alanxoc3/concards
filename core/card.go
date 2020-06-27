@@ -44,17 +44,17 @@ func NewCard(file string, sides string) (*Card, error) {
 }
 
 func (c *Card) GetSubCards() []*Card {
-	sub_cards := []*Card{}
+	subCards := []*Card{}
 	question := c.GetQuestion()
 	answers := c.GetFacts()[1:]
 	for _, answer := range answers {
 		if sc, err := NewCard(c.file, answer+" @ "+question); err == nil {
-			sub_cards = append(sub_cards, sc)
+			subCards = append(subCards, sc)
 		} else {
 			panic("Error: Sub card was not created due to bad parent card. This is a logic error and should be fixed.")
 		}
 	}
-	return sub_cards
+	return subCards
 }
 
 func (c *Card) HasAnswer() bool {

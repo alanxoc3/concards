@@ -70,21 +70,21 @@ func (d *Deck) InsertCard(c *Card, i int) error {
 	}
 }
 
-func (d *Deck) AddCardFromSides(file string, sides string, include_sides bool) []error {
+func (d *Deck) AddCardFromSides(file string, sides string, includeSides bool) []error {
 	errors := []error{}
-	if c, create_err := NewCard(file, sides); create_err == nil {
+	if c, createErr := NewCard(file, sides); createErr == nil {
 		cards := []*Card{c}
-		if include_sides {
+		if includeSides {
 			cards = append(cards, c.GetSubCards()...)
 		}
 
 		for _, c := range cards {
-			if add_err := d.AddCard(c); add_err != nil {
-				errors = append(errors, add_err)
+			if addErr := d.AddCard(c); addErr != nil {
+				errors = append(errors, addErr)
 			}
 		}
 	} else {
-		errors = append(errors, create_err)
+		errors = append(errors, createErr)
 	}
 	return errors
 }

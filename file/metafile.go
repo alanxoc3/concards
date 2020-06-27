@@ -33,11 +33,11 @@ func ReadMetasToDeck(filename string, d *core.Deck) error {
 
 func ReadMetasToDeckHelper(r io.Reader, d *core.Deck) {
 	// Scan by words.
-	line_scanner := bufio.NewScanner(r)
-	line_scanner.Split(bufio.ScanLines)
+	lineScanner := bufio.NewScanner(r)
+	lineScanner.Split(bufio.ScanLines)
 
-	for line_scanner.Scan() {
-		strs := strings.Fields(line_scanner.Text())
+	for lineScanner.Scan() {
+		strs := strings.Fields(lineScanner.Text())
 
 		// First field is a constant sized checksum.
 		if len(strs) > 0 && len(strs[0]) == 32 {
@@ -46,7 +46,7 @@ func ReadMetasToDeckHelper(r io.Reader, d *core.Deck) {
 	}
 }
 
-func WriteMetasToString(d *core.Deck) (file_str string) {
+func WriteMetasToString(d *core.Deck) (fileStr string) {
 	// Copy keys
 	keys := make([]string, len(d.Mmap))
 
@@ -63,7 +63,7 @@ func WriteMetasToString(d *core.Deck) (file_str string) {
 	for _, k := range keys {
 		m := d.Mmap[k]
 		if m != nil && m.String() != "" {
-			file_str += k + " " + m.String() + "\n"
+			fileStr += k + " " + m.String() + "\n"
 		}
 	}
 

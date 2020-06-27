@@ -42,38 +42,38 @@ func EditFile(d *core.Deck, cfg *Config, rf DeckFunc, ef DeckFunc) error {
 	}
 
 	// We need to get information for the top card first.
-	cur_hash, cur_card, cur_meta := d.Top()
-	filename := cur_card.GetFile()
+	curHash, curCard, curMeta := d.Top()
+	filename := curCard.GetFile()
 
 	// Deck before editing.
-	deck_before, e := rf(filename, cfg)
+	deckBefore, e := rf(filename, cfg)
 	if e != nil {
 		return e
 	}
 
 	// Deck after editing.
-	deck_after, e := ef(filename, cfg)
+	deckAfter, e := ef(filename, cfg)
 	if e != nil {
 		return e
 	}
 
 	// Take out any card that was removed from the file.
-	d.FileIntersection(filename, deck_after)
+	d.FileIntersection(filename, deckAfter)
 
 	// Get only the cards that were created in the file.
-	deck_after.OuterLeftJoin(deck_before)
+	deckAfter.OuterLeftJoin(deckBefore)
 
 	// Change the insert index based on if the current card was removed or not.
-	card_index := 0
-	if cur_hash == d.TopHash() {
-		card_index = 1
+	cardIndex := 0
+	if curHash == d.TopHash() {
+		cardIndex = 1
 	}
 
 	// Check if the current card was removed or not.
-	for i := deck_after.Len() - 1; i >= 0; i-- {
-		new_card := deck_after.GetCard(i)
-		d.InsertCard(new_card, card_index)
-		d.AddMetaIfNil(new_card.HashStr(), cur_meta)
+	for i := deckAfter.Len() - 1; i >= 0; i-- {
+		newCard := deckAfter.GetCard(i)
+		d.InsertCard(newCard, cardIndex)
+		d.AddMetaIfNil(newCard.HashStr(), curMeta)
 	}
 
 	return nil

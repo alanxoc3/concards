@@ -58,15 +58,15 @@ func GenConfig() *Config {
 	parser := argparse.NewParser("concards", "Concards is a simple CLI based SRS flashcard app.")
 
 	// Create flags
-	f_version := parser.Flag("V", "version", &argparse.Options{Help: "Concards build information."})
-	f_review := parser.Flag("r", "review", &argparse.Options{Help: "Show cards available to be reviewed."})
-	f_memorize := parser.Flag("m", "memorize", &argparse.Options{Help: "Show cards available to be memorized."})
-	f_done := parser.Flag("d", "done", &argparse.Options{Help: "Show cards not available to be reviewed or memorized."})
-	f_sides := parser.Flag("s", "sides", &argparse.Options{Help: "Add cards for all sides."})
-	f_print := parser.Flag("p", "print", &argparse.Options{Help: "Prints all cards, one line per card."})
-	f_number := parser.Int("n", "number", &argparse.Options{Default: 0, Help: "How many cards to review."})
-	f_editor := parser.String("E", "editor", &argparse.Options{Default: getDefaultEditor(), Help: "Which editor to use. Defaults to \"$EDITOR\""})
-	f_meta := parser.String("M", "meta", &argparse.Options{Default: getDefaultMeta(), Help: "Path to meta file. Defaults to \"$CONCARDS_META\" or \"~/.concards-meta\""})
+	fVersion := parser.Flag("V", "version", &argparse.Options{Help: "Concards build information."})
+	fReview := parser.Flag("r", "review", &argparse.Options{Help: "Show cards available to be reviewed."})
+	fMemorize := parser.Flag("m", "memorize", &argparse.Options{Help: "Show cards available to be memorized."})
+	fDone := parser.Flag("d", "done", &argparse.Options{Help: "Show cards not available to be reviewed or memorized."})
+	fSides := parser.Flag("s", "sides", &argparse.Options{Help: "Add cards for all sides."})
+	fPrint := parser.Flag("p", "print", &argparse.Options{Help: "Prints all cards, one line per card."})
+	fNumber := parser.Int("n", "number", &argparse.Options{Default: 0, Help: "How many cards to review."})
+	fEditor := parser.String("E", "editor", &argparse.Options{Default: getDefaultEditor(), Help: "Which editor to use. Defaults to \"$EDITOR\""})
+	fMeta := parser.String("M", "meta", &argparse.Options{Default: getDefaultMeta(), Help: "Path to meta file. Defaults to \"$CONCARDS_META\" or \"~/.concards-meta\""})
 
 	parser.HelpFunc = func(c *argparse.Command, msg interface{}) string {
 		var help string
@@ -90,23 +90,23 @@ func GenConfig() *Config {
 		os.Exit(1)
 	}
 
-	if *f_version {
+	if *fVersion {
 		fmt.Printf("Concards v2.0\n")
 		os.Exit(0)
 	}
 
 	c := &Config{}
 
-	c.IsReview = *f_review
-	c.IsMemorize = *f_memorize
-	c.IsDone = *f_done
-	c.IsSides = *f_sides
-	c.IsPrint = *f_print
+	c.IsReview = *fReview
+	c.IsMemorize = *fMemorize
+	c.IsDone = *fDone
+	c.IsSides = *fSides
+	c.IsPrint = *fPrint
 	c.IsStream = false
 
-	c.Editor = *f_editor
-	c.Number = *f_number
-	c.MetaFile = *f_meta
+	c.Editor = *fEditor
+	c.Number = *fNumber
+	c.MetaFile = *fMeta
 	c.Files = files
 
 	if !c.IsReview && !c.IsMemorize && !c.IsDone {

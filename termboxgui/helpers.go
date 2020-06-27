@@ -9,12 +9,12 @@ import (
 )
 
 var data []byte
-var stat_msg string
-var stat_msg_col termbox.Attribute
+var statMsg string
+var statMsgCol termbox.Attribute
 
 const coldef = termbox.ColorDefault
 
-func update_input() (string, error) {
+func updateInput() (string, error) {
 	current := ""
 
 	// Resize the data.
@@ -52,7 +52,7 @@ func flush() {
 	termbox.Flush()
 }
 
-func _tb_print_helper(x, y int, fg, bg termbox.Attribute, msg string, wrap bool) (int, int) {
+func tbPrintHelper(x, y int, fg, bg termbox.Attribute, msg string, wrap bool) (int, int) {
 	w, _ := termbox.Size()
 	xinitial := x
 	for _, c := range msg {
@@ -73,12 +73,12 @@ func _tb_print_helper(x, y int, fg, bg termbox.Attribute, msg string, wrap bool)
 
 // ignores tabs, returns the final x and y position.
 func tbprint(x, y int, fg, bg termbox.Attribute, msg string) (int, int) {
-	return _tb_print_helper(x, y, fg, bg, msg, false)
+	return tbPrintHelper(x, y, fg, bg, msg, false)
 }
 
 // returns final x and y position.
 func tbprintwrap(x, y int, fg, bg termbox.Attribute, msg string) (int, int) {
-	return _tb_print_helper(x, y, fg, bg, msg, true)
+	return tbPrintHelper(x, y, fg, bg, msg, true)
 }
 
 func tbhorizontal(y int, color termbox.Attribute) {
@@ -97,7 +97,7 @@ func tbvertical(x int, color termbox.Attribute) {
 	}
 }
 
-func tbprint_card(c *core.Card, amount int) {
+func tbprintCard(c *core.Card, amount int) {
 	y := 0
 
 	for i := 0; i < c.Len() && i < amount; i++ {
@@ -110,7 +110,7 @@ func tbprint_card(c *core.Card, amount int) {
 	}
 }
 
-func tbprint_statusbar(d *core.Deck) {
+func tbprintStatusbar(d *core.Deck) {
 	_, h := termbox.Size()
 	color := termbox.ColorBlue
 	tbhorizontal(h-2, color)
@@ -119,7 +119,7 @@ func tbprint_statusbar(d *core.Deck) {
 	tbprint(0, h-2, termbox.ColorWhite|termbox.AttrBold, color, msg)
 }
 
-func display_help_mode(color termbox.Attribute) {
+func displayHelpMode(color termbox.Attribute) {
 	str2 := "              Controls\n" +
 		"------------------------------------\n" +
 		"e, EDIT   - the current card\n" +
@@ -155,19 +155,19 @@ func display_help_mode(color termbox.Attribute) {
 	tbprint(x, y, color, coldef, str2)
 }
 
-func display_card_mode(c *core.Card, showAnswer int) {
-	tbprint_card(c, showAnswer)
+func displayCardMode(c *core.Card, showAnswer int) {
+	tbprintCard(c, showAnswer)
 }
 
-func tbprint_stat_msg() {
+func tbprintStatMsg() {
 	_, h := termbox.Size()
 	color := termbox.ColorBlack
 	tbhorizontal(h-1, color)
 
-	tbprint(0, h-1, stat_msg_col, color, stat_msg)
+	tbprint(0, h-1, statMsgCol, color, statMsg)
 }
 
-func update_stat_msg_and_card(d *core.Deck, k core.Know) {
+func updateStatMsgAndCard(d *core.Deck, k core.Know) {
 	h, _, m := d.Top()
 	if m == nil {
 		m = core.NewDefaultMeta("sm2")
@@ -175,20 +175,20 @@ func update_stat_msg_and_card(d *core.Deck, k core.Know) {
 
 	if k == core.NO {
 		m, _ = m.Exec(core.NO)
-		update_stat_msg("Not a clue, card put to the back of the pile.", termbox.ColorRed)
+		updateStatMsg("Not a clue, card put to the back of the pile.", termbox.ColorRed)
 	} else if k == core.IDK {
 		m, _ = m.Exec(core.IDK)
-		update_stat_msg("Sounds familiar, card put to the back of the pile.", termbox.ColorYellow)
+		updateStatMsg("Sounds familiar, card put to the back of the pile.", termbox.ColorYellow)
 	} else if k == core.YES {
 		m, _ = m.Exec(core.YES)
 		time := m.Next.Format("Mon 2 Jan 2006 @ 15:04")
-		update_stat_msg(fmt.Sprintf("I know it! Next review is %s.", time), termbox.ColorCyan)
+		updateStatMsg(fmt.Sprintf("I know it! Next review is %s.", time), termbox.ColorCyan)
 	}
 
 	d.AddMeta(h, m)
 }
 
-func update_stat_msg(msg string, color termbox.Attribute) {
-	stat_msg = msg
-	stat_msg_col = color
+func updateStatMsg(msg string, color termbox.Attribute) {
+	statMsg = msg
+	statMsgCol = color
 }
