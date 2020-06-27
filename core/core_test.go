@@ -7,24 +7,11 @@ import "fmt"
 const fullSum = "c6cd355e32654cb4ba506b529ff32288971420ead2e36fdc69e802e9e7510315"
 const halfSum = "c6cd355e32654cb4ba506b529ff32288"
 
-var f1 = [][]string{
-   {"hello", "there"},
-   {"i'm", "a", "beard"},
-}
-
-var f2 = [][]string{
-   {"hello"},
-}
-
-var f3 = [][]string{
-   {"i'm", "um"},
-   {"hello"},
-}
-
-var f4 = [][]string{
-   {"alan", "the", "great"},
-   {"sy", "shoe", "yu"},
-}
+var f1 = "hello there @ i'm a beard"
+var f2 = "hello"
+var f3 = "i'm um @ hello"
+var f4 = "alan the great @ sy shoe yu"
+var f5 = "a @ b @ c @ d e @ f @ @ g"
 
 func TestMeta(t *testing.T) {
    a := NewMeta("2020-01-01T00:00:00Z", "0", "sm2", []string{"2.5"})
@@ -42,7 +29,7 @@ func TestParse(t *testing.T) {
 }
 
 func TestCard(t *testing.T) {
-   c, err := NewCard(f1, "")
+   c, err := NewCard("", f1)
    if err != nil { t.FailNow() }
 
    txt := c.String()
@@ -57,7 +44,7 @@ func TestCard(t *testing.T) {
 
 func TestDeck(t *testing.T) {
    d := NewDeck()
-   d.AddFacts(f1, "afile")
+   d.AddCardFromSides("afile", f1, false)
    if d.GetCard(0).GetQuestion() != "hello there" { t.Fail() }
    if !d.GetCard(0).HasAnswer() { t.Fail() }
    if d.GetMeta(0) != nil { t.Fail() }
@@ -73,9 +60,9 @@ func TestDeck(t *testing.T) {
    d.Forget(0)
    if d.GetMeta(0) != nil { t.Fail() }
    if !d.GetCard(0).HasAnswer() { t.Fail() }
-   d.AddFacts(f1, "nofile")
+   d.AddCardFromSides("nofile", f1, false)
    if d.Len() != 1 { t.Fail() }
-   if d.GetCard(0).File != "afile" { t.Fail() }
+   if d.GetCard(0).GetFile() != "afile" { t.Fail() }
    d.FilterOutFile("nofile")
    if d.Len() != 1 { t.Fail() }
    d.FilterOutFile("afile")
@@ -86,10 +73,10 @@ func TestDeck(t *testing.T) {
 
 func TestDeckMove(t *testing.T) {
    d := NewDeck()
-   d.AddFacts(f1, "afile")
-   d.AddFacts(f2, "afile")
-   d.AddFacts(f3, "afile")
-   d.AddFacts(f4, "afile")
+   d.AddCardFromSides("afile", f1, false)
+   d.AddCardFromSides("afile", f2, false)
+   d.AddCardFromSides("afile", f3, false)
+   d.AddCardFromSides("afile", f4, false)
    d.TopToEnd()
    if d.TopCard().GetQuestion() != "hello" { panic("Bad moves") }
    if d.Len() != 4 { panic("Bad len") }
@@ -103,4 +90,28 @@ func TestDeckMove(t *testing.T) {
    d.TopToEnd()
    d.TopToEnd()
    if d.TopCard().GetQuestion() != "hello there" { panic("Bad moves") }
+}
+
+func TestAddSubCards(t *testing.T) {
+   d := NewDeck()
+   d.AddCardFromSides("dat-file", f5, true)
+
+   if d.TopCard().GetQuestion() != "a" { panic("Subcards were inserted before the parent card.") }
+   if d.Len() != 6 { panic("Wrong number of sub cards inserted.") }
+   d.DelTop()
+   if d.TopCard().GetQuestion() != "b" { panic("Second card should be the first sub card.") }
+   if d.TopCard().GetFact(1) != "a" { panic("Answer isn't the parent card.") }
+   if d.Len() != 5 { panic("Delete didn't work.") }
+
+   if d.GetCard(1).GetQuestion() != "c"   { panic("Sub cards not inserted in the correct order.") }
+   if d.GetCard(1).GetFact(1)    != "a"   { panic("Sub card doesn't have parent as the answer.") }
+
+   if d.GetCard(2).GetQuestion() != "d e" { panic("Sub cards not inserted in the correct order.") }
+   if d.GetCard(2).GetFact(1)    != "a"   { panic("Sub card doesn't have parent as the answer.") }
+
+   if d.GetCard(3).GetQuestion() != "f"   { panic("Sub cards not inserted in the correct order.") }
+   if d.GetCard(3).GetFact(1)    != "a"   { panic("Sub card doesn't have parent as the answer.") }
+
+   if d.GetCard(4).GetQuestion() != "g"   { panic("Sub cards not inserted in the correct order.") }
+   if d.GetCard(4).GetFact(1)    != "a"   { panic("Sub card doesn't have parent as the answer.") }
 }

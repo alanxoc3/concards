@@ -81,7 +81,7 @@ func TermBoxRun(d *core.Deck, cfg *file.Config) error {
                d.TopToEnd()
 					save(d)
 				} else if inp == "e" {
-					err := file.EditFile(d, cfg)
+					err := file.EditFile(d, cfg, file.ReadCards, file.EditCards)
 
 					if err != nil {
 						update_stat_msg(err.Error(), termbox.ColorRed)
@@ -111,7 +111,7 @@ func TermBoxRun(d *core.Deck, cfg *file.Config) error {
 					}
 				} else if inp == " " || inp == "\r" {
                card_shown++
-               if l := len(d.GetCard(0).Facts); card_shown > l {
+               if l := d.GetCard(0).Len(); card_shown > l {
                   card_shown = 1
                }
 				}

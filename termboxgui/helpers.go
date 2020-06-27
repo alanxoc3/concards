@@ -100,10 +100,10 @@ func tbvertical(x int, color termbox.Attribute) {
 func tbprint_card(c *core.Card, amount int) {
    y := 0
 
-   for i := 0; i < len(c.Facts) && i < amount; i++ {
+   for i := 0; i < c.Len() && i < amount; i++ {
       color := termbox.ColorCyan
       if i > 0 { color = termbox.ColorWhite }
-      _, y = tbprintwrap(0, y, color, coldef, c.Facts[i])
+      _, y = tbprintwrap(0, y, color, coldef, c.GetFact(i))
       y++
    }
 }
@@ -112,7 +112,7 @@ func tbprint_statusbar(d *core.Deck) {
 	_, h := termbox.Size()
 	color := termbox.ColorBlue
 	tbhorizontal(h-2, color)
-	msg := fmt.Sprintf("%d concards - %s", d.Len(), d.TopCard().File)
+	msg := fmt.Sprintf("%d cards - %s", d.Len(), d.TopCard().GetFile())
 
 	tbprint(0, h-2, termbox.ColorWhite|termbox.AttrBold, color, msg)
 }

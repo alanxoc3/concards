@@ -54,7 +54,6 @@ func (d *Deck) AddCard(c *Card) error {
    }
 }
 
-// TODO: Error handling here.
 func (d *Deck) InsertCard(c *Card, i int) error {
    hash := c.HashStr()
    _, exists := d.Cmap[hash]
@@ -71,11 +70,23 @@ func (d *Deck) InsertCard(c *Card, i int) error {
    }
 }
 
-func (d *Deck) AddFacts(facts [][]string, file string) error {
-   if c, err := NewCard(facts, file); err == nil {
-      return d.AddCard(c)
+func (d *Deck) AddCardFromSides(file string, sides string, include_sides bool) []error {
+   errors := []error{}
+   if c, create_err := NewCard(file, sides); create_err == nil {
+      cards := []*Card{c}
+      if include_sides {
+         cards = append(cards, c.GetSubCards()...)
+      }
+
+      for _, c := range cards {
+         if add_err := d.AddCard(c); add_err != nil {
+            errors = append(errors, add_err)
+         }
+      }
+   } else {
+      errors = append(errors, create_err)
    }
-   return nil
+   return errors
 }
 
 func (d *Deck) AddMeta(h string, m *Meta) {

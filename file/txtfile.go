@@ -2,6 +2,7 @@ package file
 
 import (
    "bufio"
+   "strings"
    "io"
    "fmt"
    "os"
@@ -11,7 +12,7 @@ import (
 )
 
 // Open opens filename and loads cards into new deck
-func ReadCardsToDeck(d *core.Deck, filename string) error {
+func ReadCardsToDeck(d *core.Deck, filename string, include_sides bool) error {
    err := filepath.Walk(filename, func(path string, info os.FileInfo, e error) error {
       if e != nil {
          return e
@@ -32,7 +33,7 @@ func ReadCardsToDeck(d *core.Deck, filename string) error {
          return fmt.Errorf("Error: Unable to open file \"%s\"", filename)
       } else {
          defer f.Close()
-         ReadCardsToDeckHelper(f, d, abs_path)
+         ReadCardsToDeckHelper(f, d, abs_path, include_sides)
       }
 
       return nil
@@ -41,9 +42,9 @@ func ReadCardsToDeck(d *core.Deck, filename string) error {
    return err
 }
 
-func ReadCardsToDeckHelper(r io.Reader, d *core.Deck, f string) {
+func ReadCardsToDeckHelper(r io.Reader, d *core.Deck, f string, include_sides bool) {
    // Initialization.
-   facts := [][]string{}
+   facts := []string{}
    state := false
    var td *core.Deck
 
@@ -55,27 +56,25 @@ func ReadCardsToDeckHelper(r io.Reader, d *core.Deck, f string) {
       t := scanner.Text()
 
       if state {
-         if t == "@" {
-            facts = append(facts, []string{})
-         } else if t == "@>" {
-            td.AddFacts(facts, f)
-            facts = [][]string{{}}
+         if t == "@>" {
+            td.AddCardFromSides(f, strings.Join(facts, " "), include_sides)
+
+            facts = []string{}
          } else if t == "<@" {
-            td.AddFacts(facts, f)
+            td.AddCardFromSides(f, strings.Join(facts, " "), include_sides)
+
             for i := 0; i < td.Len(); i++ {
                d.AddCard(td.GetCard(i))
             }
             state = false
          } else {
-            if i := len(facts)-1; i >= 0 {
-               facts[i] = append(facts[i], t)
-            }
+            facts = append(facts, t)
          }
       } else if t == "@>" {
          // create td
          td = core.NewDeck()
          state = true
-         facts = [][]string{{}}
+         facts = []string{}
       }
    }
 

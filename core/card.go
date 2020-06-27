@@ -2,6 +2,7 @@ package core
 
 import (
 	"strings"
+	"bufio"
 	"fmt"
 
    "crypto/sha256"
@@ -9,41 +10,59 @@ import (
 
 // A card is a list of facts. Usually, but not limited to, Q&A format.
 type Card struct {
-   File  string
-   Facts []string
+   file  string
+   facts [][]string
 }
 
-// Assumes a "cleaned" file string.
-func NewCard(facts [][]string, file string) (*Card, error) {
-   c := Card{}
-   c.File = file
-	for _, x := range facts {
-      if len(x) > 0 {
-         c.Facts = append(c.Facts, strings.Join(x, " "))
-      }
-	}
+func NewCard(file string, sides string) (*Card, error) {
+   fact  := []string{}
+   facts := [][]string{}
 
-   if len(c.Facts) > 0 {
-      return &c, nil
+   scanner := bufio.NewScanner(strings.NewReader(sides))
+   scanner.Split(bufio.ScanWords)
+   for scanner.Scan() {
+      t := scanner.Text()
+      if t == "@" {
+         if len(fact) > 0 {
+            facts = append(facts, fact)
+            fact = []string{}
+         }
+      } else if len(t) > 0 {
+         fact = append(fact, t)
+      }
+   }
+
+   if len(fact) > 0 {
+      facts = append(facts, fact)
+   }
+
+   if len(facts) > 0 {
+      return &Card{file, facts}, nil
    } else {
       return nil, fmt.Errorf("Question not provided.")
    }
 }
 
-func (c *Card) HasAnswer() bool {
-   return len(c.Facts) > 1
+func (c *Card) GetSubCards() []*Card {
+   sub_cards := []*Card{}
+   question := c.GetQuestion()
+   answers := c.GetFacts()[1:]
+   for _, answer := range answers {
+      if sc, err := NewCard(c.file, answer + " @ " + question); err == nil {
+         sub_cards = append(sub_cards, sc)
+      } else {
+         panic("Error: Sub card was not created due to bad parent card. This is a logic error and should be fixed.")
+      }
+   }
+   return sub_cards
 }
 
-func (c *Card) GetQuestion() string {
-   if len(c.Facts) > 0 {
-      return c.Facts[0]
-   } else {
-      return ""
-   }
+func (c *Card) HasAnswer() bool {
+   return len(c.facts) > 1
 }
 
 func (c *Card) String() string {
-   return strings.Join(c.Facts, " @ ")
+   return strings.Join(c.GetFacts(), " @ ")
 }
 
 func (c *Card) Hash() [sha256.Size]byte {
@@ -52,4 +71,32 @@ func (c *Card) Hash() [sha256.Size]byte {
 
 func (c *Card) HashStr() string {
    return fmt.Sprintf("%x", c.Hash())[:32]
+}
+
+func (c *Card) Len() int {
+   return len(c.facts)
+}
+
+func (c *Card) GetFact(i int) string {
+   if len(c.facts) > i {
+      return strings.Join(c.facts[i], " ")
+   } else {
+      return ""
+   }
+}
+
+func (c *Card) GetQuestion() string {
+   return c.GetFact(0)
+}
+
+func (c *Card) GetFacts() []string {
+   facts := []string{}
+	for i, _ := range c.facts {
+      facts = append(facts, c.GetFact(i))
+   }
+   return facts
+}
+
+func (c *Card) GetFile() string {
+   return c.file
 }

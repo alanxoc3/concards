@@ -17,7 +17,7 @@ b718c81a83d82bb83f82b0a8b18bb82b 2020-01-11T00:00:00Z 27 sm2 .05
 
 func TestReadMetasToDeck(t *testing.T) {
    d := core.NewDeck()
-   ReadCardsToDeckHelper(strings.NewReader(f1 + f2), d, "")
+   ReadCardsToDeckHelper(strings.NewReader(f1 + f2), d, "", false)
    ReadMetasToDeckHelper(strings.NewReader(c1), d)
 
    for i := 0; i < d.Len(); i++ {
@@ -34,13 +34,13 @@ func TestReadMetasToDeck(t *testing.T) {
 
 func TestReadCardsToDeck(t *testing.T) {
    d := core.NewDeck()
-   ReadCardsToDeckHelper(strings.NewReader(f2), d, "nihao")
+   ReadCardsToDeckHelper(strings.NewReader(f2), d, "nihao", false)
 
    for i := 0; i < d.Len(); i++ {
       _, c, _ := d.Get(i)
       switch i {
          case 0: if c.GetQuestion() != "hi" { t.Fail() }
-                 if c.File != "nihao" { t.Fail() }
+                 if c.GetFile() != "nihao" { t.Fail() }
          case 1: if c.GetQuestion() != "yoyo man go" { t.Fail() }
       }
 	}
