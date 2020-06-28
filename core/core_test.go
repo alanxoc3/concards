@@ -285,6 +285,14 @@ func TestFilterDone(t *testing.T) {
    if oldLen - newLen != 1 {
       panic("There should have been one card done.")
    }
+
+   if err := d.Forget(12); err == nil {
+      panic("There is no 12 index. The highest is 11.")
+   }
+
+   if err := d.Forget(11); err != nil {
+      panic("11 should have been a valid index.")
+   }
 }
 
 func TestSm2Exec(t *testing.T) {
