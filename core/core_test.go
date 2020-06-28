@@ -231,3 +231,78 @@ func TestInsertCard(t *testing.T) {
       if d.TopCard().HashStr() != c.HashStr() { panic("Card not inserted.") }
    }
 }
+
+func createDeck(includeSubcards bool) *Deck {
+	d := NewDeck()
+	d.AddCardFromSides("a", f1, includeSubcards)
+	d.AddCardFromSides("b", f2, includeSubcards)
+	d.AddCardFromSides("a", f3, includeSubcards)
+	d.AddCardFromSides("c", f4, includeSubcards)
+	d.AddCardFromSides("b", f5, includeSubcards)
+   return d
+}
+
+func TestFilterNumber(t *testing.T) {
+   d := createDeck(true)
+   d.FilterNumber(1)
+   if d.Len() != 1 {
+      panic("Should have filtered down to one.")
+   }
+}
+
+func TestFilterMemorize(t *testing.T) {
+   d := createDeck(true)
+   d.FilterOutMemorize()
+   if d.Len() != 0 {
+      panic("All were memorize.")
+   }
+}
+
+func TestFilterReview(t *testing.T) {
+   d := createDeck(true)
+	a := NewMeta("2020-01-01T00:00:00Z", "0", "sm2", []string{"2.5"})
+   d.AddMeta(d.TopHash(), a)
+
+   oldLen := d.Len()
+   d.FilterOutReview()
+   newLen := d.Len()
+
+   if oldLen - newLen != 1 {
+      panic("There should have been one card to review.")
+   }
+}
+
+func TestFilterDone(t *testing.T) {
+   d := createDeck(true)
+	a := NewDefaultMeta("sm2")
+   a.Next = a.Next.AddDate(1,0,0)
+   d.AddMeta(d.TopHash(), a)
+
+   oldLen := d.Len()
+   d.FilterOutDone()
+   newLen := d.Len()
+
+   if oldLen - newLen != 1 {
+      panic("There should have been one card done.")
+   }
+}
+
+func TestSm2Exec(t *testing.T) {
+	a := NewMeta("2020-01-01T00:00:00Z", "1", "sm2", []string{"2.5"})
+   a, _ = a.Exec(NO)
+   if a.Params[0] != "1.96" {
+      panic("Sm2 returned the wrong weight.")
+   }
+
+	a = NewMeta("2020-01-01T00:00:00Z", "1", "sm2", []string{"2.5"})
+   a, _ = a.Exec(IDK)
+   if a.Params[0] != "2.36" {
+      panic("Sm2 returned the wrong weight.")
+   }
+
+	a = NewMeta("2020-01-01T00:00:00Z", "1", "sm2", []string{"2.5"})
+   a, _ = a.Exec(YES)
+   if a.Params[0] != "2.60" {
+      panic("Sm2 returned the wrong weight.")
+   }
+}
