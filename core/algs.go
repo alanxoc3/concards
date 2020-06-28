@@ -13,10 +13,6 @@ func sm2Exec(s Meta, input Know) *Meta {
 		rank = floatOrDefault(s.Params[0], rank)
 	}
 
-	if input != NO && input != IDK && input != YES {
-		input = IDK
-	}
-
 	// Sm2 Logic
 	var q float32
 	s.Next = time.Now()

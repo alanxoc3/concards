@@ -12,7 +12,7 @@ import (
 	"github.com/alanxoc3/concards/core"
 )
 
-func oe(arr []string, i int) string {
+func getParam(arr []string, i int) string {
 	if i < len(arr) {
 		return arr[i]
 	} else {
@@ -41,7 +41,7 @@ func ReadMetasToDeckHelper(r io.Reader, d *core.Deck) {
 
 		// First field is a constant sized checksum.
 		if len(strs) > 0 && len(strs[0]) == 32 {
-			d.AddMeta(strs[0], core.NewMeta(oe(strs, 1), oe(strs, 2), oe(strs, 3), strs[4:]))
+			d.AddMeta(strs[0], core.NewMeta(getParam(strs, 1), getParam(strs, 2), getParam(strs, 3), strs[4:]))
 		}
 	}
 }

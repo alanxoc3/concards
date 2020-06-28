@@ -1,17 +1,6 @@
 package core
 
-import (
-	"math/rand"
-	"sort"
-)
-
-func (d *Deck) Less(i, j int) bool {
-	return d.Cmap[d.refs[i]].GetQuestion() < d.Cmap[d.refs[j]].GetQuestion()
-}
-
-func (d *Deck) SortByQuestion() {
-	sort.Sort(d)
-}
+import "math/rand"
 
 func (d *Deck) Shuffle() {
 	// fisher-yates shuffle

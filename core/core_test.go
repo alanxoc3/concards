@@ -95,7 +95,7 @@ func TestDeck(t *testing.T) {
 		t.Fail()
 	}
 
-	d.Forget(0)
+	d.ForgetTop()
 	if d.GetMeta(0) != nil {
 		t.Fail()
 	}
@@ -114,7 +114,7 @@ func TestDeck(t *testing.T) {
 		t.Fail()
 	}
 	d.FilterOutFile("afile")
-	if d.Len() != 0 {
+	if !d.IsEmpty() {
 		t.Fail()
 	}
 	d.Del(0)
@@ -229,5 +229,178 @@ func TestInsertCard(t *testing.T) {
    } else {
       if e := d.InsertCard(c, -100); e != nil    { panic("Should have inserted.") }
       if d.TopCard().HashStr() != c.HashStr() { panic("Card not inserted.") }
+   }
+}
+
+func TestDoubleInsertCard(t *testing.T) {
+	d := NewDeck()
+	c1, _ := NewCard("file1", f3)
+	c2, _ := NewCard("file2", f3)
+   d.InsertCard(c1, 10)
+   if err := d.InsertCard(c2, -10); err == nil || d.Len() != 1 {
+      panic("Same card should have not been inserted twice!")
+   }
+
+   if errs := d.AddCardFromSides("file3", f3, false); len(errs) != 1 {
+      panic("Card already exists and should not have been added.")
+   }
+}
+
+func createDeck(includeSubcards bool) *Deck {
+	d := NewDeck()
+	d.AddCardFromSides("a", f1, includeSubcards)
+	d.AddCardFromSides("b", f2, includeSubcards)
+	d.AddCardFromSides("a", f3, includeSubcards)
+	d.AddCardFromSides("c", f4, includeSubcards)
+	d.AddCardFromSides("b", f5, includeSubcards)
+   return d
+}
+
+func TestSwap(t *testing.T) {
+	d := createDeck(false)
+   if d.GetCard(0).String() != f1 && d.GetCard(1).String() != f2 {
+      panic("Create deck doesn't have expected values.")
+   }
+
+   d.Swap(0,1)
+
+   if d.GetCard(0).String() != f2 && d.GetCard(1).String() != f1 {
+      panic("Swap didn't work.")
+   }
+}
+
+func TestClone(t *testing.T) {
+   d1 := createDeck(false)
+   d2 := NewDeck()
+   d2.Clone(d1)
+
+   if d1.GetHash(0) != d2.GetHash(0) || d1.GetHash(1) != d2.GetHash(1) {
+      panic("Cloned deck should be equal to original.")
+   }
+}
+
+func TestCopy(t *testing.T) {
+   d1 := createDeck(false)
+   d2 := d1.Copy()
+
+   if d1.GetHash(0) != d2.GetHash(0) || d1.GetHash(1) != d2.GetHash(1) {
+      panic("Cloned deck should be equal to original.")
+   }
+}
+
+func TestFilterNumber(t *testing.T) {
+   d := createDeck(true)
+   d.FilterNumber(1)
+   if d.Len() != 1 {
+      panic("Should have filtered down to one.")
+   }
+}
+
+func TestFilterMemorize(t *testing.T) {
+   d := createDeck(true)
+   d.FilterOutMemorize()
+   if d.Len() != 0 {
+      panic("All were memorize.")
+   }
+}
+
+func TestTop(t *testing.T) {
+   d := createDeck(false)
+	m1 := NewMeta("2020-01-01T00:00:00Z", "0", "sm2", []string{"2.5"})
+   d.AddMeta(d.TopHash(), m1)
+
+   h, c, m2 := d.Top()
+
+   if h != d.TopHash() {
+      panic("Top returned bad hash.")
+   }
+
+   if c.String() != f1 && c != d.TopCard() {
+      panic("Top returned bad card.")
+   }
+
+   if m1 != m2 || m2.Next != d.TopMeta().Next {
+      panic("Top returned bad meta.")
+   }
+}
+
+func TestFilterReview(t *testing.T) {
+   d := createDeck(true)
+	a := NewMeta("2020-01-01T00:00:00Z", "0", "sm2", []string{"2.5"})
+   d.AddMeta(d.TopHash(), a)
+
+   oldLen := d.Len()
+   d.FilterOutReview()
+   newLen := d.Len()
+
+   if oldLen - newLen != 1 {
+      panic("There should have been one card to review.")
+   }
+}
+
+func TestFilterDone(t *testing.T) {
+   d := createDeck(true)
+	a := NewDefaultMeta("sm2")
+   a.Next = a.Next.AddDate(1,0,0)
+   d.AddMetaIfNil(d.TopHash(), a)
+
+   oldLen := d.Len()
+   d.FilterOutDone()
+   newLen := d.Len()
+
+   if oldLen - newLen != 1 {
+      panic("There should have been one card done.")
+   }
+
+   if err := d.Forget(12); err == nil {
+      panic("There is no 12 index. The highest is 11.")
+   }
+
+   if err := d.Forget(11); err != nil {
+      panic("11 should have been a valid index.")
+   }
+}
+
+func TestSm2Exec(t *testing.T) {
+   // Testing NO.
+	a := NewMeta("2020-01-01T00:00:00Z", "1", "sm2", []string{"2.5"})
+   a, _ = a.Exec(NO)
+   if a.Params[0] != "1.96" {
+      panic("Sm2 returned the wrong weight.")
+   }
+
+   // Testing NO, streak go down.
+	a = NewMeta("2020-01-01T00:00:00Z", "-3", "sm2", []string{"2.5"})
+   a, _ = a.Exec(NO)
+   if a.Params[0] != "1.96" && a.Streak != -4 {
+      panic("Sm2 returned the wrong weight.")
+   }
+
+   // Testing IDK.
+	a = NewMeta("2020-01-01T00:00:00Z", "1", "sm2", []string{"2.5"})
+   a, _ = a.Exec(IDK)
+   if a.Params[0] != "2.36" {
+      panic("Sm2 returned the wrong weight.")
+   }
+
+   // Testing YES.
+	a = NewMeta("2020-01-01T00:00:00Z", "3", "sm2", []string{"2.5"})
+   a, _ = a.Exec(YES)
+   if a.Params[0] != "2.60" {
+      panic("Sm2 returned the wrong weight.")
+   }
+
+   // Testing YES, negative streak.
+	a = NewMeta("2020-01-01T00:00:00Z", "-1", "sm2", []string{"2.5"})
+   a, _ = a.Exec(YES)
+   if a.Params[0] != "2.50" {
+      panic("Sm2 returned the wrong weight.")
+   }
+
+   // Should not go lower than the lowest weight.
+	a = NewMeta("2020-01-01T00:00:00Z", "1", "sm2", []string{"1.3"})
+   a, _ = a.Exec(NO)
+   if a.Params[0] != "1.30" {
+      panic("Sm2 returned the wrong weight.")
    }
 }
