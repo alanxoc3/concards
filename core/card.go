@@ -22,7 +22,7 @@ func NewCard(file string, sides string) (*Card, error) {
 	scanner.Split(bufio.ScanWords)
 	for scanner.Scan() {
 		t := scanner.Text()
-		if t == "@" {
+		if t == "|" {
 			if len(fact) > 0 {
 				facts = append(facts, fact)
 				fact = []string{}
@@ -48,7 +48,7 @@ func (c *Card) GetSubCards() []*Card {
 	question := c.GetQuestion()
 	answers := c.GetFacts()[1:]
 	for _, answer := range answers {
-		if sc, err := NewCard(c.file, answer+" @ "+question); err == nil {
+		if sc, err := NewCard(c.file, answer+" | "+question); err == nil {
 			subCards = append(subCards, sc)
 		} else {
 			panic("Error: Sub card was not created due to bad parent card. This is a logic error and should be fixed.")
@@ -62,7 +62,7 @@ func (c *Card) HasAnswer() bool {
 }
 
 func (c *Card) String() string {
-	return strings.Join(c.GetFacts(), " @ ")
+	return strings.Join(c.GetFacts(), " | ")
 }
 
 func (c *Card) Hash() [sha256.Size]byte {

@@ -4,14 +4,14 @@ import "testing"
 import "strings"
 import "github.com/alanxoc3/concards/core"
 
-const f1 = "@> hello there @ i'm a beard <@"
-const c1 = "c6cd355e32654cb4ba506b529ff32288 2020-01-01T00:00:00Z 3 sm2 2.5"
+const f1 = "@> hello there | i'm a beard <@"
+const c1 = "c435597dd9718c64b135087e944fd614 2020-01-01T00:00:00Z 3 sm2 2.5"
 
-const f2 = " @> hi @ hello @> yoyo man go <@"
-const c2 = "ab11ffa53d45453729f90b2aa6df9d65 2020-01-11T00:00:00Z 2 sm2 .00001"
+const f2 = " @> hi | hello @> yoyo man go <@"
+const c2 = "19d480d8751e75494e70e65c18cc7fac 2020-01-11T00:00:00Z 2 sm2 .00001"
 
-const c3 = `ab11ffa53d45453729f90b2aa6df9d65 2020-01-01T00:00:00Z 2 sm2 .00001
-c6cd355e32654cb4ba506b529ff32288 2020-01-11T00:00:00Z 3 sm2 .05
+const c3 = `19d480d8751e75494e70e65c18cc7fac 2020-01-01T00:00:00Z 2 sm2 .00001
+c435597dd9718c64b135087e944fd614 2020-01-11T00:00:00Z 3 sm2 .05
 b718c81a83d82bb83f82b0a8b18bb82b 2020-01-11T00:00:00Z 27 sm2 .05
 `
 
