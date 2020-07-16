@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+CONCARDS_META_FILE=~/.concards-meta
+
+NEW_META="$(mktemp)"
+TMP="$(mktemp)"
+OLD_HASH="$(mktemp)"
+NEW_HASH="$(mktemp)"
+
+printf "Getting the current cards...\n"
+concards "$@" -drmp | \
+   head -n -1 | \
+   sed "s;^@> ;;g" | tee $TMP | wc
+
+printf "\nGenerating the old hashes...\n"
+cat $TMP | \
+   while read line; \
+   do echo -n "$line" | \
+      sha256sum | \
+      awk '{print $1;}'; \
+   done | sed 's/.\{32\}$//g' | tee $OLD_HASH | wc
+
+printf "\nGenerating the new hashes...\n"
+cat $TMP | \
+   while read line; \
+   do echo -n "$line" | \
+      sed "s; @ ; | ;g" | \
+      sha256sum | \
+      awk '{print $1;}'; \
+   done | sed 's/.\{32\}$//g' | tee $NEW_HASH | wc
+
+printf "\nReplacing the hashes in the concards meta file...\n"
+cp $CONCARDS_META_FILE $NEW_META
+paste $OLD_HASH $NEW_HASH | \
+   while read old new; \
+   do echo -n "$old $new" | \
+      sed -i "s/$old/$new/g" $NEW_META
+   done
+
+printf "\nSorting the meta file...\n"
+cat $NEW_META | sort > $NEW_META
+
+rm $TMP $OLD_HASHES $NEW_HASHES
+printf "\nProcessing complete! Your new meta file is located here:\n$NEW_META\n\n"
