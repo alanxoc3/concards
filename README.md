@@ -56,7 +56,7 @@ Here are a few example concards:
 
 @> What does a concard look like?
  | \@> It could look like this \| What does a concard look like? \<@
- | \@> It could also look like this \| with multiple \| sides! \<@
+ | \@> It could also look like this \| with multiple \| answers! \<@
 
 @> How do you escape a concard keyword?
  | Put a backslash before it. Your text file would show "\@>", but the app shows "@>".
@@ -72,7 +72,7 @@ Here are a few example concards:
 The easiest way to understand that syntax is by trying it out! Just run
 concards on this `README.md` file and see what happens!
 ``` bash
-concards README.md
+$ concards README.md
 ```
 
 ## Advanced Usage
