@@ -3,12 +3,14 @@ package core
 import (
 	"bufio"
 	"fmt"
+	"regexp"
 	"strings"
 
 	"crypto/sha256"
 )
 
 // All the keywords that concards treats special.
+const CEsc = "\\"
 const CSep = "|"
 const CBeg = "@>"
 const CEnd = "<@"
@@ -93,20 +95,50 @@ func (c *Card) Len() int {
 	return len(c.facts)
 }
 
-func (c *Card) GetFactRaw(i int) string {
+func (c *Card) getFactHelper(i int, factLogic func([]string)[]string) string {
+   words := []string{}
 	if len(c.facts) > i && 0 <= i {
-		return strings.Join(c.facts[i], " ")
-	} else {
-		return ""
+      words = factLogic(c.facts[i])
 	}
+   return strings.Join(words, " ")
+}
+
+func (c *Card) GetFactRaw(i int) string {
+   return c.getFactHelper(i, func(words []string) []string {
+      return words
+   })
+}
+
+// This banks on the fact that the backslash is an ASCII character at the beginning.
+// If the escape character wasn't ASCII, the logic here would have to change.
+func (c *Card) GetFactEsc(i int) string {
+   return c.getFactHelper(i, func(words []string) []string {
+      re := regexp.MustCompile(`^\\+`)
+      newWords := []string{}
+      for _, word := range words {
+         if escStr := re.ReplaceAllString(word, ""); len(escStr) < len(word) && keyWords[escStr] {
+            word = word[1:]
+         }
+         newWords = append(newWords, word)
+      }
+      return newWords
+   })
+}
+
+func (c *Card) getFactsHelper(factFunc func(*Card, int)string) []string {
+	facts := []string{}
+	for i := range c.facts {
+		facts = append(facts, factFunc(c,i))
+	}
+	return facts
 }
 
 func (c *Card) GetFactsRaw() []string {
-	facts := []string{}
-	for i := range c.facts {
-		facts = append(facts, c.GetFactRaw(i))
-	}
-	return facts
+   return c.getFactsHelper((*Card).GetFactRaw)
+}
+
+func (c *Card) GetFactsEsc() []string {
+   return c.getFactsHelper((*Card).GetFactEsc)
 }
 
 func (c *Card) GetFile() string {

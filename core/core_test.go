@@ -404,3 +404,31 @@ func TestSm2Exec(t *testing.T) {
       panic("Sm2 returned the wrong weight.")
    }
 }
+
+func TestEsc(t *testing.T) {
+   raw := "in c, what is 1 \\| 2 | 3"
+   esc := "in c, what is 1 | 2 | 3"
+   rawFirst := "in c, what is 1 \\| 2"
+   escFirst := "in c, what is 1 | 2"
+
+	c, _ := NewCard("file1", raw)
+   if c.GetFactEsc(0) != escFirst {
+      panic("Fact not prettified/escaped.")
+   }
+
+   if c.GetFactRaw(0) != rawFirst {
+      panic("Raw fact not what it was originally.")
+   }
+
+   if c.GetFactRaw(-1) != "" || c.GetFactEsc(-1) != "" || c.GetFactRaw(2) != "" || c.GetFactEsc(2) != "" {
+      panic("Out of bounds esc and raw facts didn't work.")
+   }
+
+	if strings.Join(c.GetFactsRaw(), " | ") != raw {
+      panic("Raw facts not preserved.")
+   }
+
+	if strings.Join(c.GetFactsEsc(), " | ") != esc {
+      panic("Esc facts not preserved.")
+   }
+}
