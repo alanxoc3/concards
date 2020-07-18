@@ -14,23 +14,28 @@ type Card struct {
 	facts [][]string
 }
 
+func parseByWords(s string, wordFunc func(string)) {
+	scanner := bufio.NewScanner(strings.NewReader(s))
+	scanner.Split(bufio.ScanWords)
+	for scanner.Scan() {
+      wordFunc(scanner.Text())
+	}
+}
+
 func NewCard(file string, sides string) (*Card, error) {
 	fact := []string{}
 	facts := [][]string{}
 
-	scanner := bufio.NewScanner(strings.NewReader(sides))
-	scanner.Split(bufio.ScanWords)
-	for scanner.Scan() {
-		t := scanner.Text()
-		if t == "|" {
-			if len(fact) > 0 {
-				facts = append(facts, fact)
-				fact = []string{}
-			}
-		} else if len(t) > 0 {
-			fact = append(fact, t)
-		}
-	}
+   parseByWords(sides, func(word string) {
+      if word == "|" {
+         if len(fact) > 0 {
+            facts = append(facts, fact)
+            fact = []string{}
+         }
+      } else if len(word) > 0 {
+         fact = append(fact, word)
+      }
+   })
 
 	if len(fact) > 0 {
 		facts = append(facts, fact)
