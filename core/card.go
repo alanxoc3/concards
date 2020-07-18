@@ -45,8 +45,8 @@ func NewCard(file string, sides string) (*Card, error) {
 
 func (c *Card) GetSubCards() []*Card {
 	subCards := []*Card{}
-	question := c.GetQuestion()
-	answers := c.GetFacts()[1:]
+	question := c.GetFactRaw(0)
+	answers := c.GetFactsRaw()[1:]
 	for _, answer := range answers {
 		if sc, err := NewCard(c.file, answer+" | "+question); err == nil {
 			subCards = append(subCards, sc)
@@ -62,7 +62,7 @@ func (c *Card) HasAnswer() bool {
 }
 
 func (c *Card) String() string {
-	return strings.Join(c.GetFacts(), " | ")
+	return strings.Join(c.GetFactsRaw(), " | ")
 }
 
 func (c *Card) Hash() [sha256.Size]byte {
@@ -77,22 +77,18 @@ func (c *Card) Len() int {
 	return len(c.facts)
 }
 
-func (c *Card) GetFact(i int) string {
-	if len(c.facts) > i {
+func (c *Card) GetFactRaw(i int) string {
+	if len(c.facts) > i && 0 <= i {
 		return strings.Join(c.facts[i], " ")
 	} else {
 		return ""
 	}
 }
 
-func (c *Card) GetQuestion() string {
-	return c.GetFact(0)
-}
-
-func (c *Card) GetFacts() []string {
+func (c *Card) GetFactsRaw() []string {
 	facts := []string{}
 	for i := range c.facts {
-		facts = append(facts, c.GetFact(i))
+		facts = append(facts, c.GetFactRaw(i))
 	}
 	return facts
 }

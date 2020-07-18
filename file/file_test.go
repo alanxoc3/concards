@@ -24,7 +24,7 @@ func TestReadMetasToDeck(t *testing.T) {
 		_, c, m := d.Get(i)
 		switch i {
 		case 0:
-			if c.GetQuestion() != "hello there" {
+			if c.GetFactRaw(0) != "hello there" {
 				t.Fail()
 			}
 			if m.NextStr() != "2020-01-01T00:00:00Z" {
@@ -46,14 +46,14 @@ func TestReadCardsToDeck(t *testing.T) {
 		_, c, _ := d.Get(i)
 		switch i {
 		case 0:
-			if c.GetQuestion() != "hi" {
+			if c.GetFactRaw(0) != "hi" {
 				t.Fail()
 			}
 			if c.GetFile() != "nihao" {
 				t.Fail()
 			}
 		case 1:
-			if c.GetQuestion() != "yoyo man go" {
+			if c.GetFactRaw(0) != "yoyo man go" {
 				t.Fail()
 			}
 		}

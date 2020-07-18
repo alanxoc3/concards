@@ -105,7 +105,7 @@ func tbprintCard(c *core.Card, amount int) {
 		if i > 0 {
 			color = termbox.ColorWhite
 		}
-		_, y = tbprintwrap(0, y, color, coldef, c.GetFact(i))
+		_, y = tbprintwrap(0, y, color, coldef, c.GetFactRaw(i))
 		y++
 	}
 }

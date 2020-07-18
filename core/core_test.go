@@ -69,7 +69,7 @@ func TestCard(t *testing.T) {
 func TestDeck(t *testing.T) {
 	d := NewDeck()
 	d.AddCardFromSides("afile", f1, false)
-	if d.GetCard(0).GetQuestion() != "hello there" {
+	if d.GetCard(0).GetFactRaw(0) != "hello there" {
 		t.Fail()
 	}
 	if !d.GetCard(0).HasAnswer() {
@@ -130,30 +130,30 @@ func TestDeckMove(t *testing.T) {
 	d.AddCardFromSides("afile", f3, false)
 	d.AddCardFromSides("afile", f4, false)
 	d.TopToEnd()
-	if d.TopCard().GetQuestion() != "hello" {
+	if d.TopCard().GetFactRaw(0) != "hello" {
 		panic("Bad moves")
 	}
 	if d.Len() != 4 {
 		panic("Bad len")
 	}
 	d.TopTo(10)
-	if d.TopCard().GetQuestion() != "i'm um" {
+	if d.TopCard().GetFactRaw(0) != "i'm um" {
 		panic("Bad moves")
 	}
 	d.TopTo(1)
-	if d.TopCard().GetQuestion() != "alan the great" {
+	if d.TopCard().GetFactRaw(0) != "alan the great" {
 		panic("Bad moves")
 	}
 	d.TopTo(1)
 	if d.Len() != 4 {
 		panic("Bad len")
 	}
-	if d.TopCard().GetQuestion() != "i'm um" {
+	if d.TopCard().GetFactRaw(0) != "i'm um" {
 		panic("Bad moves")
 	}
 	d.TopToEnd()
 	d.TopToEnd()
-	if d.TopCard().GetQuestion() != "hello there" {
+	if d.TopCard().GetFactRaw(0) != "hello there" {
 		panic("Bad moves")
 	}
 }
@@ -162,48 +162,48 @@ func TestAddSubCards(t *testing.T) {
 	d := NewDeck()
 	d.AddCardFromSides("dat-file", f5, true)
 
-	if d.TopCard().GetQuestion() != "a" {
+	if d.TopCard().GetFactRaw(0) != "a" {
 		panic("Subcards were inserted before the parent card.")
 	}
 	if d.Len() != 6 {
 		panic("Wrong number of sub cards inserted.")
 	}
 	d.DelTop()
-	if d.TopCard().GetQuestion() != "b" {
+	if d.TopCard().GetFactRaw(0) != "b" {
 		panic("Second card should be the first sub card.")
 	}
-	if d.TopCard().GetFact(1) != "a" {
+	if d.TopCard().GetFactRaw(1) != "a" {
 		panic("Answer isn't the parent card.")
 	}
 	if d.Len() != 5 {
 		panic("Delete didn't work.")
 	}
 
-	if d.GetCard(1).GetQuestion() != "c" {
+	if d.GetCard(1).GetFactRaw(0) != "c" {
 		panic("Sub cards not inserted in the correct order.")
 	}
-	if d.GetCard(1).GetFact(1) != "a" {
+	if d.GetCard(1).GetFactRaw(1) != "a" {
 		panic("Sub card doesn't have parent as the answer.")
 	}
 
-	if d.GetCard(2).GetQuestion() != "d e" {
+	if d.GetCard(2).GetFactRaw(0) != "d e" {
 		panic("Sub cards not inserted in the correct order.")
 	}
-	if d.GetCard(2).GetFact(1) != "a" {
+	if d.GetCard(2).GetFactRaw(1) != "a" {
 		panic("Sub card doesn't have parent as the answer.")
 	}
 
-	if d.GetCard(3).GetQuestion() != "f" {
+	if d.GetCard(3).GetFactRaw(0) != "f" {
 		panic("Sub cards not inserted in the correct order.")
 	}
-	if d.GetCard(3).GetFact(1) != "a" {
+	if d.GetCard(3).GetFactRaw(1) != "a" {
 		panic("Sub card doesn't have parent as the answer.")
 	}
 
-	if d.GetCard(4).GetQuestion() != "g" {
+	if d.GetCard(4).GetFactRaw(0) != "g" {
 		panic("Sub cards not inserted in the correct order.")
 	}
-	if d.GetCard(4).GetFact(1) != "a" {
+	if d.GetCard(4).GetFactRaw(1) != "a" {
 		panic("Sub card doesn't have parent as the answer.")
 	}
 }
