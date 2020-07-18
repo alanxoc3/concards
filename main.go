@@ -10,8 +10,10 @@ import (
 	"time"
 )
 
+var version string
+
 func main() {
-	c := file.GenConfig()
+	c := file.GenConfig(version)
 	d := core.NewDeck()
 
 	// We don't care if there is no meta data.

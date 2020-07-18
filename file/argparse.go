@@ -53,7 +53,7 @@ func getDefaultMeta() string {
 	}
 }
 
-func GenConfig() *Config {
+func GenConfig(version string) *Config {
 	// Create new parser object
 	parser := argparse.NewParser("concards", "Concards is a simple CLI based SRS flashcard app.")
 
@@ -91,7 +91,7 @@ func GenConfig() *Config {
 	}
 
 	if *fVersion {
-		fmt.Printf("Concards v2.0\n")
+		fmt.Printf("Concards %s\n", version)
 		os.Exit(0)
 	}
 
