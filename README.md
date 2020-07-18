@@ -1,4 +1,4 @@
-<!-- @> concards @ Console Cards @ A cool + simple flashcard app. <@ -->
+<!-- @> concards | Console Cards | A cool + simple flashcard app. <@ -->
 # <img src="logo.svg" />
 
 [![Build Status](https://travis-ci.org/alanxoc3/concards.svg?branch=master)](https://travis-ci.org/alanxoc3/concards)
@@ -36,7 +36,7 @@ flashcard apps (like [Anki](https://apps.ankiweb.net/) or
 The syntax to embed your flashcards is like this:
 ```
 @> What is the answer?
- @ Here is the answer! <@
+ | Here is the answer! <@
 ```
 
 Wanna try it out? Run concards on this `README.md` file!
@@ -47,16 +47,16 @@ concards README.md
 ### A Simple Concard
 ```
 @> This is a question.
- @ Answer #1
- @ Answer #2
- @ Answer #3 <@
+ | Answer #1
+ | Answer #2
+ | Answer #3 <@
 ```
 
 ### 3 Simple Concards
 ```
-@> This is question #1. @ Answer #1
-@> This is question #2. @ Answer #1 @ Answer #2
-@> This is question #3. @ Answer #1 @ Answer #2 @ Answer #3 <@
+@> This is question #1. | Answer #1
+@> This is question #2. | Answer #1 | Answer #2
+@> This is question #3. | Answer #1 | Answer #2 | Answer #3 <@
 ```
 
 ## All Special Tokens
@@ -64,7 +64,7 @@ All the special tokens that are a part of concards syntax are below.
 ```
 @>   = Starts a concards block. Starts a question.
 <@   = Ends the concards block.
-@    = Separates answers.
+|    = Separates answers.
 ```
 
 ## Advanced Usage
