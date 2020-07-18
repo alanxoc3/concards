@@ -56,11 +56,11 @@ func ReadCardsToDeckHelper(r io.Reader, d *core.Deck, f string, includeSides boo
 		t := scanner.Text()
 
 		if state {
-			if t == "@>" {
+			if t == core.CBeg {
 				td.AddCardFromSides(f, strings.Join(facts, " "), includeSides)
 
 				facts = []string{}
-			} else if t == "<@" {
+			} else if t == core.CEnd {
 				td.AddCardFromSides(f, strings.Join(facts, " "), includeSides)
 
 				for i := 0; i < td.Len(); i++ {
@@ -70,7 +70,7 @@ func ReadCardsToDeckHelper(r io.Reader, d *core.Deck, f string, includeSides boo
 			} else {
 				facts = append(facts, t)
 			}
-		} else if t == "@>" {
+		} else if t == core.CBeg {
 			// create td
 			td = core.NewDeck()
 			state = true

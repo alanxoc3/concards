@@ -8,6 +8,17 @@ import (
 	"crypto/sha256"
 )
 
+// All the keywords that concards treats special.
+const CSep = "|"
+const CBeg = "@>"
+const CEnd = "<@"
+
+var keyWords = map[string]bool {
+   CSep: true,
+   CBeg: true,
+   CEnd: true,
+}
+
 // A card is a list of facts. Usually, but not limited to, Q&A format.
 type Card struct {
 	file  string
@@ -27,7 +38,7 @@ func NewCard(file string, sides string) (*Card, error) {
 	facts := [][]string{}
 
    parseByWords(sides, func(word string) {
-      if word == "|" {
+      if word == CSep {
          if len(fact) > 0 {
             facts = append(facts, fact)
             fact = []string{}
@@ -53,7 +64,7 @@ func (c *Card) GetSubCards() []*Card {
 	question := c.GetFactRaw(0)
 	answers := c.GetFactsRaw()[1:]
 	for _, answer := range answers {
-		if sc, err := NewCard(c.file, answer+" | "+question); err == nil {
+		if sc, err := NewCard(c.file, fmt.Sprintf("%s %s %s", answer, CSep, question)); err == nil {
 			subCards = append(subCards, sc)
 		} else {
 			panic("Error: Sub card was not created due to bad parent card. This is a logic error and should be fixed.")
@@ -67,7 +78,7 @@ func (c *Card) HasAnswer() bool {
 }
 
 func (c *Card) String() string {
-	return strings.Join(c.GetFactsRaw(), " | ")
+	return strings.Join(c.GetFactsRaw(), " " + CSep + " ")
 }
 
 func (c *Card) Hash() [sha256.Size]byte {
