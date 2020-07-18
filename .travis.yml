@@ -6,7 +6,7 @@ go:
 - 1.x
 
 env:
-- CONCARDS_VERSION=$(git describe --tags $(git rev-list --tags --max-count=1))
+- CONCARDS_VERSION="$(git describe --tags $(git rev-list --tags --max-count=1))"
 
 before_install:
 - go get github.com/mattn/goveralls
