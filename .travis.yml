@@ -9,7 +9,7 @@ env:
   - CONCARDS_VERSION="$(git describe --tags $(git rev-list --tags --max-count=1))"
 
 script:
-  - printf 'Current concards version is: %s' "$CONCARDS_VERSION"
+  - echo Building Concards $CONCARDS_VERSION
   - go get github.com/mattn/goveralls
   - go test -v ./...
   - "$GOPATH/bin/goveralls -service=travis-ci"
