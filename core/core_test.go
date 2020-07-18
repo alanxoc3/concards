@@ -4,14 +4,14 @@ import "testing"
 import "strings"
 import "fmt"
 
-const fullSum = "c6cd355e32654cb4ba506b529ff32288971420ead2e36fdc69e802e9e7510315"
-const halfSum = "c6cd355e32654cb4ba506b529ff32288"
+const fullSum = "c435597dd9718c64b135087e944fd614716219d2f6663c1596e0d8f9c95e5681"
+const halfSum = "c435597dd9718c64b135087e944fd614"
 
-var f1 = "hello there @ i'm a beard"
+var f1 = "hello there | i'm a beard"
 var f2 = "hello"
-var f3 = "i'm um @ hello"
-var f4 = "alan the great @ sy shoe yu"
-var f5 = "a @ b @ c @ d e @ f @ @ g"
+var f3 = "i'm um | hello"
+var f4 = "alan the great | sy shoe yu"
+var f5 = "a | b | c | d e | f | | g"
 
 func TestMeta(t *testing.T) {
 	a := NewMeta("2020-01-01T00:00:00Z", "0", "sm2", []string{"2.5"})
@@ -49,7 +49,7 @@ func TestCard(t *testing.T) {
 	}
 
 	txt := c.String()
-	if txt != "hello there @ i'm a beard" {
+	if txt != "hello there | i'm a beard" {
 		t.Fail()
 	}
 

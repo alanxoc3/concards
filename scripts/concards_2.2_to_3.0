@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+# Concards transition from 2.2 to 3.0 script.
+# By Alan Morgan
+#
+# To transition your cards from 2.2 to 3.0, follow these steps:
+# Step 0: Ensure all your cards are in the old format and you have concards
+#         currently 2.2 installed.
+# Step 1: Keep all your cards in the old format and run this script.
+#         Example: ./concards_2.2_to_3.0 ~/.concards-meta ~/cards/
+# Step 2: Replace your current meta file with tmp file printed.
+# Step 3: Switch your cards to the new format, replacing all "@" with "|".
+# Step 4: Install concards 3.0 and double check that your progress hasn't changed!
+#
+# If you are smart, you will keep both your meta file and flashcards in version
+# control so you can revert anything bad that happens.
+#
+# Though not perfect, this may help you transition your cards in Step 3:
+# find ./ \( -type d -name .git -prune \) -o -type f -print0 | xargs -0 sed -i 's/ @ / | /g'
+#
+# Above find command partly thanks to stack overflow:
+# https://stackoverflow.com/questions/1583219/how-to-do-a-recursive-find-replace-of-a-string-with-awk-or-sed
+
+CONCARDS_META_FILE=$1
+ARGS="${@:2}"
+
+NEW_META="$(mktemp)"
+TMP="$(mktemp)"
+OLD_HASH="$(mktemp)"
+NEW_HASH="$(mktemp)"
+
+printf "Concards Meta File: $CONCARDS_META_FILE\n"
+printf "Files: $ARGS\n\n"
+
+printf "Getting the current cards...\n"
+concards "$ARGS" -drmp | \
+   head -n -1 | \
+   sed "s;^@> ;;g" | tee $TMP | wc
+
+printf "\nGenerating the old hashes...\n"
+cat $TMP | \
+   while read line; \
+   do echo -n "$line" | \
+      sha256sum | \
+      awk '{print $1;}'; \
+   done | sed 's/.\{32\}$//g' | tee $OLD_HASH | wc
+
+printf "\nGenerating the new hashes...\n"
+cat $TMP | \
+   while read line; \
+   do echo -n "$line" | \
+      sed "s; @ ; | ;g" | \
+      sha256sum | \
+      awk '{print $1;}'; \
+   done | sed 's/.\{32\}$//g' | tee $NEW_HASH | wc
+
+printf "\nReplacing the hashes in the concards meta file...\n"
+cp $CONCARDS_META_FILE $NEW_META
+paste $OLD_HASH $NEW_HASH | \
+   while read old new; \
+   do echo -n "$old $new" | \
+      sed -i "s/$old/$new/g" $NEW_META
+   done
+
+printf "\nSorting the meta file...\n"
+sort $NEW_META -o $NEW_META
+
+rm $TMP $OLD_HASHES $NEW_HASHES
+printf "\nProcessing complete! Your new meta file is located here:\n$NEW_META\n\n"
