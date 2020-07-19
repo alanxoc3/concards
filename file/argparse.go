@@ -12,7 +12,6 @@ type Config struct {
 	IsReview   bool
 	IsMemorize bool
 	IsDone     bool
-	IsSides    bool
 	IsPrint    bool
 	IsStream   bool
 
@@ -62,7 +61,6 @@ func GenConfig(version string) *Config {
 	fReview := parser.Flag("r", "review", &argparse.Options{Help: "Show cards available to be reviewed."})
 	fMemorize := parser.Flag("m", "memorize", &argparse.Options{Help: "Show cards available to be memorized."})
 	fDone := parser.Flag("d", "done", &argparse.Options{Help: "Show cards not available to be reviewed or memorized."})
-	fSides := parser.Flag("s", "sides", &argparse.Options{Help: "Add cards for all sides."})
 	fPrint := parser.Flag("p", "print", &argparse.Options{Help: "Prints all cards, one line per card."})
 	fNumber := parser.Int("n", "number", &argparse.Options{Default: 0, Help: "How many cards to review."})
 	fEditor := parser.String("E", "editor", &argparse.Options{Default: getDefaultEditor(), Help: "Which editor to use. Defaults to \"$EDITOR\""})
@@ -100,7 +98,6 @@ func GenConfig(version string) *Config {
 	c.IsReview = *fReview
 	c.IsMemorize = *fMemorize
 	c.IsDone = *fDone
-	c.IsSides = *fSides
 	c.IsPrint = *fPrint
 	c.IsStream = false
 

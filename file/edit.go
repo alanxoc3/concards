@@ -12,7 +12,7 @@ type DeckFunc func(string, *Config) (*core.Deck, error)
 
 func ReadCards(filename string, cfg *Config) (*core.Deck, error) {
 	d := core.NewDeck()
-	if err := ReadCardsToDeck(d, filename, cfg.IsSides); err != nil {
+	if err := ReadCardsToDeck(d, filename); err != nil {
 		return nil, err
 	}
 	return d, nil

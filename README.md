@@ -15,11 +15,11 @@ thing and do it well".
 
 ## Features
 - Implements the [SM2](https://www.supermemo.com/english/ol/sm2.htm) Repetition Algorithm.
-- Beautiful terminal gui.
-- Supports UTF-8!
-- Reading in from multiple files & directories.
-- Undoing/Redoing.
-- Easily editing a card while reviewing your cards.
+- Reading from multiple files & directories.
+- Conveniently edit cards while reviewing them!
+- Helpful syntax for adding reversible cards.
+- Built with Unicode in mind!
+- Undoing/Redoing support.
 
 ## Install
 Download the latest binary executable from the [release
@@ -39,17 +39,24 @@ of these keywords:
 ```
 '@>' = Starts a concards block and also starts a question.
 '|'  = Separates sides.
+':'  = Separates sides, and adds a reversed card.
 '<@' = Ends the concards block.
 '\'  = Escapes the special tokens above.
 ```
 
 Here are a few example concards:
 ```
-@> What does this mean 你好世界?
- | Hello World
+@> Concards
+ : A lightweight embeddable note-taking flashcard program.
 
 @> What does "concards" stand for?
  | Console Cards
+
+@> What does the ":" do in concards?
+ | It will add an extra card where the "colon" side is the question and the
+   question is the answer.
+ | This syntax is especially useful for vocabulary when learning a language and
+   can save typing.
 
 @> Can a concard have more than 2 sides?
  | Yes. | Yes it can.
@@ -64,8 +71,12 @@ Here are a few example concards:
 @> How do you show a backslash then a keyword in the concards ui?
  | To see \\@> in the ui, your text document must have 2 backslashes: \\\@>
 
-@> The person who created concards.
- | Alan Morgan
+@> 你好世界
+ : Hello World
+ : Greetings World
+
+@> The human who created concards.
+ : Alan Morgan
 <@
 ```
 

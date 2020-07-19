@@ -43,32 +43,32 @@ func TestParse(t *testing.T) {
 }
 
 func TestCard(t *testing.T) {
-	c, err := NewCard("", f1)
+	c, err := NewCards("", f1)
 	if err != nil {
 		t.FailNow()
 	}
 
-	txt := c.String()
+	txt := c[0].String()
 	if txt != "hello there | i'm a beard" {
 		t.Fail()
 	}
 
-	cardSum := fmt.Sprintf("%x", c.Hash())
+	cardSum := fmt.Sprintf("%x", c[0].Hash())
 
 	if fullSum != cardSum {
 		t.Fail()
 	}
-	if c.HashStr() != halfSum {
+	if c[0].HashStr() != halfSum {
 		t.Fail()
 	}
-	if !c.HasAnswer() {
+	if !c[0].HasAnswer() {
 		t.Fail()
 	}
 }
 
 func TestDeck(t *testing.T) {
 	d := NewDeck()
-	d.AddCardFromSides("afile", f1, false)
+	d.AddNewCards("afile", f1)
 	if d.GetCard(0).GetFactRaw(0) != "hello there" {
 		t.Fail()
 	}
@@ -102,7 +102,7 @@ func TestDeck(t *testing.T) {
 	if !d.GetCard(0).HasAnswer() {
 		t.Fail()
 	}
-	d.AddCardFromSides("nofile", f1, false)
+	d.AddNewCards("nofile", f1)
 	if d.Len() != 1 {
 		t.Fail()
 	}
@@ -125,10 +125,10 @@ func TestDeck(t *testing.T) {
 
 func TestDeckMove(t *testing.T) {
 	d := NewDeck()
-	d.AddCardFromSides("afile", f1, false)
-	d.AddCardFromSides("afile", f2, false)
-	d.AddCardFromSides("afile", f3, false)
-	d.AddCardFromSides("afile", f4, false)
+	d.AddNewCards("afile", f1)
+	d.AddNewCards("afile", f2)
+	d.AddNewCards("afile", f3)
+	d.AddNewCards("afile", f4)
 	d.TopToEnd()
 	if d.TopCard().GetFactRaw(0) != "hello" {
 		panic("Bad moves")
@@ -158,106 +158,56 @@ func TestDeckMove(t *testing.T) {
 	}
 }
 
-func TestAddSubCards(t *testing.T) {
-	d := NewDeck()
-	d.AddCardFromSides("dat-file", f5, true)
-
-	if d.TopCard().GetFactRaw(0) != "a" {
-		panic("Subcards were inserted before the parent card.")
-	}
-	if d.Len() != 6 {
-		panic("Wrong number of sub cards inserted.")
-	}
-	d.DelTop()
-	if d.TopCard().GetFactRaw(0) != "b" {
-		panic("Second card should be the first sub card.")
-	}
-	if d.TopCard().GetFactRaw(1) != "a" {
-		panic("Answer isn't the parent card.")
-	}
-	if d.Len() != 5 {
-		panic("Delete didn't work.")
-	}
-
-	if d.GetCard(1).GetFactRaw(0) != "c" {
-		panic("Sub cards not inserted in the correct order.")
-	}
-	if d.GetCard(1).GetFactRaw(1) != "a" {
-		panic("Sub card doesn't have parent as the answer.")
-	}
-
-	if d.GetCard(2).GetFactRaw(0) != "d e" {
-		panic("Sub cards not inserted in the correct order.")
-	}
-	if d.GetCard(2).GetFactRaw(1) != "a" {
-		panic("Sub card doesn't have parent as the answer.")
-	}
-
-	if d.GetCard(3).GetFactRaw(0) != "f" {
-		panic("Sub cards not inserted in the correct order.")
-	}
-	if d.GetCard(3).GetFactRaw(1) != "a" {
-		panic("Sub card doesn't have parent as the answer.")
-	}
-
-	if d.GetCard(4).GetFactRaw(0) != "g" {
-		panic("Sub cards not inserted in the correct order.")
-	}
-	if d.GetCard(4).GetFactRaw(1) != "a" {
-		panic("Sub card doesn't have parent as the answer.")
-	}
-}
-
 func TestInsertCard(t *testing.T) {
 	d := NewDeck()
-	if c, err := NewCard("", f5); err != nil {
+	if c, err := NewCards("", f5); err != nil {
       panic("Should not error new card.")
    } else {
-      if e := d.InsertCard(c, 5); e != nil    { panic("Should have inserted.") }
-      if d.TopCard().HashStr() != c.HashStr() { panic("Card not inserted.") }
+      if e := d.InsertCard(c[0], 5); e != nil    { panic("Should have inserted.") }
+      if d.TopCard().HashStr() != c[0].HashStr() { panic("Card not inserted.") }
    }
 
-	if c, err := NewCard("", f3); err != nil {
+	if c, err := NewCards("", f3); err != nil {
       panic("Should not error new card.")
    } else {
-      if e := d.InsertCard(c, 0); e != nil    { panic("Should have inserted.") }
-      if d.TopCard().HashStr() != c.HashStr() { panic("Card not inserted.") }
+      if e := d.InsertCard(c[0], 0); e != nil    { panic("Should have inserted.") }
+      if d.TopCard().HashStr() != c[0].HashStr() { panic("Card not inserted.") }
    }
 
-	if c, err := NewCard("", f2); err != nil {
+	if c, err := NewCards("", f2); err != nil {
       panic("Should not error new card.")
    } else {
-      if e := d.InsertCard(c, -100); e != nil    { panic("Should have inserted.") }
-      if d.TopCard().HashStr() != c.HashStr() { panic("Card not inserted.") }
+      if e := d.InsertCard(c[0], -100); e != nil    { panic("Should have inserted.") }
+      if d.TopCard().HashStr() != c[0].HashStr() { panic("Card not inserted.") }
    }
 }
 
 func TestDoubleInsertCard(t *testing.T) {
 	d := NewDeck()
-	c1, _ := NewCard("file1", f3)
-	c2, _ := NewCard("file2", f3)
-   d.InsertCard(c1, 10)
-   if err := d.InsertCard(c2, -10); err == nil || d.Len() != 1 {
+	c1, _ := NewCards("file1", f3)
+	c2, _ := NewCards("file2", f3)
+   d.InsertCard(c1[0], 10)
+   if err := d.InsertCard(c2[0], -10); err == nil || d.Len() != 1 {
       panic("Same card should have not been inserted twice!")
    }
 
-   if errs := d.AddCardFromSides("file3", f3, false); len(errs) != 1 {
+   if err := d.AddNewCards("file3", f3); err == nil || d.Len() != 1 {
       panic("Card already exists and should not have been added.")
    }
 }
 
-func createDeck(includeSubcards bool) *Deck {
+func createDeck() *Deck {
 	d := NewDeck()
-	d.AddCardFromSides("a", f1, includeSubcards)
-	d.AddCardFromSides("b", f2, includeSubcards)
-	d.AddCardFromSides("a", f3, includeSubcards)
-	d.AddCardFromSides("c", f4, includeSubcards)
-	d.AddCardFromSides("b", f5, includeSubcards)
+	d.AddNewCards("a", f1)
+	d.AddNewCards("b", f2)
+	d.AddNewCards("a", f3)
+	d.AddNewCards("c", f4)
+	d.AddNewCards("b", f5)
    return d
 }
 
 func TestSwap(t *testing.T) {
-	d := createDeck(false)
+	d := createDeck()
    if d.GetCard(0).String() != f1 && d.GetCard(1).String() != f2 {
       panic("Create deck doesn't have expected values.")
    }
@@ -270,7 +220,7 @@ func TestSwap(t *testing.T) {
 }
 
 func TestClone(t *testing.T) {
-   d1 := createDeck(false)
+   d1 := createDeck()
    d2 := NewDeck()
    d2.Clone(d1)
 
@@ -280,7 +230,7 @@ func TestClone(t *testing.T) {
 }
 
 func TestCopy(t *testing.T) {
-   d1 := createDeck(false)
+   d1 := createDeck()
    d2 := d1.Copy()
 
    if d1.GetHash(0) != d2.GetHash(0) || d1.GetHash(1) != d2.GetHash(1) {
@@ -289,7 +239,7 @@ func TestCopy(t *testing.T) {
 }
 
 func TestFilterNumber(t *testing.T) {
-   d := createDeck(true)
+   d := createDeck()
    d.FilterNumber(1)
    if d.Len() != 1 {
       panic("Should have filtered down to one.")
@@ -297,7 +247,7 @@ func TestFilterNumber(t *testing.T) {
 }
 
 func TestFilterMemorize(t *testing.T) {
-   d := createDeck(true)
+   d := createDeck()
    d.FilterOutMemorize()
    if d.Len() != 0 {
       panic("All were memorize.")
@@ -305,7 +255,7 @@ func TestFilterMemorize(t *testing.T) {
 }
 
 func TestTop(t *testing.T) {
-   d := createDeck(false)
+   d := createDeck()
 	m1 := NewMeta("2020-01-01T00:00:00Z", "0", "sm2", []string{"2.5"})
    d.AddMeta(d.TopHash(), m1)
 
@@ -325,7 +275,7 @@ func TestTop(t *testing.T) {
 }
 
 func TestFilterReview(t *testing.T) {
-   d := createDeck(true)
+   d := createDeck()
 	a := NewMeta("2020-01-01T00:00:00Z", "0", "sm2", []string{"2.5"})
    d.AddMeta(d.TopHash(), a)
 
@@ -339,7 +289,7 @@ func TestFilterReview(t *testing.T) {
 }
 
 func TestFilterDone(t *testing.T) {
-   d := createDeck(true)
+   d := createDeck()
 	a := NewDefaultMeta("sm2")
    a.Next = a.Next.AddDate(1,0,0)
    d.AddMetaIfNil(d.TopHash(), a)
@@ -352,12 +302,12 @@ func TestFilterDone(t *testing.T) {
       panic("There should have been one card done.")
    }
 
-   if err := d.Forget(12); err == nil {
-      panic("There is no 12 index. The highest is 11.")
+   if err := d.Forget(4); err == nil {
+      panic("There is no 4 index. The highest is 3.")
    }
 
-   if err := d.Forget(11); err != nil {
-      panic("11 should have been a valid index.")
+   if err := d.Forget(3); err != nil {
+      panic("3 should have been a valid index.")
    }
 }
 
@@ -411,24 +361,24 @@ func TestEsc(t *testing.T) {
    rawFirst := "in c, what is 1 \\| 2"
    escFirst := "in c, what is 1 | 2"
 
-	c, _ := NewCard("file1", raw)
-   if c.GetFactEsc(0) != escFirst {
+	c, _ := NewCards("file1", raw)
+   if c[0].GetFactEsc(0) != escFirst {
       panic("Fact not prettified/escaped.")
    }
 
-   if c.GetFactRaw(0) != rawFirst {
+   if c[0].GetFactRaw(0) != rawFirst {
       panic("Raw fact not what it was originally.")
    }
 
-   if c.GetFactRaw(-1) != "" || c.GetFactEsc(-1) != "" || c.GetFactRaw(2) != "" || c.GetFactEsc(2) != "" {
+   if c[0].GetFactRaw(-1) != "" || c[0].GetFactEsc(-1) != "" || c[0].GetFactRaw(2) != "" || c[0].GetFactEsc(2) != "" {
       panic("Out of bounds esc and raw facts didn't work.")
    }
 
-	if strings.Join(c.GetFactsRaw(), " | ") != raw {
+	if strings.Join(c[0].GetFactsRaw(), " | ") != raw {
       panic("Raw facts not preserved.")
    }
 
-	if strings.Join(c.GetFactsEsc(), " | ") != esc {
+	if strings.Join(c[0].GetFactsEsc(), " | ") != esc {
       panic("Esc facts not preserved.")
    }
 }
