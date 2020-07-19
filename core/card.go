@@ -35,7 +35,7 @@ func parseByWords(s string, wordFunc func(string)) {
 	}
 }
 
-func NewCard(file string, sides string) (*Card, error) {
+func NewCards(file string, sides string) (*Card, error) {
 	fact := []string{}
 	facts := [][]string{}
 
@@ -61,12 +61,13 @@ func NewCard(file string, sides string) (*Card, error) {
 	}
 }
 
+/*
 func (c *Card) GetSubCards() []*Card {
 	subCards := []*Card{}
 	question := c.GetFactRaw(0)
 	answers := c.GetFactsRaw()[1:]
 	for _, answer := range answers {
-		if sc, err := NewCard(c.file, fmt.Sprintf("%s %s %s", answer, CSep, question)); err == nil {
+		if sc, err := NewCards(c.file, fmt.Sprintf("%s %s %s", answer, CSep, question)); err == nil {
 			subCards = append(subCards, sc)
 		} else {
 			panic("Error: Sub card was not created due to bad parent card. This is a logic error and should be fixed.")
@@ -74,6 +75,7 @@ func (c *Card) GetSubCards() []*Card {
 	}
 	return subCards
 }
+*/
 
 func (c *Card) HasAnswer() bool {
 	return len(c.facts) > 1

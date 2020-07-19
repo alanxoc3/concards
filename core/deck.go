@@ -79,20 +79,12 @@ func (d *Deck) InsertCard(c *Card, i int) error {
 	}
 }
 
-func (d *Deck) AddCardFromSides(file string, sides string) []error {
-	errors := []error{}
-	if c, createErr := NewCard(file, sides); createErr == nil {
-		cards := []*Card{c}
-
-		for _, c := range cards {
-			if addErr := d.AddCard(c); addErr != nil {
-				errors = append(errors, addErr)
-			}
-		}
+func (d *Deck) AddNewCards(file string, sides string) error {
+	if c, err := NewCards(file, sides); err != nil {
+      return err
 	} else {
-		errors = append(errors, createErr)
-	}
-	return errors
+      return d.AddCard(c)
+   }
 }
 
 func (d *Deck) AddMeta(h string, m *Meta) {

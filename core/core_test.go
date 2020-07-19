@@ -43,7 +43,7 @@ func TestParse(t *testing.T) {
 }
 
 func TestCard(t *testing.T) {
-	c, err := NewCard("", f1)
+	c, err := NewCards("", f1)
 	if err != nil {
 		t.FailNow()
 	}
@@ -68,7 +68,7 @@ func TestCard(t *testing.T) {
 
 func TestDeck(t *testing.T) {
 	d := NewDeck()
-	d.AddCardFromSides("afile", f1)
+	d.AddNewCards("afile", f1)
 	if d.GetCard(0).GetFactRaw(0) != "hello there" {
 		t.Fail()
 	}
@@ -102,7 +102,7 @@ func TestDeck(t *testing.T) {
 	if !d.GetCard(0).HasAnswer() {
 		t.Fail()
 	}
-	d.AddCardFromSides("nofile", f1)
+	d.AddNewCards("nofile", f1)
 	if d.Len() != 1 {
 		t.Fail()
 	}
@@ -125,10 +125,10 @@ func TestDeck(t *testing.T) {
 
 func TestDeckMove(t *testing.T) {
 	d := NewDeck()
-	d.AddCardFromSides("afile", f1)
-	d.AddCardFromSides("afile", f2)
-	d.AddCardFromSides("afile", f3)
-	d.AddCardFromSides("afile", f4)
+	d.AddNewCards("afile", f1)
+	d.AddNewCards("afile", f2)
+	d.AddNewCards("afile", f3)
+	d.AddNewCards("afile", f4)
 	d.TopToEnd()
 	if d.TopCard().GetFactRaw(0) != "hello" {
 		panic("Bad moves")
@@ -160,21 +160,21 @@ func TestDeckMove(t *testing.T) {
 
 func TestInsertCard(t *testing.T) {
 	d := NewDeck()
-	if c, err := NewCard("", f5); err != nil {
+	if c, err := NewCards("", f5); err != nil {
       panic("Should not error new card.")
    } else {
       if e := d.InsertCard(c, 5); e != nil    { panic("Should have inserted.") }
       if d.TopCard().HashStr() != c.HashStr() { panic("Card not inserted.") }
    }
 
-	if c, err := NewCard("", f3); err != nil {
+	if c, err := NewCards("", f3); err != nil {
       panic("Should not error new card.")
    } else {
       if e := d.InsertCard(c, 0); e != nil    { panic("Should have inserted.") }
       if d.TopCard().HashStr() != c.HashStr() { panic("Card not inserted.") }
    }
 
-	if c, err := NewCard("", f2); err != nil {
+	if c, err := NewCards("", f2); err != nil {
       panic("Should not error new card.")
    } else {
       if e := d.InsertCard(c, -100); e != nil    { panic("Should have inserted.") }
@@ -184,25 +184,25 @@ func TestInsertCard(t *testing.T) {
 
 func TestDoubleInsertCard(t *testing.T) {
 	d := NewDeck()
-	c1, _ := NewCard("file1", f3)
-	c2, _ := NewCard("file2", f3)
+	c1, _ := NewCards("file1", f3)
+	c2, _ := NewCards("file2", f3)
    d.InsertCard(c1, 10)
    if err := d.InsertCard(c2, -10); err == nil || d.Len() != 1 {
       panic("Same card should have not been inserted twice!")
    }
 
-   if errs := d.AddCardFromSides("file3", f3); len(errs) != 1 {
+   if err := d.AddNewCards("file3", f3); err == nil || d.Len() != 1 {
       panic("Card already exists and should not have been added.")
    }
 }
 
 func createDeck() *Deck {
 	d := NewDeck()
-	d.AddCardFromSides("a", f1)
-	d.AddCardFromSides("b", f2)
-	d.AddCardFromSides("a", f3)
-	d.AddCardFromSides("c", f4)
-	d.AddCardFromSides("b", f5)
+	d.AddNewCards("a", f1)
+	d.AddNewCards("b", f2)
+	d.AddNewCards("a", f3)
+	d.AddNewCards("c", f4)
+	d.AddNewCards("b", f5)
    return d
 }
 
@@ -361,7 +361,7 @@ func TestEsc(t *testing.T) {
    rawFirst := "in c, what is 1 \\| 2"
    escFirst := "in c, what is 1 | 2"
 
-	c, _ := NewCard("file1", raw)
+	c, _ := NewCards("file1", raw)
    if c.GetFactEsc(0) != escFirst {
       panic("Fact not prettified/escaped.")
    }
