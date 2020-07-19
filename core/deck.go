@@ -80,10 +80,15 @@ func (d *Deck) InsertCard(c *Card, i int) error {
 }
 
 func (d *Deck) AddNewCards(file string, sides string) error {
-	if c, err := NewCards(file, sides); err != nil {
+	if cards, err := NewCards(file, sides); err != nil {
       return err
 	} else {
-      return d.AddCard(c)
+      for _, c := range cards {
+         if addErr := d.AddCard(c); addErr != nil {
+            err = addErr
+         }
+      }
+      return err
    }
 }
 

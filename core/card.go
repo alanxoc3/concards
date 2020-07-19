@@ -12,11 +12,13 @@ import (
 // All the keywords that concards treats special.
 const CEsc = "\\"
 const CSep = "|"
+const CRev = ":"
 const CBeg = "@>"
 const CEnd = "<@"
 
 var keyWords = map[string]bool {
    CSep: true,
+   CRev: true,
    CBeg: true,
    CEnd: true,
 }
@@ -35,27 +37,38 @@ func parseByWords(s string, wordFunc func(string)) {
 	}
 }
 
-func NewCards(file string, sides string) (*Card, error) {
+func createReverseCard(file string, facts [][]string) *Card {
+   return &Card{file, [][]string{facts[len(facts)-1], facts[0]}}
+}
+
+func NewCards(file string, sides string) ([]*Card, error) {
 	fact := []string{}
 	facts := [][]string{}
+   cards := []*Card{}
+   waitForReverse := false
+
+   // Add a separator to the end to not repeat logic.
+   sides = sides + " " + CSep
 
    parseByWords(sides, func(word string) {
-      if word == CSep {
+      if word == CSep || word == CRev {
          if len(fact) > 0 {
             facts = append(facts, fact)
             fact = []string{}
+
+            if waitForReverse {
+               cards = append(cards, createReverseCard(file, facts))
+            }
          }
+
+         waitForReverse = word == CRev
       } else if len(word) > 0 {
          fact = append(fact, word)
       }
    })
 
-	if len(fact) > 0 {
-		facts = append(facts, fact)
-	}
-
 	if len(facts) > 0 {
-		return &Card{file, facts}, nil
+      return append([]*Card{&Card{file, facts}}, cards...), nil
 	} else {
 		return nil, fmt.Errorf("Question not provided.")
 	}

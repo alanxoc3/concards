@@ -48,20 +48,20 @@ func TestCard(t *testing.T) {
 		t.FailNow()
 	}
 
-	txt := c.String()
+	txt := c[0].String()
 	if txt != "hello there | i'm a beard" {
 		t.Fail()
 	}
 
-	cardSum := fmt.Sprintf("%x", c.Hash())
+	cardSum := fmt.Sprintf("%x", c[0].Hash())
 
 	if fullSum != cardSum {
 		t.Fail()
 	}
-	if c.HashStr() != halfSum {
+	if c[0].HashStr() != halfSum {
 		t.Fail()
 	}
-	if !c.HasAnswer() {
+	if !c[0].HasAnswer() {
 		t.Fail()
 	}
 }
@@ -163,22 +163,22 @@ func TestInsertCard(t *testing.T) {
 	if c, err := NewCards("", f5); err != nil {
       panic("Should not error new card.")
    } else {
-      if e := d.InsertCard(c, 5); e != nil    { panic("Should have inserted.") }
-      if d.TopCard().HashStr() != c.HashStr() { panic("Card not inserted.") }
+      if e := d.InsertCard(c[0], 5); e != nil    { panic("Should have inserted.") }
+      if d.TopCard().HashStr() != c[0].HashStr() { panic("Card not inserted.") }
    }
 
 	if c, err := NewCards("", f3); err != nil {
       panic("Should not error new card.")
    } else {
-      if e := d.InsertCard(c, 0); e != nil    { panic("Should have inserted.") }
-      if d.TopCard().HashStr() != c.HashStr() { panic("Card not inserted.") }
+      if e := d.InsertCard(c[0], 0); e != nil    { panic("Should have inserted.") }
+      if d.TopCard().HashStr() != c[0].HashStr() { panic("Card not inserted.") }
    }
 
 	if c, err := NewCards("", f2); err != nil {
       panic("Should not error new card.")
    } else {
-      if e := d.InsertCard(c, -100); e != nil    { panic("Should have inserted.") }
-      if d.TopCard().HashStr() != c.HashStr() { panic("Card not inserted.") }
+      if e := d.InsertCard(c[0], -100); e != nil    { panic("Should have inserted.") }
+      if d.TopCard().HashStr() != c[0].HashStr() { panic("Card not inserted.") }
    }
 }
 
@@ -186,8 +186,8 @@ func TestDoubleInsertCard(t *testing.T) {
 	d := NewDeck()
 	c1, _ := NewCards("file1", f3)
 	c2, _ := NewCards("file2", f3)
-   d.InsertCard(c1, 10)
-   if err := d.InsertCard(c2, -10); err == nil || d.Len() != 1 {
+   d.InsertCard(c1[0], 10)
+   if err := d.InsertCard(c2[0], -10); err == nil || d.Len() != 1 {
       panic("Same card should have not been inserted twice!")
    }
 
@@ -362,23 +362,23 @@ func TestEsc(t *testing.T) {
    escFirst := "in c, what is 1 | 2"
 
 	c, _ := NewCards("file1", raw)
-   if c.GetFactEsc(0) != escFirst {
+   if c[0].GetFactEsc(0) != escFirst {
       panic("Fact not prettified/escaped.")
    }
 
-   if c.GetFactRaw(0) != rawFirst {
+   if c[0].GetFactRaw(0) != rawFirst {
       panic("Raw fact not what it was originally.")
    }
 
-   if c.GetFactRaw(-1) != "" || c.GetFactEsc(-1) != "" || c.GetFactRaw(2) != "" || c.GetFactEsc(2) != "" {
+   if c[0].GetFactRaw(-1) != "" || c[0].GetFactEsc(-1) != "" || c[0].GetFactRaw(2) != "" || c[0].GetFactEsc(2) != "" {
       panic("Out of bounds esc and raw facts didn't work.")
    }
 
-	if strings.Join(c.GetFactsRaw(), " | ") != raw {
+	if strings.Join(c[0].GetFactsRaw(), " | ") != raw {
       panic("Raw facts not preserved.")
    }
 
-	if strings.Join(c.GetFactsEsc(), " | ") != esc {
+	if strings.Join(c[0].GetFactsEsc(), " | ") != esc {
       panic("Esc facts not preserved.")
    }
 }
