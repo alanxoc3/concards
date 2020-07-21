@@ -120,9 +120,7 @@ func tbprintStatusbar(d *core.Deck) {
 }
 
 func displayHelpMode(color termbox.Attribute) {
-	str2 := "              Controls\n" +
-		"------------------------------------\n" +
-		"[d]elete: Remove card from session.\n" +
+	str2 := "[d]elete: Remove card from session.\n" +
 		"[e]dit:   Open card in editor.\n" +
 		"[f]orget: Reset card's progress.\n" +
 		"[h]elp:   Toggle this menu.\n" +
