@@ -126,16 +126,16 @@ func displayHelpMode(color termbox.Attribute) {
 		"[e]dit:   Open card in editor.\n" +
 		"[f]orget: Reset card's progress.\n" +
 		"[h]elp:   Toggle this menu.\n" +
-		"[k]now:   Exit the program.\n" +
+		"[k]now:   Ask again in 1000 years.\n" +
 		"[q]uit:   Exit the program.\n" +
 		"[r]edo:   Redo the undo.\n" +
 		"[s]kip:   Put the card at the end.\n" +
 		"[u]ndo:   Undo last action.\n" +
 		"[w]rite:  Write state to meta file.\n" +
 		"\n" +
-		"[1]: Not a clue.\n" +
-      "[2]: Sounds familiar.\n" +
-      "[3]: I know it!\n" +
+		"[1]: No!\n" +
+      "[2]: Idk!\n" +
+      "[3]: Yes!\n" +
 		"\n" +
       "[space,enter]: Reveal next side.\n"
 	// 12 lines, longest line is 36 characters
