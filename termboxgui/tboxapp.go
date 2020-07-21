@@ -65,6 +65,11 @@ func TermBoxRun(d *core.Deck, cfg *file.Config) error {
 					cardShown = 1
 					d.DelTop()
 					save(d)
+				} else if inp == "k" {
+					updateStatMsgAndCard(d, core.KNOW)
+					cardShown = 1
+					d.DelTop()
+					save(d)
 				} else if inp == "d" {
 					updateStatMsg("Deleted.", termbox.ColorYellow)
 					cardShown = 1

@@ -6,10 +6,13 @@ import "strings"
 
 type Know uint16
 
+var YearsToAddForKnown = 1000
+
 const (
 	NO  Know = iota
 	IDK      = iota
 	YES      = iota
+	KNOW     = iota
 )
 
 type Meta struct {
@@ -41,13 +44,23 @@ func (m *Meta) IsZero() bool {
 	return m.Next.IsZero() && m.Name == "" && m.Streak == 0 && len(m.Params) == 0
 }
 
+func (m *Meta) getKnowIt() *Meta {
+   newMeta := *m
+   newMeta.Next = m.Next.AddDate(YearsToAddForKnown, 0, 0)
+   return &newMeta
+}
+
 func (m *Meta) Exec(input Know) (*Meta, error) {
-	switch m.Name {
-	case "sm2":
-		return sm2Exec(*m, input), nil
-	default:
-		return m, fmt.Errorf("Algorithm doesn't exist")
-	}
+   if input == KNOW {
+      return m.getKnowIt(), nil
+   } else {
+      switch m.Name {
+      case "sm2":
+         return sm2Exec(*m, input), nil
+      default:
+         return m, fmt.Errorf("Algorithm doesn't exist")
+      }
+   }
 }
 
 func (m *Meta) NextStr() string {

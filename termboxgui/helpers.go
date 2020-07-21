@@ -122,21 +122,22 @@ func tbprintStatusbar(d *core.Deck) {
 func displayHelpMode(color termbox.Attribute) {
 	str2 := "              Controls\n" +
 		"------------------------------------\n" +
-		"e, EDIT   - the current card\n" +
-		"d, DELETE - delete the current card\n" +
-		"s, SKIP   - skips the current card\n" +
-		"f, FORGET - removes card's progress\n" +
-		"w, WRITE  - your cards to their files\n" +
-		"q, QUIT   - the program\n" +
-		"h, HELP   - toggle this menu\n" +
-		"u, UNDO   - you messed up\n" +
-		"r, REDO   - maybe not\n" +
+		"[d]elete: Remove card from session.\n" +
+		"[e]dit:   Open card in editor.\n" +
+		"[f]orget: Reset card's progress.\n" +
+		"[h]elp:   Toggle this menu.\n" +
+		"[k]now:   Exit the program.\n" +
+		"[q]uit:   Exit the program.\n" +
+		"[r]edo:   Redo the undo.\n" +
+		"[s]kip:   Put the card at the end.\n" +
+		"[u]ndo:   Undo last action.\n" +
+		"[w]rite:  Write state to meta file.\n" +
 		"\n" +
-		"1, INPUT 1 - Not a clue.\n" +
-		"2, INPUT 2 - Sounds familiar.\n" +
-		"3, INPUT 3 - I know it!\n" +
+		"[1]: Not a clue.\n" +
+      "[2]: Sounds familiar.\n" +
+      "[3]: I know it!\n" +
 		"\n" +
-		"<space> or <enter> - reveal card\n"
+      "[space,enter]: Reveal next side.\n"
 	// 12 lines, longest line is 36 characters
 
 	w, h := termbox.Size()
@@ -175,14 +176,17 @@ func updateStatMsgAndCard(d *core.Deck, k core.Know) {
 
 	if k == core.NO {
 		m, _ = m.Exec(core.NO)
-		updateStatMsg("Not a clue, card put to the back of the pile.", termbox.ColorRed)
+		updateStatMsg("No! Try again soon.", termbox.ColorRed)
 	} else if k == core.IDK {
 		m, _ = m.Exec(core.IDK)
-		updateStatMsg("Sounds familiar, card put to the back of the pile.", termbox.ColorYellow)
+		updateStatMsg("Idk! Try again in a bit.", termbox.ColorYellow)
 	} else if k == core.YES {
 		m, _ = m.Exec(core.YES)
 		time := m.Next.Format("Mon 2 Jan 2006 @ 15:04")
-		updateStatMsg(fmt.Sprintf("I know it! Next review is %s.", time), termbox.ColorCyan)
+		updateStatMsg(fmt.Sprintf("Yes! Next review is %s.", time), termbox.ColorCyan)
+	} else if k == core.KNOW {
+		m, _ = m.Exec(core.KNOW)
+		updateStatMsg(fmt.Sprintf("Known! Next review is %d years from now.", core.YearsToAddForKnown), termbox.ColorCyan)
 	}
 
 	d.AddMeta(h, m)
