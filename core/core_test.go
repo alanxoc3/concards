@@ -312,45 +312,35 @@ func TestFilterDone(t *testing.T) {
 }
 
 func TestSm2Exec(t *testing.T) {
-   // Testing NO.
-	a := NewMeta("2020-01-01T00:00:00Z", "1", "sm2", []string{"2.5"})
-   a, _ = a.Exec(NO)
-   if a.Params[0] != "1.96" {
-      panic("Sm2 returned the wrong weight.")
-   }
-
-   // Testing NO, streak go down.
-	a = NewMeta("2020-01-01T00:00:00Z", "-3", "sm2", []string{"2.5"})
-   a, _ = a.Exec(NO)
-   if a.Params[0] != "1.96" && a.Streak != -4 {
-      panic("Sm2 returned the wrong weight.")
-   }
-
-   // Testing IDK.
-	a = NewMeta("2020-01-01T00:00:00Z", "1", "sm2", []string{"2.5"})
-   a, _ = a.Exec(IDK)
-   if a.Params[0] != "2.36" {
-      panic("Sm2 returned the wrong weight.")
-   }
+   d := createDeck()
 
    // Testing YES.
-	a = NewMeta("2020-01-01T00:00:00Z", "3", "sm2", []string{"2.5"})
-   a, _ = a.Exec(YES)
-   if a.Params[0] != "2.60" {
+	d.AddMeta(d.TopHash(), NewMeta("2020-01-01T00:00:00Z", "3", "sm2", []string{"2.5"}))
+   if a, _ := d.ExecTop(true, "sm2"); a.Params[0] != "2.60" {
       panic("Sm2 returned the wrong weight.")
    }
 
    // Testing YES, negative streak.
-	a = NewMeta("2020-01-01T00:00:00Z", "-1", "sm2", []string{"2.5"})
-   a, _ = a.Exec(YES)
-   if a.Params[0] != "2.50" {
+	d.AddMeta(d.TopHash(), NewMeta("2020-01-01T00:00:00Z", "-1", "sm2", []string{"2.5"}))
+   if a, _ := d.ExecTop(true, "sm2"); a.Params[0] != "2.50" {
+      panic("Sm2 returned the wrong weight.")
+   }
+
+   // Testing NO.
+   d.AddMeta(d.TopHash(), NewMeta("2020-01-01T00:00:00Z", "1", "sm2", []string{"2.5"}))
+   if a, _ := d.ExecTop(false, "sm2"); a.Params[0] != "1.96" {
+      panic("Sm2 returned the wrong weight.")
+   }
+
+   // Testing NO, streak go down.
+   d.AddMeta(d.TopHash(), NewMeta("2020-01-01T00:00:00Z", "-3", "sm2", []string{"2.5"}))
+   if a, _ := d.ExecTop(false, "sm2"); a.Params[0] != "1.96" && a.Streak != -4 {
       panic("Sm2 returned the wrong weight.")
    }
 
    // Should not go lower than the lowest weight.
-	a = NewMeta("2020-01-01T00:00:00Z", "1", "sm2", []string{"1.3"})
-   a, _ = a.Exec(NO)
-   if a.Params[0] != "1.30" {
+	d.AddMeta(d.TopHash(), NewMeta("2020-01-01T00:00:00Z", "1", "sm2", []string{"1.3"}))
+   if a, _ := d.ExecTop(false, "sm2"); a.Params[0] != "1.30" {
       panic("Sm2 returned the wrong weight.")
    }
 }

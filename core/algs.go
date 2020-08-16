@@ -1,65 +1,55 @@
 package core
 
 import (
-	"fmt"
-	"time"
+   "fmt"
+   "time"
+   "math"
+   "math/rand"
 )
 
-// Implementing the SM2 algorithm.
-func sm2Exec(s Meta, input Know) *Meta {
-	// Input defaults.
-	var rank float32 = 2.5
-	if len(s.Params) > 0 {
-		rank = floatOrDefault(s.Params[0], rank)
-	}
+// SM2 Algorithm
+// Returns meta & location to put card in deck.
+func sm2Exec(m MetaHist) *MetaAlg {
+   ac := m.GetAnswerCategory(input)
 
-	// Sm2 Logic
-	var q float32
-	s.Next = time.Now()
+   // Rank Logic
+   var rank float32 = 2.5
+   if len(m.Params) > 0 {
+      rank = floatOrDefault(m.Params[0], rank)
+   }
 
-	if input == NO {
-		q = 1
-	} else if input == IDK {
-		q = 3
-	} else if input == YES {
-		q = 5
-	}
+   switch ac {
+      case YesWasYes: rank += .10
+      case YesWasNo:  rank += .03
+      case NoWasYes:  rank -= .32
+      case NoWasNo:   rank -= .05
+   }
 
-	if s.Streak > 0 {
-		rank += -.8 + .28*q - .02*q*q
-	}
+   rank = math.Max(1.3, rank)
+   m.Params = []string{fmt.Sprintf("%.2f", rank)}
 
-	if rank < 1.3 {
-		rank = 1.3
-	}
+   // Next Day Logic
+   if ac == YesWasYes {
+      nextDay := float32(1.0)
+      if m.Streak < 0 { panic("Logic error with concards! Please make an issue on github.") }
 
-	if input == YES {
-		nextDay := float32(1.0)
+      if m.Streak > 0 {
+         nextDay += 5
+      }
 
-		if s.Streak < 0 {
-			s.Streak = 0
-		}
+      if m.Streak >= 2 {
+         for i := 2; i <= m.Streak; i++ {
+            nextDay *= rank
+         }
+      }
 
-		if s.Streak >= 1 {
-			nextDay += 5
-		}
+      // 3 extra days for randomness.
+      m.Next = m.Next.Add(time.Day*nextDay + time.Second * rand.Intn(86400*3))
+   } else if ac == YesWasNo {
+      m.Next = m.Next.Add(time.Minute*5 + time.Second*rand.Intn(120))
+   } else {
+      m.Next = m.Next.Add(time.Minute + time.Second*rand.Intn(60))
+   }
 
-		if s.Streak >= 2 {
-			for i := 2; i <= s.Streak; i++ {
-				nextDay *= rank
-			}
-		}
-
-		s.Streak++
-		s.Next = time.Now().AddDate(0, 0, int(nextDay))
-	} else {
-		if s.Streak > 0 {
-			s.Streak = -1
-		} else if s.Streak < 0 {
-			s.Streak -= 1
-		}
-	}
-
-	s.Params = []string{fmt.Sprintf("%.2f", rank)}
-	return &s
+   return m
 }

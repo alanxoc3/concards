@@ -51,24 +51,12 @@ func TermBoxRun(d *core.Deck, cfg *file.Config) error {
 				}
 			} else if !helpMode {
 				if inp == "1" {
-					updateStatMsgAndCard(d, core.NO)
+					updateStatMsgAndCard(d, false)
 					cardShown = 1
-					d.TopTo(3)
 					save(d)
 				} else if inp == "2" {
-					updateStatMsgAndCard(d, core.IDK)
+					updateStatMsgAndCard(d, true)
 					cardShown = 1
-					d.TopTo(6)
-					save(d)
-				} else if inp == "3" {
-					updateStatMsgAndCard(d, core.YES)
-					cardShown = 1
-					d.DelTop()
-					save(d)
-				} else if inp == "k" {
-					updateStatMsgAndCard(d, core.KNOW)
-					cardShown = 1
-					d.DelTop()
 					save(d)
 				} else if inp == "d" {
 					updateStatMsg("Deleted.", termbox.ColorYellow)

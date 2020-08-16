@@ -4,63 +4,96 @@ import "time"
 import "fmt"
 import "strings"
 
-type Know uint16
-
-var YearsToAddForKnown = 1000
+type AnswerCategory uint8
 
 const (
-	NO  Know = iota
-	IDK      = iota
-	YES      = iota
-	KNOW     = iota
+    YesWasYes AnswerCategory = 1 << iota
+    YesWasNo
+    NoWasYes
+    NoWasNo
 )
 
-type Meta struct {
+type MetaBase {
 	Next   time.Time
 	Streak int
-	Name   string
+	Curr   time.Time
+}
+
+type MetaAlg struct {
+   *MetaBase
 	Params []string
+	Name   string
 }
 
-func NewMeta(ts string, streak string, name string, params []string) *Meta {
-	return &Meta{
-		Next:   timeOrNow(ts),
+type MetaHist struct {
+   *MetaBase
+   Target bool
+}
+
+func NewMetaBase(next string, streak string) *Meta {
+	return &MetaBase{
+      Next: timeOrNow(next),
 		Streak: intOrDefault(streak, 0),
-		Name:   name,
-		Params: params,
+      Curr: time.Now(),
 	}
 }
 
-func NewDefaultMeta(name string) *Meta {
+func NewMetaAlg(next string, streak string, name string, params []string) *Meta {
 	return &Meta{
-		Next:   time.Now(),
-		Streak: 0,
-		Name:   name,
-		Params: []string{},
+      MetaBase: NewMetaBase(next, streak)
+      Params: params,
+		Name: name,
 	}
+}
+
+func NewMetaHist(next string, streak string, bool target) *Meta {
+	return &Meta{
+      MetaBase: NewMetaBase(next, streak)
+      Target: target,
+	}
+}
+
+func NewDefaultMetaAlg(name string) *Meta {
+	return &Meta{
+      MetaBase: NewMetaBase(time.Now, 0),
+      Params: []string{},
+		Name: name,
+	}
+}
+
+func (m *Meta) Exec(input bool) *Meta, error {
+   nm := &Meta{}
+   *nm = *m
+
+   // Save the current time for logging & not saving the current time multiple times.
+   nm.Next = time.Now()
+   switch nm.Name {
+      case "sm2": nm = sm2Exec(nm, input)
+      default: return m, fmt.Errorf("Algorithm doesn't exist.")
+   }
+
+   // Streak Logic
+   switch nm.GetAnswerCategory() {
+      case YesWasYes: nm.Streak++
+      case NoWasNo:   nm.Streak--
+      default: nm.Streak=0
+   }
+
+   return nm, nil
+}
+
+func (m *Meta) GetAnswerCategory(input bool) AnswerCategory {
+   if input {
+      if m.Streak < 0 { return YesWasNo }
+      else { return YesWasYes }
+   } else {
+      if m.Streak > 0 { return NoWasYes }
+      else { return NoWasNo }
+   }
 }
 
 func (m *Meta) IsZero() bool {
 	return m.Next.IsZero() && m.Name == "" && m.Streak == 0 && len(m.Params) == 0
-}
-
-func (m *Meta) getKnowIt() *Meta {
-   newMeta := *m
-   newMeta.Next = m.Next.AddDate(YearsToAddForKnown, 0, 0)
-   return &newMeta
-}
-
-func (m *Meta) Exec(input Know) (*Meta, error) {
-   if input == KNOW {
-      return m.getKnowIt(), nil
-   } else {
-      switch m.Name {
-      case "sm2":
-         return sm2Exec(*m, input), nil
-      default:
-         return m, fmt.Errorf("Algorithm doesn't exist")
-      }
-   }
 }
 
 func (m *Meta) NextStr() string {

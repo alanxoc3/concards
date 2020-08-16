@@ -166,28 +166,14 @@ func tbprintStatMsg() {
 	tbprint(0, h-1, statMsgCol, color, statMsg)
 }
 
-func updateStatMsgAndCard(d *core.Deck, k core.Know) {
-	h, _, m := d.Top()
-	if m == nil {
-		m = core.NewDefaultMeta("sm2")
-	}
-
-	if k == core.NO {
-		m, _ = m.Exec(core.NO)
-		updateStatMsg("No! Try again soon.", termbox.ColorRed)
-	} else if k == core.IDK {
-		m, _ = m.Exec(core.IDK)
-		updateStatMsg("Idk! Try again in a bit.", termbox.ColorYellow)
-	} else if k == core.YES {
-		m, _ = m.Exec(core.YES)
+func updateStatMsgAndCard(d *core.Deck, input bool) {
+   m = d.ExecTop(input, "sm2")
+	if input {
 		time := m.Next.Format("Mon 2 Jan 2006 @ 15:04")
 		updateStatMsg(fmt.Sprintf("Yes! Next review is %s.", time), termbox.ColorCyan)
-	} else if k == core.KNOW {
-		m, _ = m.Exec(core.KNOW)
-		updateStatMsg(fmt.Sprintf("Known! Next review is %d years from now.", core.YearsToAddForKnown), termbox.ColorCyan)
+	} else {
+		updateStatMsg("No! Try again soon.", termbox.ColorRed)
 	}
-
-	d.AddMeta(h, m)
 }
 
 func updateStatMsg(msg string, color termbox.Attribute) {

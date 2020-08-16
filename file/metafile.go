@@ -48,10 +48,10 @@ func ReadMetasToDeckHelper(r io.Reader, d *core.Deck) {
 
 func WriteMetasToString(d *core.Deck) (fileStr string) {
 	// Copy keys
-	keys := make([]string, len(d.Mmap))
+	keys := make([]string, len(d.MetaMap))
 
 	i := 0
-	for k := range d.Mmap {
+	for k := range d.MetaMap {
 		keys[i] = k
 		i++
 	}
@@ -61,7 +61,7 @@ func WriteMetasToString(d *core.Deck) (fileStr string) {
 
 	// Create string
 	for _, k := range keys {
-		m := d.Mmap[k]
+		m := d.MetaMap[k]
 		if m != nil && m.String() != "" {
 			fileStr += k + " " + m.String() + "\n"
 		}
