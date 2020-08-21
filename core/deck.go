@@ -1,6 +1,7 @@
 package core
 
 import "fmt"
+import "sort"
 
 func removeIndex(s []string, index int) []string {
    return append(s[:index], s[index+1:]...)
@@ -108,11 +109,11 @@ func (d *Deck) AddNewCards(file string, sides string) error {
    }
 }
 
-func (d *Deck) AddMeta(h string, m *Meta) {
+func (d *Deck) AddMeta(h string, m *MetaAlg) {
    d.MetaMap[h] = m
 }
 
-func (d *Deck) AddMetaIfNil(h string, m *Meta) {
+func (d *Deck) AddMetaIfNil(h string, m *MetaAlg) {
    if _, ok := d.MetaMap[h]; !ok {
       d.AddMeta(h, m)
    }
@@ -130,7 +131,7 @@ func (d *Deck) Swap(i, j int) {
    d.refs[i], d.refs[j] = d.refs[j], d.refs[i]
 }
 
-func (d *Deck) Get(i int) (h string, c *Card, m *Meta) {
+func (d *Deck) Get(i int) (h string, c *Card, m *MetaAlg) {
    if i >= 0 && i < d.Len() {
       h = d.refs[i]
       c = d.refsMap[h]
@@ -149,7 +150,7 @@ func (d *Deck) GetCard(i int) (c *Card) {
    return
 }
 
-func (d *Deck) GetMeta(i int) (m *Meta) {
+func (d *Deck) GetMeta(i int) (m *MetaAlg) {
    _, _, m = d.Get(i)
    return
 }
@@ -171,7 +172,7 @@ func (d *Deck) Copy() *Deck {
 func (d *Deck) Clone(o *Deck) {
    d.refs = []string{}
    d.refsMap = map[string]*Card{}
-   d.MetaMap = map[string]*Meta{}
+   d.MetaMap = map[string]*MetaAlg{}
 
    for _, v := range o.refs {
       d.refs = append(d.refs, v)
@@ -185,18 +186,18 @@ func (d *Deck) Clone(o *Deck) {
 }
 
 // Top shortcuts
-func (d *Deck) Top() (string, *Card, *Meta) { return d.Get(0) }
-func (d *Deck) TopHash() string             { return d.GetHash(0) }
-func (d *Deck) TopCard() *Card              { return d.GetCard(0) }
-func (d *Deck) TopMeta() *Meta              { return d.GetMeta(0) }
-func (d *Deck) DropTop() error              { return d.Drop(0) }
-func (d *Deck) DelayTop() error             { return d.Delay(0) }
-func (d *Deck) ForgetTop() error            { return d.Forget(0) }
+func (d *Deck) Top() (string, *Card, *MetaAlg) { return d.Get(0) }
+func (d *Deck) TopHash() string                { return d.GetHash(0) }
+func (d *Deck) TopCard() *Card                 { return d.GetCard(0) }
+func (d *Deck) TopMeta() *MetaAlg              { return d.GetMeta(0) }
+func (d *Deck) DropTop() error                 { return d.Drop(0) }
+func (d *Deck) DelayTop() error                { return d.Delay(0) }
+func (d *Deck) ForgetTop() error               { return d.Forget(0) }
 
-func (d *Deck) TopMetaOrDefault(defaultAlg string) *Meta {
-   m := TopMeta()
+func (d *Deck) TopMetaOrDefault(defaultAlg string) *MetaAlg {
+   m := d.TopMeta()
    if m == nil {
-      return core.NewDefaultMeta(defaultAlg)
+      return NewDefaultMetaAlg(defaultAlg)
    }
    return m
 }
@@ -204,7 +205,7 @@ func (d *Deck) TopMetaOrDefault(defaultAlg string) *Meta {
 func (d *Deck) ExecTop(input bool, defaultAlg string) (*MetaAlg, error) {
    h := d.TopHash()
 
-   if ma, e := d.TopMetaOrDefault(defaultAlg).Exec(input); e != nil {
+   if ma, e := d.TopMetaOrDefault(defaultAlg).Exec(h, input); e != nil {
       d.DropTop()
       return nil, e
    } else {

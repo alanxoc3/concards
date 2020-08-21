@@ -8,6 +8,12 @@ import (
 	"strconv"
 )
 
+type AlgInfo struct {
+   Next   time.Time
+   Name   string
+   Params []string
+}
+
 func floatOrDefault(str string, def float64) float64 {
 	if x, err := strconv.ParseFloat(str, 64); err != nil {
 		return def
@@ -18,7 +24,7 @@ func floatOrDefault(str string, def float64) float64 {
 
 // SM2 Algorithm
 // Returns meta & location to put card in deck.
-func sm2Exec(mh MetaHist, ma MetaAlg) *MetaAlg {
+func sm2Exec(mh MetaHist, ma MetaAlg) *AlgInfo {
    const maxPeriod float64 = float64(time.Hour*24*365*100)
    const randPercentage float64 = .1
 
@@ -64,7 +70,9 @@ func sm2Exec(mh MetaHist, ma MetaAlg) *MetaAlg {
    period = math.Min(period * (1 + rand.Float64()*randPercentage), maxPeriod)
 
    // The "Next" on meta history should represent "time.Now".
-   ma.Next = mh.Next.Add(time.Duration(period))
-   ma.Params = []string{fmt.Sprintf("%.2f", rank)}
-   return &ma
+   return &AlgInfo{
+      Next: mh.Next.Add(time.Duration(period)),
+      Name: "sm2",
+      Params: []string{fmt.Sprintf("%.2f", rank)}
+   }
 }

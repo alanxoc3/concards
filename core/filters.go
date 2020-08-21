@@ -7,7 +7,7 @@ type predicate func(int) bool
 func (d *Deck) filter(p predicate) {
 	for i := len(d.refs) - 1; i >= 0; i-- {
 		if p(i) {
-			d.Del(i)
+			d.Drop(i)
 		}
 	}
 }

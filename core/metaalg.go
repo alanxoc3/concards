@@ -26,10 +26,11 @@ func NewDefaultMetaAlg(name string) *MetaAlg {
    }
 }
 
-func (m *MetaAlg) Exec(input bool) (*MetaAlg, error) {
+func (m *MetaAlg) Exec(hash string, input bool) (*MetaAlg, error) {
    ma := &MetaAlg{}
+   // gotta clone this
    *ma = *m
-   mh := NewMetaHistFromMetaAlg(m)
+   mh := NewMetaHistFromMetaAlg(hash, m, input)
 
    // Save the current time for logging & not saving the current time multiple times.
    switch ma.Name {
@@ -38,7 +39,7 @@ func (m *MetaAlg) Exec(input bool) (*MetaAlg, error) {
    }
 
    // Streak Logic
-   switch ma.GetAnswerCategory() {
+   switch mh.GetAnswerCategory() {
       case YesWasYes: ma.Streak++
       case NoWasNo:   ma.Streak--
       default: ma.Streak=0
