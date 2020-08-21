@@ -14,7 +14,7 @@ type Deck struct {
    reviews []string // Hashes you have reviewed. Ordered by date.
    refsMap map[string]*Card // All cards in this session.
    metaHist []MetaHist // Meta history.
-   MetaMap map[string]*Meta // All metas.
+   MetaMap map[string]*MetaAlg // All metas.
 }
 
 func NewDeck() *Deck {
@@ -201,7 +201,7 @@ func (d *Deck) TopMetaOrDefault(defaultAlg string) *Meta {
    return m
 }
 
-func (d *Deck) ExecTop(input bool, defaultAlg string) *MetaAlg, error {
+func (d *Deck) ExecTop(input bool, defaultAlg string) (*MetaAlg, error) {
    h := d.TopHash()
 
    if ma, e := d.TopMetaOrDefault(defaultAlg).Exec(input); e != nil {

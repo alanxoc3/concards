@@ -26,7 +26,7 @@ func NewDefaultMetaAlg(name string) *MetaAlg {
    }
 }
 
-func (m *MetaAlg) Exec(input bool) *MetaAlg, error {
+func (m *MetaAlg) Exec(input bool) (*MetaAlg, error) {
    ma := &MetaAlg{}
    *ma = *m
    mh := NewMetaHistFromMetaAlg(m)

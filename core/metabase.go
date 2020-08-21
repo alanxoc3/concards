@@ -1,10 +1,8 @@
 package core
 
 import "time"
-import "fmt"
-import "strings"
 
-type MetaBase {
+type MetaBase struct {
    Next   time.Time
    Curr   time.Time
    Streak int
