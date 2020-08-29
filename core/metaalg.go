@@ -1,71 +1,76 @@
 package core
 
-import "time"
 import "fmt"
-import "strings"
 
 type MetaAlg struct {
-   *MetaBase
+   MetaBase
    Name   string
-   Params []string
 }
 
-func NewMetaAlgFromStrings(next string, curr string, streak string, name string, params []string) *MetaAlg {
+func NewMetaAlgFromStrings(strs []string) *MetaAlg {
    return &MetaAlg {
-      MetaBase: NewMetaBaseFromStrings(next, curr, streak),
-      Name: name,
-      Params: params,
+      MetaBase: *NewMetaBase(strs),
+      Name: getParam(strs, 5),
    }
 }
 
 func NewDefaultMetaAlg(name string) *MetaAlg {
    return &MetaAlg {
-      MetaBase: &MetaBase{time.Now(), time.Now(), 0},
+      MetaBase: *NewMetaBase([]string{}),
       Name: name,
-      Params: []string{},
+   }
+}
+
+func NewMetaAlg(ai *AlgInfo, mh *MetaHist) *MetaAlg {
+   // Yes/No count
+   yesCount := mh.YesCount
+   noCount := mh.NoCount
+   if mh.Target {
+      yesCount++
+   } else {
+      noCount++
+   }
+
+   // Streak Logic
+   streak := mh.Streak
+   switch mh.GetAnswerCategory() {
+      case YesWasYes: streak++
+      case NoWasNo:   streak--
+      default: streak=0
+   }
+
+   return &MetaAlg{
+      MetaBase{
+         ai.Next,
+         mh.Next,
+         yesCount,
+         noCount,
+         streak,
+      }, ai.Name,
    }
 }
 
 func (m *MetaAlg) Exec(hash string, input bool) (*MetaAlg, error) {
-   ma := &MetaAlg{}
-   // gotta clone this
-   *ma = *m
    mh := NewMetaHistFromMetaAlg(hash, m, input)
 
    // Save the current time for logging & not saving the current time multiple times.
-   switch ma.Name {
-      case "sm2": ma = sm2Exec(*mh, *m)
-      default: return m, fmt.Errorf("Algorithm doesn't exist.")
+   var ai AlgInfo
+   if algFunc, exists := Algs[m.Name]; exists {
+      ai = algFunc(*mh)
+   } else {
+      return nil, fmt.Errorf("Algorithm doesn't exist.")
    }
 
-   // Streak Logic
-   switch mh.GetAnswerCategory() {
-      case YesWasYes: ma.Streak++
-      case NoWasNo:   ma.Streak--
-      default: ma.Streak=0
-   }
-
-   return ma, nil
+   return NewMetaAlg(&ai, mh), nil
 }
 
 func (m *MetaAlg) IsZero() bool {
-   return m.Next.IsZero() && m.Name == "" && m.Streak == 0 && len(m.Params) == 0
-}
-
-func (m *MetaAlg) ParamsStr() string {
-   return strings.Join(m.Params, " ")
+   return m.MetaBase.IsZero() && m.Name == ""
 }
 
 func (m *MetaAlg) String() (s string) {
    if !m.IsZero() {
-      s = fmt.Sprintf("%s %d", m.NextStr(), m.Streak)
-
-      if m.Name != "" {
-         s += " " + m.Name
-         if ps := m.ParamsStr(); ps != "" {
-            s += " " + ps
-         }
-      }
+      s = fmt.Sprintf("%s %s", m.MetaBase.String(), m.Name)
    }
 
    return

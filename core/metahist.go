@@ -1,9 +1,5 @@
 package core
 
-import "time"
-import "fmt"
-import "strings"
-
 type AnswerCategory uint8
 
 const (
@@ -15,14 +11,14 @@ const (
 
 type MetaHist struct {
    Hash string
-   *MetaBase
+   MetaBase
    Target bool
 }
 
 func NewMetaHistFromMetaAlg(hash string, ma *MetaAlg, target bool) *MetaHist {
    return &MetaHist{
       Hash: hash,
-      MetaBase: NewMetaBase(time.Now(), ma.Curr, ma.Streak),
+      MetaBase: MetaBase{},
       Target: target,
    }
 }

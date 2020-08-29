@@ -1,17 +1,21 @@
 package core
 
 import (
-   "fmt"
    "time"
    "math"
    "math/rand"
 	"strconv"
 )
 
+type AlgFunc func(MetaHist) AlgInfo
+
+var Algs = map[string]AlgFunc{
+   "sm2": sm2Exec,
+}
+
 type AlgInfo struct {
    Next   time.Time
    Name   string
-   Params []string
 }
 
 func floatOrDefault(str string, def float64) float64 {
@@ -22,42 +26,32 @@ func floatOrDefault(str string, def float64) float64 {
 	}
 }
 
+// If streak = 0, curr 0. prev + or -.
+// If streak > 0, curr +. prev 0 or +.
+// If streak < 0, curr -. prev 0 or -.
+
 // SM2 Algorithm
 // Returns meta & location to put card in deck.
-func sm2Exec(mh MetaHist, ma MetaAlg) *AlgInfo {
+func sm2Exec(mh MetaHist) AlgInfo {
    const maxPeriod float64 = float64(time.Hour*24*365*100)
    const randPercentage float64 = .1
 
    ac := mh.GetAnswerCategory()
    period := 0.0
-   rank := 2.5
-
-   // Rank Logic
-   if len(ma.Params) > 0 {
-      rank = floatOrDefault(ma.Params[0], rank)
-   }
-
-   switch ac {
-      case YesWasYes: rank += .10
-      case YesWasNo:  rank += .03
-      case NoWasYes:  rank -= .32
-      case NoWasNo:   rank -= .05
-   }
-
-   rank = math.Max(1.3, rank)
+   rank := math.Max(1.3, 2.5 + .1*float64(mh.YesCount) - .3*float64(mh.NoCount) + .05*float64(mh.Streak))
 
    // Next Day Logic
    if ac == YesWasYes {
-      if ma.Streak < 0 {
+      if mh.Streak < 0 {
          panic("Logic error with concards! Please make an issue on github.")
-      } else if ma.Streak == 0 {
+      } else if mh.Streak == 0 {
          period += float64(time.Hour*24)
       } else {
          period += float64(time.Hour*24*6)
       }
 
-      if ma.Streak >= 2 {
-         for i := 2; i <= ma.Streak; i++ {
+      if mh.Streak >= 2 {
+         for i := 2; i <= mh.Streak; i++ {
             period *= rank
          }
       }
@@ -70,9 +64,8 @@ func sm2Exec(mh MetaHist, ma MetaAlg) *AlgInfo {
    period = math.Min(period * (1 + rand.Float64()*randPercentage), maxPeriod)
 
    // The "Next" on meta history should represent "time.Now".
-   return &AlgInfo{
+   return AlgInfo{
       Next: mh.Next.Add(time.Duration(period)),
       Name: "sm2",
-      Params: []string{fmt.Sprintf("%.2f", rank)}
    }
 }

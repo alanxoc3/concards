@@ -61,7 +61,7 @@ func TermBoxRun(d *core.Deck, cfg *file.Config) error {
 				} else if inp == "d" {
 					updateStatMsg("Deleted.", termbox.ColorYellow)
 					cardShown = 1
-					d.DelTop()
+					d.DropTop()
 					save(d)
 				} else if inp == "f" {
 					updateStatMsg("Forgotten.", termbox.ColorYellow)

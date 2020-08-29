@@ -167,8 +167,10 @@ func tbprintStatMsg() {
 }
 
 func updateStatMsgAndCard(d *core.Deck, input bool) {
-   m = d.ExecTop(input, "sm2")
-	if input {
+   m, err := d.ExecTop(input, "sm2")
+   if err != nil {
+      updateStatMsg("Problem reading the card :(.", termbox.ColorRed)
+   } else if input {
 		time := m.Next.Format("Mon 2 Jan 2006 @ 15:04")
 		updateStatMsg(fmt.Sprintf("Yes! Next review is %s.", time), termbox.ColorCyan)
 	} else {
