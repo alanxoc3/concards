@@ -5,6 +5,7 @@ import "time"
 import "strconv"
 
 type MetaBase struct {
+   Hash     string
    Next     time.Time
    Curr     time.Time
    YesCount int
@@ -39,11 +40,12 @@ func timeOrNow(str string) time.Time {
 func NewMetaBase(strs []string) *MetaBase {
    mb := &MetaBase{}
 
-   mb.Next     = timeOrNow(getParam(strs, 0))
-   mb.Curr     = timeOrNow(getParam(strs, 1))
-   mb.YesCount = intOrZero(getParam(strs, 2))
-   mb.NoCount  = intOrZero(getParam(strs, 3))
-   mb.Streak   = intOrZero(getParam(strs, 4))
+   mb.Hash     = getParam(strs, 0)
+   mb.Next     = timeOrNow(getParam(strs, 1))
+   mb.Curr     = timeOrNow(getParam(strs, 2))
+   mb.YesCount = intOrZero(getParam(strs, 3))
+   mb.NoCount  = intOrZero(getParam(strs, 4))
+   mb.Streak   = intOrZero(getParam(strs, 5))
 
    return mb
 }

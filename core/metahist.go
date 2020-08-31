@@ -1,5 +1,7 @@
 package core
 
+import "time"
+
 type AnswerCategory uint8
 
 const (
@@ -10,17 +12,18 @@ const (
 )
 
 type MetaHist struct {
-   Hash string
    MetaBase
    Target bool
 }
 
-func NewMetaHistFromMetaAlg(hash string, ma *MetaAlg, target bool) *MetaHist {
-   return &MetaHist{
-      Hash: hash,
-      MetaBase: MetaBase{},
+func NewMetaHistFromMetaAlg(ma *MetaAlg, target bool) *MetaHist {
+   mh := &MetaHist{
+      MetaBase: ma.MetaBase,
       Target: target,
    }
+
+   mh.Next = time.Now()
+   return mh
 }
 
 func (m *MetaHist) GetAnswerCategory() AnswerCategory {

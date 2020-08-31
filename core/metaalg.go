@@ -10,13 +10,13 @@ type MetaAlg struct {
 func NewMetaAlgFromStrings(strs []string) *MetaAlg {
    return &MetaAlg {
       MetaBase: *NewMetaBase(strs),
-      Name: getParam(strs, 5),
+      Name: getParam(strs, 6),
    }
 }
 
-func NewDefaultMetaAlg(name string) *MetaAlg {
+func NewDefaultMetaAlg(hash string, name string) *MetaAlg {
    return &MetaAlg {
-      MetaBase: *NewMetaBase([]string{}),
+      MetaBase: *NewMetaBase([]string{hash}),
       Name: name,
    }
 }
@@ -41,6 +41,7 @@ func NewMetaAlg(ai *AlgInfo, mh *MetaHist) *MetaAlg {
 
    return &MetaAlg{
       MetaBase{
+         mh.Hash,
          ai.Next,
          mh.Next,
          yesCount,
@@ -50,8 +51,8 @@ func NewMetaAlg(ai *AlgInfo, mh *MetaHist) *MetaAlg {
    }
 }
 
-func (m *MetaAlg) Exec(hash string, input bool) (*MetaAlg, error) {
-   mh := NewMetaHistFromMetaAlg(hash, m, input)
+func (m *MetaAlg) Exec(input bool) (*MetaAlg, error) {
+   mh := NewMetaHistFromMetaAlg(m, input)
 
    // Save the current time for logging & not saving the current time multiple times.
    var ai AlgInfo

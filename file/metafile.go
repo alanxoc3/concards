@@ -33,7 +33,7 @@ func ReadMetasToDeckHelper(r io.Reader, d *core.Deck) {
 
       // First field is a constant sized checksum.
       if len(strs) > 0 && len(strs[0]) == 32 {
-         d.AddMeta(strs[0], core.NewMetaAlgFromStrings(strs[1:]))
+         d.AddMeta(strs[0], core.NewMetaAlgFromStrings(strs[:]))
       }
    }
 }

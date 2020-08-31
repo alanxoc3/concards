@@ -197,7 +197,7 @@ func (d *Deck) ForgetTop() error               { return d.Forget(0) }
 func (d *Deck) TopMetaOrDefault(defaultAlg string) *MetaAlg {
    m := d.TopMeta()
    if m == nil {
-      return NewDefaultMetaAlg(defaultAlg)
+      return NewDefaultMetaAlg(d.TopHash(), defaultAlg)
    }
    return m
 }
@@ -205,7 +205,7 @@ func (d *Deck) TopMetaOrDefault(defaultAlg string) *MetaAlg {
 func (d *Deck) ExecTop(input bool, defaultAlg string) (*MetaAlg, error) {
    h := d.TopHash()
 
-   if ma, e := d.TopMetaOrDefault(defaultAlg).Exec(h, input); e != nil {
+   if ma, e := d.TopMetaOrDefault(defaultAlg).Exec(input); e != nil {
       d.DropTop()
       return nil, e
    } else {

@@ -4,7 +4,6 @@ import (
    "time"
    "math"
    "math/rand"
-	"strconv"
 )
 
 type AlgFunc func(MetaHist) AlgInfo
@@ -16,14 +15,6 @@ var Algs = map[string]AlgFunc{
 type AlgInfo struct {
    Next   time.Time
    Name   string
-}
-
-func floatOrDefault(str string, def float64) float64 {
-	if x, err := strconv.ParseFloat(str, 64); err != nil {
-		return def
-	} else {
-		return float64(x)
-	}
 }
 
 // If streak = 0, curr 0. prev + or -.
