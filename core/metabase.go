@@ -52,6 +52,6 @@ func NewMetaBase(strs []string) *MetaBase {
 
 func (m *MetaBase) NextStr() string { return m.Next.Format(time.RFC3339) }
 func (m *MetaBase) CurrStr() string { return m.Curr.Format(time.RFC3339) }
-func (m *MetaBase) String() string { return fmt.Sprintf("%s %s %d %d %d", m.NextStr(), m.CurrStr(), m.YesCount, m.NoCount, m.Streak) }
+func (m *MetaBase) String() string { return fmt.Sprintf("%s %s %s %d %d %d", m.Hash, m.NextStr(), m.CurrStr(), m.YesCount, m.NoCount, m.Streak) }
 
 func (m *MetaBase) IsZero() bool { return m.Next.IsZero() && m.Curr.IsZero() && m.YesCount == 0 && m.NoCount == 0 && m.Streak == 0 }
