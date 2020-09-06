@@ -12,13 +12,13 @@ const (
 )
 
 type MetaHist struct {
-   MetaBase
+   metaBase
    Target bool
 }
 
 func NewMetaHistFromMetaAlg(ma *MetaAlg, target bool) *MetaHist {
    mh := &MetaHist{
-      MetaBase: ma.MetaBase,
+      metaBase: ma.metaBase,
       Target: target,
    }
 

@@ -3,20 +3,20 @@ package core
 import "fmt"
 
 type MetaAlg struct {
-   MetaBase
+   metaBase
    Name   string
 }
 
 func NewMetaAlgFromStrings(strs []string) *MetaAlg {
    return &MetaAlg {
-      MetaBase: *NewMetaBase(strs),
+      metaBase: *newMetaBase(strs),
       Name: getParam(strs, 6),
    }
 }
 
 func NewDefaultMetaAlg(hash string, name string) *MetaAlg {
    return &MetaAlg {
-      MetaBase: *NewMetaBase([]string{hash}),
+      metaBase: *newMetaBase([]string{hash}),
       Name: name,
    }
 }
@@ -40,7 +40,7 @@ func NewMetaAlg(ai *AlgInfo, mh *MetaHist) *MetaAlg {
    }
 
    return &MetaAlg{
-      MetaBase{
+      metaBase{
          mh.Hash,
          ai.Next,
          mh.Next,
@@ -66,12 +66,12 @@ func (m *MetaAlg) Exec(input bool) (*MetaAlg, error) {
 }
 
 func (m *MetaAlg) IsZero() bool {
-   return m.MetaBase.IsZero() && m.Name == ""
+   return m.metaBase.isZero() && m.Name == ""
 }
 
 func (m *MetaAlg) String() (s string) {
    if !m.IsZero() {
-      s = fmt.Sprintf("%s %s", m.MetaBase.String(), m.Name)
+      s = fmt.Sprintf("%s %s", m.metaBase.String(), m.Name)
    }
 
    return

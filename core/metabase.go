@@ -4,7 +4,7 @@ import "fmt"
 import "time"
 import "strconv"
 
-type MetaBase struct {
+type metaBase struct {
    Hash     string
    Next     time.Time
    Curr     time.Time
@@ -29,20 +29,20 @@ func intOrZero(str string) int {
 	}
 }
 
-func timeOrNow(str string) time.Time {
+func timeOrZero(str string) time.Time {
 	if x, err := time.Parse(time.RFC3339, str); err != nil {
-		return time.Now()
+		return time.Time{}
 	} else {
 		return x
 	}
 }
 
-func NewMetaBase(strs []string) *MetaBase {
-   mb := &MetaBase{}
+func newMetaBase(strs []string) *metaBase {
+   mb := &metaBase{}
 
    mb.Hash     = getParam(strs, 0)
-   mb.Next     = timeOrNow(getParam(strs, 1))
-   mb.Curr     = timeOrNow(getParam(strs, 2))
+   mb.Next     = timeOrZero(getParam(strs, 1))
+   mb.Curr     = timeOrZero(getParam(strs, 2))
    mb.YesCount = intOrZero(getParam(strs, 3))
    mb.NoCount  = intOrZero(getParam(strs, 4))
    mb.Streak   = intOrZero(getParam(strs, 5))
@@ -50,8 +50,8 @@ func NewMetaBase(strs []string) *MetaBase {
    return mb
 }
 
-func (m *MetaBase) NextStr() string { return m.Next.Format(time.RFC3339) }
-func (m *MetaBase) CurrStr() string { return m.Curr.Format(time.RFC3339) }
-func (m *MetaBase) String() string { return fmt.Sprintf("%s %s %s %d %d %d", m.Hash, m.NextStr(), m.CurrStr(), m.YesCount, m.NoCount, m.Streak) }
+func (m *metaBase) NextStr() string { return m.Next.Format(time.RFC3339) }
+func (m *metaBase) CurrStr() string { return m.Curr.Format(time.RFC3339) }
+func (m *metaBase) String() string { return fmt.Sprintf("%s %s %s %d %d %d", m.Hash, m.NextStr(), m.CurrStr(), m.YesCount, m.NoCount, m.Streak) }
 
-func (m *MetaBase) IsZero() bool { return m.Next.IsZero() && m.Curr.IsZero() && m.YesCount == 0 && m.NoCount == 0 && m.Streak == 0 }
+func (m *metaBase) isZero() bool { return m.Hash == "" && m.Next.IsZero() && m.Curr.IsZero() && m.YesCount == 0 && m.NoCount == 0 && m.Streak == 0 }
