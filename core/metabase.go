@@ -2,10 +2,12 @@ package core
 
 import "fmt"
 import "time"
+import "encoding/hex"
+import "bytes"
 import "strconv"
 
 type metaBase struct {
-   Hash     string
+   Hash     [16]byte
    Next     time.Time
    Curr     time.Time
    YesCount int
@@ -19,6 +21,13 @@ func getParam(arr []string, i int) string {
    } else {
       return ""
    }
+}
+
+func hashOrZero(str string) (hash [16]byte) {
+	if x, err := hex.DecodeString(str); err == nil {
+      copy(hash[:], x)
+	}
+   return hash
 }
 
 func intOrZero(str string) int {
@@ -40,7 +49,7 @@ func timeOrZero(str string) time.Time {
 func newMetaBase(strs []string) *metaBase {
    mb := &metaBase{}
 
-   mb.Hash     = getParam(strs, 0)
+   mb.Hash     = hashOrZero(getParam(strs, 0))
    mb.Next     = timeOrZero(getParam(strs, 1))
    mb.Curr     = timeOrZero(getParam(strs, 2))
    mb.YesCount = intOrZero(getParam(strs, 3))
@@ -52,6 +61,7 @@ func newMetaBase(strs []string) *metaBase {
 
 func (m *metaBase) NextStr() string { return m.Next.Format(time.RFC3339) }
 func (m *metaBase) CurrStr() string { return m.Curr.Format(time.RFC3339) }
-func (m *metaBase) String() string { return fmt.Sprintf("%s %s %s %d %d %d", m.Hash, m.NextStr(), m.CurrStr(), m.YesCount, m.NoCount, m.Streak) }
+func (m *metaBase) HashStr() string { return fmt.Sprintf("%x", m.Hash) }
+func (m *metaBase) String()  string { return fmt.Sprintf("%s %s %s %d %d %d", m.HashStr(), m.NextStr(), m.CurrStr(), m.YesCount, m.NoCount, m.Streak) }
 
-func (m *metaBase) isZero() bool { return m.Hash == "" && m.Next.IsZero() && m.Curr.IsZero() && m.YesCount == 0 && m.NoCount == 0 && m.Streak == 0 }
+func (m *metaBase) isZero() bool { return bytes.Equal(m.Hash[:], make([]byte, 16)) && m.Next.IsZero() && m.Curr.IsZero() && m.YesCount == 0 && m.NoCount == 0 && m.Streak == 0 }
