@@ -1,6 +1,7 @@
 package core
 
 import "time"
+import "fmt"
 
 type AnswerCategory uint8
 
@@ -16,28 +17,59 @@ type MetaHist struct {
    Target bool
 }
 
+func NewMetaHistFromStrings(strs ...string) *MetaHist {
+   return &MetaHist{
+      metaBase: *NewMetaBaseFromStrings(strs...),
+      Target: getParam(strs, 6) == "1",
+   }
+}
+
 func NewMetaHistFromMetaAlg(ma *MetaAlg, target bool) *MetaHist {
    mh := &MetaHist{
       metaBase: ma.metaBase,
       Target: target,
    }
 
-   mh.Next = time.Now()
+   mh.next = time.Now()
    return mh
 }
 
-func (m *MetaHist) GetAnswerCategory() AnswerCategory {
-   if m.Target {
-      if m.Streak < 0 {
+func (mh *MetaHist) AnswerCategory() AnswerCategory {
+   if mh.Target {
+      if mh.streak < 0 {
          return YesWasNo
       } else {
          return YesWasYes
       }
    } else {
-      if m.Streak > 0 {
+      if mh.streak > 0 {
          return NoWasYes
       } else {
          return NoWasNo
       }
    }
+}
+
+func (mh *MetaHist) NewStreak() int {
+   // Streak Logic
+   streak := mh.streak
+   switch mh.AnswerCategory() {
+      case YesWasYes: streak++
+      case NoWasNo:   streak--
+      default: streak=0
+   }
+   return streak
+}
+
+func (mh *MetaHist) newCount(count int) int {
+   if mh.Target { count++ }
+   return count
+}
+
+func (mh *MetaHist) NewYesCount() int { return mh.newCount(mh.yesCount) }
+func (mh *MetaHist) NewNoCount() int { return mh.newCount(mh.noCount) }
+func (mh *MetaHist) TargetStr() string { if mh.Target { return "1" } else { return "0" } }
+
+func (mh *MetaHist) String() string {
+   return fmt.Sprintf("%s %s", mh.metaBase.String(), mh.TargetStr())
 }

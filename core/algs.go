@@ -27,22 +27,22 @@ func sm2Exec(mh MetaHist) AlgInfo {
    const maxPeriod float64 = float64(time.Hour*24*365*100)
    const randPercentage float64 = .1
 
-   ac := mh.GetAnswerCategory()
+   ac := mh.AnswerCategory()
    period := 0.0
-   rank := math.Max(1.3, 2.5 + .1*float64(mh.YesCount) - .3*float64(mh.NoCount) + .05*float64(mh.Streak))
+   rank := math.Max(1.3, 2.5 + .1*float64(mh.YesCount()) - .3*float64(mh.NoCount()) + .05*float64(mh.Streak()))
 
    // Next Day Logic
    if ac == YesWasYes {
-      if mh.Streak < 0 {
+      if mh.Streak() < 0 {
          panic("Logic error with concards! Please make an issue on github.")
-      } else if mh.Streak == 0 {
+      } else if mh.Streak() == 0 {
          period += float64(time.Hour*24)
       } else {
          period += float64(time.Hour*24*6)
       }
 
-      if mh.Streak >= 2 {
-         for i := 2; i <= mh.Streak; i++ {
+      if mh.Streak() >= 2 {
+         for i := 2; i <= mh.Streak(); i++ {
             period *= rank
          }
       }
@@ -56,7 +56,7 @@ func sm2Exec(mh MetaHist) AlgInfo {
 
    // The "Next" on meta history should represent "time.Now".
    return AlgInfo{
-      Next: mh.Next.Add(time.Duration(period)),
+      Next: mh.Next().Add(time.Duration(period)),
       Name: "sm2",
    }
 }

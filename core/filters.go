@@ -48,13 +48,13 @@ func (d *Deck) FilterOutMemorize() {
 func (d *Deck) FilterOutReview() {
 	d.filter(func(i int) bool {
 		m := d.GetMeta(i)
-		return m != nil && m.Next.Before(time.Now())
+		return m != nil && m.Next().Before(time.Now())
 	})
 }
 
 func (d *Deck) FilterOutDone() {
 	d.filter(func(i int) bool {
 		m := d.GetMeta(i)
-		return m != nil && m.Next.After(time.Now())
+		return m != nil && m.Next().After(time.Now())
 	})
 }

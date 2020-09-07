@@ -54,7 +54,7 @@ func (d *Deck) Delay(i int) error {
       d.refs = removeIndex(d.refs, i)
 
       sort.Slice(d.reviews, func(i, j int) bool {
-         return d.MetaMap[d.reviews[i]].Next.Before(d.MetaMap[d.reviews[j]].Next)
+         return d.MetaMap[d.reviews[i]].Next().Before(d.MetaMap[d.reviews[j]].Next())
       })
       return nil
    } else {
