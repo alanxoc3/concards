@@ -21,6 +21,18 @@ var metaTestFuncs = map[string]metaTestFunc{
       assert.NotZero(t, m.Hash())
    },
 
+   "HashTooLong": func(t *testing.T, cf metaCreate) {
+      m := cf("ff0000000000000000000000000000ff11")
+      assert.Equal(t, "ff0000000000000000000000000000ff", m.HashStr())
+      assert.NotZero(t, m.Hash())
+   },
+
+   "HashOdd": func(t *testing.T, cf metaCreate) {
+      m := cf("fab1e")
+      assert.Equal(t, "fab1e000000000000000000000000000", m.HashStr())
+      assert.NotZero(t, m.Hash())
+   },
+
    "Next": func(t *testing.T, cf metaCreate) {
       m := cf("", "2020-01-01T00:00:00Z")
       assert.False(t, m.IsZero())

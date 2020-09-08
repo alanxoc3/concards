@@ -1,53 +1,59 @@
 package core
 
 import "fmt"
+import "time"
+import "math"
+
+// A given interval may not exceed 100 years.
+// This is partially limited by Go's time.Duration.
+const MaxInterval float64 = float64(time.Hour*24*365*100)
 
 type MetaAlg struct {
    metaBase
-   Name   string
+   name   string
 }
 
 func NewMetaAlgFromStrings(strs ...string) *MetaAlg {
    return &MetaAlg {
-      metaBase: *NewMetaBaseFromStrings(strs...),
-      Name: getParam(strs, 6),
+      metaBase: *newMetaBaseFromStrings(strs...),
+      name: getParam(strs, 6),
    }
 }
 
 func NewDefaultMetaAlg(hash string, name string) *MetaAlg {
    return &MetaAlg {
-      metaBase: *NewMetaBaseFromStrings([]string{hash}...),
-      Name: name,
+      metaBase: *newMetaBaseFromStrings([]string{hash}...),
+      name: name,
    }
 }
 
-func newMetaAlg(ai *AlgInfo, mh *MetaHist) *MetaAlg {
-   return &MetaAlg{
-      *newMetaBase(
-         mh.hash,
-         ai.Next,
-         mh.next,
-         mh.NewYesCount(),
-         mh.NewNoCount(),
-         mh.NewStreak(),
-      ), ai.Name,
-   }
-}
-
-func (m *MetaAlg) Exec(input bool) (*MetaAlg, error) {
-   mh := NewMetaHistFromMetaAlg(m, input)
+func (ma *MetaAlg) Exec(input bool) (*MetaAlg, error) {
+   mh := NewMetaHistFromMetaAlg(ma, input)
 
    // Save the current time for logging & not saving the current time multiple times.
-   var ai AlgInfo
-   if algFunc, exists := Algs[m.Name]; exists {
-      ai = algFunc(*mh)
+   var next time.Time
+   if algFunc, exists := Algs[ma.name]; exists {
+      next = mh.Next().Add(time.Duration(math.Min(algFunc(*mh), MaxInterval)))
    } else {
       return nil, fmt.Errorf("Algorithm doesn't exist.")
    }
 
-   return newMetaAlg(&ai, mh), nil
+   return &MetaAlg{
+      *newMetaBase(
+         mh.Hash(),
+         next,
+         mh.Next(),
+         mh.NewYesCount(),
+         mh.NewNoCount(),
+         mh.NewStreak(),
+      ), ma.Name(),
+   }, nil
+}
+
+func (m *MetaAlg) Name() string {
+   return m.name
 }
 
 func (m *MetaAlg) String() string {
-   return fmt.Sprintf("%s %s", m.metaBase.String(), m.Name)
+   return fmt.Sprintf("%s %s", m.metaBase.String(), m.name)
 }

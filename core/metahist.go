@@ -19,7 +19,7 @@ type MetaHist struct {
 
 func NewMetaHistFromStrings(strs ...string) *MetaHist {
    return &MetaHist{
-      metaBase: *NewMetaBaseFromStrings(strs...),
+      metaBase: *newMetaBaseFromStrings(strs...),
       Target: getParam(strs, 6) == "1",
    }
 }
@@ -31,6 +31,10 @@ func NewMetaHistFromMetaAlg(ma *MetaAlg, target bool) *MetaHist {
    }
 
    mh.next = time.Now()
+   if mh.curr.IsZero() {
+      mh.curr = mh.next
+   }
+
    return mh
 }
 

@@ -6,7 +6,7 @@ import (
    "math/rand"
 )
 
-type AlgFunc func(MetaHist) AlgInfo
+type AlgFunc func(MetaHist) float64
 
 var Algs = map[string]AlgFunc{
    "sm2": sm2Exec,
@@ -22,11 +22,8 @@ type AlgInfo struct {
 // If streak < 0, curr -. prev 0 or -.
 
 // SM2 Algorithm
-// Returns meta & location to put card in deck.
-func sm2Exec(mh MetaHist) AlgInfo {
-   const maxPeriod float64 = float64(time.Hour*24*365*100)
-   const randPercentage float64 = .1
-
+// Returns the duration in nanoseconds for when to review the card next.
+func sm2Exec(mh MetaHist) float64 {
    ac := mh.AnswerCategory()
    period := 0.0
    rank := math.Max(1.3, 2.5 + .1*float64(mh.YesCount()) - .3*float64(mh.NoCount()) + .05*float64(mh.Streak()))
@@ -52,11 +49,6 @@ func sm2Exec(mh MetaHist) AlgInfo {
       period = float64(time.Minute*1)
    }
 
-   period = math.Min(period * (1 + rand.Float64()*randPercentage), maxPeriod)
-
-   // The "Next" on meta history should represent "time.Now".
-   return AlgInfo{
-      Next: mh.Next().Add(time.Duration(period)),
-      Name: "sm2",
-   }
+   // Add some noise, so everything doesn't get reviewed at the same time.
+   return period * (1 + .1*rand.Float64())
 }

@@ -52,6 +52,8 @@ func getParam(arr []string, i int) string {
 }
 
 func hashOrZero(str string) (hash [16]byte) {
+   if len(str) % 2 == 1 { str += "0" }
+
 	if x, err := hex.DecodeString(str); err == nil {
       copy(hash[:], x)
 	}
@@ -74,7 +76,7 @@ func timeOrZero(str string) time.Time {
 	}
 }
 
-func NewMetaBaseFromStrings(strs ...string) *metaBase {
+func newMetaBaseFromStrings(strs ...string) *metaBase {
    return newMetaBase(
       hashOrZero(getParam(strs, 0)),
       timeOrZero(getParam(strs, 1)),
