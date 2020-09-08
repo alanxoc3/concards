@@ -28,9 +28,9 @@ func NewDefaultMetaAlg(hash string, name string) *MetaAlg {
 }
 
 func (ma *MetaAlg) Exec(input bool) (*MetaAlg, error) {
+   // Note that mh.Next() has the current time.
    mh := NewMetaHistFromMetaAlg(ma, input)
 
-   // Save the current time for logging & not saving the current time multiple times.
    var next time.Time
    if algFunc, exists := Algs[ma.name]; exists {
       next = mh.Next().Add(time.Duration(math.Min(algFunc(*mh), MaxInterval)))
