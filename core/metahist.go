@@ -65,13 +65,13 @@ func (mh *MetaHist) NewStreak() int {
    return streak
 }
 
-func (mh *MetaHist) newCount(count int) int {
-   if mh.Target { count++ }
+func (mh *MetaHist) newCount(expecting bool, count int) int {
+   if expecting == mh.Target { count++ }
    return count
 }
 
-func (mh *MetaHist) NewYesCount() int { return mh.newCount(mh.yesCount) }
-func (mh *MetaHist) NewNoCount() int { return mh.newCount(mh.noCount) }
+func (mh *MetaHist) NewYesCount() int { return mh.newCount(true, mh.yesCount) }
+func (mh *MetaHist) NewNoCount()  int { return mh.newCount(false, mh.noCount) }
 func (mh *MetaHist) TargetStr() string { if mh.Target { return "1" } else { return "0" } }
 
 func (mh *MetaHist) String() string {
