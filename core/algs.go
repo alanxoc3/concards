@@ -26,7 +26,7 @@ type AlgInfo struct {
 func sm2Exec(mh MetaHist) float64 {
    ac := mh.AnswerCategory()
    period := 0.0
-   rank := math.Max(1.3, 2.5 + .1*float64(mh.YesCount()) - .3*float64(mh.NoCount()) + .05*float64(mh.Streak()))
+   rank := math.Max(1.3, 2.5 + .11*float64(mh.YesCount()) - .29*float64(mh.NoCount()) + .06*float64(mh.Streak()))
 
    // Next Day Logic
    if ac == YesWasYes {
