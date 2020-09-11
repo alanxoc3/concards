@@ -9,12 +9,12 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/alanxoc3/concards/core"
+	"github.com/alanxoc3/concards/deck"
 	"github.com/alanxoc3/concards/meta"
 )
 
 // Open opens filename and loads cards into new deck
-func ReadMetasToDeck(filename string, d *core.Deck) error {
+func ReadMetasToDeck(filename string, d *deck.Deck) error {
 	if f, err := os.Open(filename); err != nil {
 		return fmt.Errorf("Error: Unable to open meta file \"%s\"", filename)
 	} else {
@@ -24,7 +24,7 @@ func ReadMetasToDeck(filename string, d *core.Deck) error {
 	}
 }
 
-func ReadMetasToDeckHelper(r io.Reader, d *core.Deck) {
+func ReadMetasToDeckHelper(r io.Reader, d *deck.Deck) {
 	// Scan by words.
 	lineScanner := bufio.NewScanner(r)
 	lineScanner.Split(bufio.ScanLines)
@@ -39,7 +39,7 @@ func ReadMetasToDeckHelper(r io.Reader, d *core.Deck) {
 	}
 }
 
-func WriteMetasToString(d *core.Deck) (fileStr string) {
+func WriteMetasToString(d *deck.Deck) (fileStr string) {
 	// Copy keys
 	keys := make([]string, len(d.MetaMap))
 
@@ -63,7 +63,7 @@ func WriteMetasToString(d *core.Deck) (fileStr string) {
 	return
 }
 
-func WriteMetasToFile(d *core.Deck, filename string) error {
+func WriteMetasToFile(d *deck.Deck, filename string) error {
 	str := []byte(WriteMetasToString(d))
 	err := ioutil.WriteFile(filename, str, 0644)
 	if err != nil {

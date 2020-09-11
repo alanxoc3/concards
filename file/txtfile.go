@@ -8,11 +8,12 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/alanxoc3/concards/core"
+	"github.com/alanxoc3/concards/card"
+	"github.com/alanxoc3/concards/deck"
 )
 
 // Open opens filename and loads cards into new deck
-func ReadCardsToDeck(d *core.Deck, filename string) error {
+func ReadCardsToDeck(d *deck.Deck, filename string) error {
 	err := filepath.Walk(filename, func(path string, info os.FileInfo, e error) error {
 		if e != nil {
 			return e
@@ -42,11 +43,11 @@ func ReadCardsToDeck(d *core.Deck, filename string) error {
 	return err
 }
 
-func ReadCardsToDeckHelper(r io.Reader, d *core.Deck, f string) {
+func ReadCardsToDeckHelper(r io.Reader, d *deck.Deck, f string) {
 	// Initialization.
 	facts := []string{}
 	state := false
-	var td *core.Deck
+	var td *deck.Deck
 
 	// Scan by words.
 	scanner := bufio.NewScanner(r)
@@ -56,11 +57,11 @@ func ReadCardsToDeckHelper(r io.Reader, d *core.Deck, f string) {
 		t := scanner.Text()
 
 		if state {
-			if t == core.CBeg {
+			if t == card.CBeg {
 				td.AddNewCards(f, strings.Join(facts, " "))
 
 				facts = []string{}
-			} else if t == core.CEnd {
+			} else if t == card.CEnd {
 				td.AddNewCards(f, strings.Join(facts, " "))
 
 				for i := 0; i < td.Len(); i++ {
@@ -70,9 +71,9 @@ func ReadCardsToDeckHelper(r io.Reader, d *core.Deck, f string) {
 			} else {
 				facts = append(facts, t)
 			}
-		} else if t == core.CBeg {
+		} else if t == card.CBeg {
 			// create td
-			td = core.NewDeck()
+			td = deck.NewDeck()
 			state = true
 			facts = []string{}
 		}

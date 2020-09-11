@@ -3,7 +3,8 @@ package termboxgui
 import (
 	"fmt"
 
-	"github.com/alanxoc3/concards/core"
+	"github.com/alanxoc3/concards/card"
+	"github.com/alanxoc3/concards/deck"
 	runewidth "github.com/mattn/go-runewidth"
 	termbox "github.com/nsf/termbox-go"
 )
@@ -97,7 +98,7 @@ func tbvertical(x int, color termbox.Attribute) {
 	}
 }
 
-func tbprintCard(c *core.Card, amount int) {
+func tbprintCard(c *card.Card, amount int) {
 	y := 0
 
 	for i := 0; i < c.Len() && i < amount; i++ {
@@ -110,7 +111,7 @@ func tbprintCard(c *core.Card, amount int) {
 	}
 }
 
-func tbprintStatusbar(d *core.Deck) {
+func tbprintStatusbar(d *deck.Deck) {
 	_, h := termbox.Size()
 	color := termbox.ColorBlue
 	tbhorizontal(h-2, color)
@@ -132,10 +133,10 @@ func displayHelpMode(color termbox.Attribute) {
 		"[w]rite:  Write state to meta file.\n" +
 		"\n" +
 		"[1]: No!\n" +
-      "[2]: Idk!\n" +
-      "[3]: Yes!\n" +
+		"[2]: Idk!\n" +
+		"[3]: Yes!\n" +
 		"\n" +
-      "[space,enter]: Reveal next side.\n"
+		"[space,enter]: Reveal next side.\n"
 	// 12 lines, longest line is 36 characters
 
 	w, h := termbox.Size()
@@ -154,7 +155,7 @@ func displayHelpMode(color termbox.Attribute) {
 	tbprint(x, y, color, coldef, str2)
 }
 
-func displayCardMode(c *core.Card, showAnswer int) {
+func displayCardMode(c *card.Card, showAnswer int) {
 	tbprintCard(c, showAnswer)
 }
 
@@ -166,11 +167,11 @@ func tbprintStatMsg() {
 	tbprint(0, h-1, statMsgCol, color, statMsg)
 }
 
-func updateStatMsgAndCard(d *core.Deck, input bool) {
-   m, err := d.ExecTop(input, "sm2")
-   if err != nil {
-      updateStatMsg("Problem reading the card :(.", termbox.ColorRed)
-   } else if input {
+func updateStatMsgAndCard(d *deck.Deck, input bool) {
+	m, err := d.ExecTop(input, "sm2")
+	if err != nil {
+		updateStatMsg("Problem reading the card :(.", termbox.ColorRed)
+	} else if input {
 		time := m.Next().Format("Mon 2 Jan 2006 @ 15:04")
 		updateStatMsg(fmt.Sprintf("Yes! Next review is %s.", time), termbox.ColorCyan)
 	} else {

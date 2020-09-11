@@ -5,20 +5,20 @@ import (
 	"os"
 	"os/exec"
 
-	"github.com/alanxoc3/concards/core"
+	"github.com/alanxoc3/concards/deck"
 )
 
-type DeckFunc func(string, *Config) (*core.Deck, error)
+type DeckFunc func(string, *Config) (*deck.Deck, error)
 
-func ReadCards(filename string, cfg *Config) (*core.Deck, error) {
-	d := core.NewDeck()
+func ReadCards(filename string, cfg *Config) (*deck.Deck, error) {
+	d := deck.NewDeck()
 	if err := ReadCardsToDeck(d, filename); err != nil {
 		return nil, err
 	}
 	return d, nil
 }
 
-func EditCards(filename string, cfg *Config) (*core.Deck, error) {
+func EditCards(filename string, cfg *Config) (*deck.Deck, error) {
 	if cfg == nil {
 		panic("Config was nil when passed to edit function.")
 	}
@@ -36,7 +36,7 @@ func EditCards(filename string, cfg *Config) (*core.Deck, error) {
 }
 
 // Assumes the deck is sorted how you want it to be sorted.
-func EditFile(d *core.Deck, cfg *Config, rf DeckFunc, ef DeckFunc) error {
+func EditFile(d *deck.Deck, cfg *Config, rf DeckFunc, ef DeckFunc) error {
 	if d.IsEmpty() {
 		return fmt.Errorf("Error: The deck is empty.")
 	}

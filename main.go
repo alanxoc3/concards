@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/alanxoc3/concards/core"
+	"github.com/alanxoc3/concards/deck"
 	"github.com/alanxoc3/concards/file"
 	"github.com/alanxoc3/concards/termboxgui"
 	"math/rand"
@@ -14,7 +14,7 @@ var version string = "snapshot"
 
 func main() {
 	c := file.GenConfig(version)
-	d := core.NewDeck()
+	d := deck.NewDeck()
 
 	// We don't care if there is no meta data.
 	file.ReadMetasToDeck(c.MetaFile, d)

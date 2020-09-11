@@ -1,12 +1,12 @@
 package termboxgui
 
 import (
-	"github.com/alanxoc3/concards/core"
+	"github.com/alanxoc3/concards/deck"
 	"github.com/alanxoc3/concards/file"
 	termbox "github.com/nsf/termbox-go"
 )
 
-func TermBoxRun(d *core.Deck, cfg *file.Config) error {
+func TermBoxRun(d *deck.Deck, cfg *file.Config) error {
 	err := termbox.Init()
 	if err != nil {
 		return err
@@ -123,7 +123,7 @@ func TermBoxRun(d *core.Deck, cfg *file.Config) error {
 	return nil
 }
 
-func drawScreen(d *core.Deck, helpMode bool, cardShown int, finishedEditing bool) {
+func drawScreen(d *deck.Deck, helpMode bool, cardShown int, finishedEditing bool) {
 	if finishedEditing {
 		termbox.Sync()
 	}
