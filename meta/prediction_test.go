@@ -1,4 +1,4 @@
-package _test
+package meta_test
 
 import (
 	"testing"
