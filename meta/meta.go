@@ -23,7 +23,7 @@ type Meta interface {
 	IsZero() bool
 }
 
-type meta struct {
+type base struct {
 	hash     [16]byte
 	next     time.Time
 	curr     time.Time
@@ -81,8 +81,8 @@ func timeOrZero(str string) time.Time {
 	}
 }
 
-func newMetaFromStrings(strs ...string) *meta {
-	return newMetaBase(
+func newMetaFromStrings(strs ...string) *base {
+	return newBase(
 		hashOrZero(getParam(strs, 0)),
 		timeOrZero(getParam(strs, 1)),
 		timeOrZero(getParam(strs, 2)),
@@ -91,7 +91,7 @@ func newMetaFromStrings(strs ...string) *meta {
 		intOrZero(getParam(strs, 5)))
 }
 
-func newMetaBase(hash [16]byte, next time.Time, curr time.Time, yesCount int, noCount int, streak int) *meta {
+func newBase(hash [16]byte, next time.Time, curr time.Time, yesCount int, noCount int, streak int) *base {
 	curr = curr.UTC()
 	next = next.UTC()
 
@@ -106,24 +106,24 @@ func newMetaBase(hash [16]byte, next time.Time, curr time.Time, yesCount int, no
 		noCount = -streak
 	}
 
-	return &meta{hash, next, curr, yesCount, noCount, streak}
+	return &base{hash, next, curr, yesCount, noCount, streak}
 }
 
-func (m *meta) nextStr() string { return m.next.Format(time.RFC3339) }
-func (m *meta) currStr() string { return m.curr.Format(time.RFC3339) }
-func (m *meta) HashStr() string { return fmt.Sprintf("%x", m.hash) }
-func (m *meta) String() string {
-	return fmt.Sprintf("%s %s %s %d %d %d", m.HashStr(), m.nextStr(), m.currStr(), m.yesCount, m.noCount, m.streak)
+func (b *base) nextStr() string { return b.next.Format(time.RFC3339) }
+func (b *base) currStr() string { return b.curr.Format(time.RFC3339) }
+func (b *base) HashStr() string { return fmt.Sprintf("%x", b.hash) }
+func (b *base) String() string {
+	return fmt.Sprintf("%s %s %s %d %d %d", b.HashStr(), b.nextStr(), b.currStr(), b.yesCount, b.noCount, b.streak)
 }
 
-func (m *meta) Hash() [16]byte  { return m.hash }
-func (m *meta) Next() time.Time { return m.next }
-func (m *meta) Curr() time.Time { return m.curr }
-func (m *meta) YesCount() int   { return m.yesCount }
-func (m *meta) NoCount() int    { return m.noCount }
-func (m *meta) Streak() int     { return m.streak }
+func (b *base) Hash() [16]byte  { return b.hash }
+func (b *base) Next() time.Time { return b.next }
+func (b *base) Curr() time.Time { return b.curr }
+func (b *base) YesCount() int   { return b.yesCount }
+func (b *base) NoCount() int    { return b.noCount }
+func (b *base) Streak() int     { return b.streak }
 
-func (m *meta) IsNew() bool { return m.yesCount == 0 && m.noCount == 0 && m.streak == 0 }
-func (m *meta) IsZero() bool {
-	return bytes.Equal(m.hash[:], make([]byte, 16)) && m.next.IsZero() && m.curr.IsZero() && m.yesCount == 0 && m.noCount == 0 && m.streak == 0
+func (b *base) IsNew() bool { return b.yesCount == 0 && b.noCount == 0 && b.streak == 0 }
+func (b *base) IsZero() bool {
+	return bytes.Equal(b.hash[:], make([]byte, 16)) && b.next.IsZero() && b.curr.IsZero() && b.yesCount == 0 && b.noCount == 0 && b.streak == 0
 }

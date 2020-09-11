@@ -6,13 +6,13 @@ import (
 )
 
 type Result struct {
-	meta
+	base
 	Target bool
 }
 
 func NewResultFromPrediction(p *Prediction, target bool) *Result {
 	r := &Result{
-		meta:   p.meta,
+		base:   p.base,
 		Target: target,
 	}
 
@@ -26,7 +26,7 @@ func NewResultFromPrediction(p *Prediction, target bool) *Result {
 
 func NewResultFromStrings(strs ...string) *Result {
 	return &Result{
-		meta:   *newMetaFromStrings(strs...),
+		base:   *newMetaFromStrings(strs...),
 		Target: getParam(strs, 6) == "1",
 	}
 }
@@ -79,5 +79,5 @@ func (r *Result) targetStr() string {
 }
 
 func (r *Result) String() string {
-	return fmt.Sprintf("%s %s", r.meta.String(), r.targetStr())
+	return fmt.Sprintf("%s %s", r.base.String(), r.targetStr())
 }

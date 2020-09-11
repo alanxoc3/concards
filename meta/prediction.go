@@ -7,20 +7,20 @@ import (
 )
 
 type Prediction struct {
-	meta
+	base
 	name string
 }
 
 func NewPredictionFromStrings(strs ...string) *Prediction {
 	return &Prediction{
-		meta: *newMetaFromStrings(strs...),
+		base: *newMetaFromStrings(strs...),
 		name: getParam(strs, 6),
 	}
 }
 
 func NewDefaultPrediction(hash string, name string) *Prediction {
 	return &Prediction{
-		meta: *newMetaFromStrings([]string{hash}...),
+		base: *newMetaFromStrings([]string{hash}...),
 		name: name,
 	}
 }
@@ -37,7 +37,7 @@ func (p *Prediction) Exec(input bool) (*Prediction, error) {
 	}
 
 	return &Prediction{
-		*newMetaBase(
+		*newBase(
 			r.Hash(),
 			next,
 			r.Next(),
@@ -48,10 +48,10 @@ func (p *Prediction) Exec(input bool) (*Prediction, error) {
 	}, nil
 }
 
-func (m *Prediction) Name() string {
-	return m.name
+func (b *Prediction) Name() string {
+	return b.name
 }
 
-func (m *Prediction) String() string {
-	return fmt.Sprintf("%s %s", m.meta.String(), m.name)
+func (b *Prediction) String() string {
+	return fmt.Sprintf("%s %s", b.base.String(), b.name)
 }
