@@ -39,7 +39,7 @@ This project currently depends on:
   [akamensky/argparse](https://github.com/akamensky/argparse) for CLI options.
 - [nsf/termbox-go](https://github.com/nsf/termbox-go) for the terminal gui.
 - [mattn/go-runewidth](https://github.com/mattn/go-runewidth) to help with
-  printing Asian characters.
+  Asian characters.
 
 Concards wouldn't be where it is today without those open source projects &
 their contributors, so please check them out too :).
