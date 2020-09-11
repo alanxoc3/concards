@@ -89,7 +89,7 @@ func GenConfig(version string) *Config {
 	}
 
 	if *fVersion {
-		fmt.Printf("Concards %s\n", version)
+		fmt.Printf("concards %s\n", version)
 		os.Exit(0)
 	}
 

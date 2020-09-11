@@ -27,11 +27,22 @@ page](https://github.com/alanxoc3/concards/releases). At the moment, only Linux
 and Mac are supported.
 
 ### Building From Source
-Use the `go install` command, passing in snapshot as the version concards
-compiles with.
+It should be super simple. Just use the `go install` command:
 ``` bash
-go install -ldflags="-X main.version=snapshot" github.com/alanxoc3/concards
+go install github.com/alanxoc3/concards
 ```
+
+### Dependencies
+This project currently depends on:
+- [stretchr/testify](https://github.com/stretchr/testify) for unit tests.
+- [alanxoc3/argparse](https://github.com/alanxoc3/argparse) forked from
+  [akamensky/argparse](https://github.com/akamensky/argparse) for CLI options.
+- [nsf/termbox-go](https://github.com/nsf/termbox-go) for the terminal gui.
+- [mattn/go-runewidth](https://github.com/mattn/go-runewidth) to help with
+  printing Asian characters.
+
+Concards wouldn't be where it is today without those open source projects &
+their contributors, so please check them out too :).
 
 ## Usage
 The complete syntax of embedding your flashcards into text documents consists

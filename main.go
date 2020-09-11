@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-var version string
+var version string = "snapshot"
 
 func main() {
 	c := file.GenConfig(version)
