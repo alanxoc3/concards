@@ -43,7 +43,7 @@ func EditFile(d *deck.Deck, cfg *Config, rf DeckFunc, ef DeckFunc) error {
 
 	// We need to get information for the top card first.
 	curHash, curCard, curMeta := d.Top()
-	filename := curCard.GetFile()
+	filename := curCard.File()
 
 	// Deck before editing.
 	deckBefore, e := rf(filename, cfg)

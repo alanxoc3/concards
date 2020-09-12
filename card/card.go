@@ -16,13 +16,6 @@ const CRev = ":"
 const CBeg = "@>"
 const CEnd = "<@"
 
-var keyWords = map[string]bool {
-   CSep: true,
-   CRev: true,
-   CBeg: true,
-   CEnd: true,
-}
-
 // A card is a list of facts. Usually, but not limited to, Q&A format.
 type Card struct {
 	file  string
@@ -30,6 +23,8 @@ type Card struct {
 }
 
 func NewCards(file string, sides string) ([]*Card, error) {
+   if file == "" { return nil, fmt.Errorf("File not provided.") }
+
 	fact := []string{}
 	facts := [][]string{}
    cards := []*Card{}
@@ -62,43 +57,21 @@ func NewCards(file string, sides string) ([]*Card, error) {
 	}
 }
 
-func (c *Card) HasAnswer() bool {
-	return len(c.facts) > 1
+func (c *Card) HasAnswer() bool { return len(c.facts) > 1 }
+func (c *Card) String() string { return strings.Join(c.getFactsRaw(), " " + CSep + " ") }
+func (c *Card) HashStr() string { return fmt.Sprintf("%x", c.Hash()) }
+func (c *Card) File() string { return c.file }
+func (c *Card) Len() int { return len(c.facts) }
+
+func (c *Card) Hash() (dest [16]byte) {
+   hash := sha256.Sum256([]byte(c.String()))
+   copy(dest[:], hash[:])
+   return dest
 }
 
-func (c *Card) String() string {
-	return strings.Join(c.GetFactsRaw(), " " + CSep + " ")
-}
-
-func (c *Card) Hash() [sha256.Size]byte {
-	return sha256.Sum256([]byte(c.String()))
-}
-
-func (c *Card) HashStr() string {
-	return fmt.Sprintf("%x", c.Hash())[:32]
-}
-
-func (c *Card) Len() int {
-	return len(c.facts)
-}
-
-func (c *Card) getFactHelper(i int, factLogic func([]string)[]string) string {
-   words := []string{}
-	if len(c.facts) > i && 0 <= i {
-      words = factLogic(c.facts[i])
-	}
-   return strings.Join(words, " ")
-}
-
-func (c *Card) GetFactRaw(i int) string {
-   return c.getFactHelper(i, func(words []string) []string {
-      return words
-   })
-}
-
-// This banks on the fact that the backslash is an ASCII character at the beginning.
-// If the escape character wasn't ASCII, the logic here would have to change.
 func (c *Card) GetFactEsc(i int) string {
+   // This banks on the fact that the backslash is an ASCII character at the beginning.
+   // If the escape character wasn't ASCII, the logic here would have to change.
    return c.getFactHelper(i, func(words []string) []string {
       re := regexp.MustCompile(`^\\+`)
       newWords := []string{}
@@ -112,6 +85,25 @@ func (c *Card) GetFactEsc(i int) string {
    })
 }
 
+// -------------------- Private stuff below --------------------
+
+var keyWords = map[string]bool {
+   CSep: true,
+   CRev: true,
+   CBeg: true,
+   CEnd: true,
+}
+
+func (c *Card) getFactRaw(i int) string {
+   return c.getFactHelper(i, func(words []string) []string {
+      return words
+   })
+}
+
+func (c *Card) getFactsRaw() []string {
+   return c.getFactsHelper((*Card).getFactRaw)
+}
+
 func (c *Card) getFactsHelper(factFunc func(*Card, int)string) []string {
 	facts := []string{}
 	for i := range c.facts {
@@ -120,16 +112,12 @@ func (c *Card) getFactsHelper(factFunc func(*Card, int)string) []string {
 	return facts
 }
 
-func (c *Card) GetFactsRaw() []string {
-   return c.getFactsHelper((*Card).GetFactRaw)
-}
-
-func (c *Card) GetFactsEsc() []string {
-   return c.getFactsHelper((*Card).GetFactEsc)
-}
-
-func (c *Card) GetFile() string {
-	return c.file
+func (c *Card) getFactHelper(i int, factLogic func([]string)[]string) string {
+   words := []string{}
+	if len(c.facts) > i && 0 <= i {
+      words = factLogic(c.facts[i])
+	}
+   return strings.Join(words, " ")
 }
 
 func parseByWords(s string, wordFunc func(string)) {

@@ -22,7 +22,7 @@ func (d *Deck) FilterNumber(param int) {
 func (d *Deck) FileIntersection(path string, otherDeck *Deck) {
 	d.filter(func(i int) bool {
 		_, contains := otherDeck.refsMap[d.refs[i]]
-		return d.GetCard(i).GetFile() == path && !contains
+		return d.GetCard(i).File() == path && !contains
 	})
 }
 
@@ -35,7 +35,7 @@ func (d *Deck) OuterLeftJoin(otherDeck *Deck) {
 
 func (d *Deck) FilterOutFile(path string) {
 	d.filter(func(i int) bool {
-		return d.GetCard(i).GetFile() == path
+		return d.GetCard(i).File() == path
 	})
 }
 
