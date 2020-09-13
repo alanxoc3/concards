@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/alanxoc3/concards/card"
+	"github.com/alanxoc3/concards/internal/card"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
