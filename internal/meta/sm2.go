@@ -15,9 +15,7 @@ func sm2Exec(r Outcome) float64 {
 
 	// Next Day Logic
 	if ac == YesWasYes {
-		if r.Streak() < 0 {
-			panic("Logic error with concards! Please make an issue on github.")
-		} else if r.Streak() == 0 {
+		if r.Streak() == 0 {
 			period += float64(time.Hour * 24)
 		} else {
 			period += float64(time.Hour * 24 * 6)

@@ -6,6 +6,7 @@ import (
 	"os/exec"
 
 	"github.com/alanxoc3/concards/deck"
+	"github.com/alanxoc3/concards/internal"
 )
 
 type DeckFunc func(string, *Config) (*deck.Deck, error)
@@ -19,9 +20,7 @@ func ReadCards(filename string, cfg *Config) (*deck.Deck, error) {
 }
 
 func EditCards(filename string, cfg *Config) (*deck.Deck, error) {
-	if cfg == nil {
-		panic("Config was nil when passed to edit function.")
-	}
+	internal.AssertLogic(cfg != nil, "config was nil when passed to edit function")
 
 	// Load the file with your favorite editor.
 	cmd := exec.Command(cfg.Editor, filename)

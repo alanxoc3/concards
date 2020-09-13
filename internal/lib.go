@@ -32,3 +32,9 @@ type RKey struct {
 	Hash  Hash
 	Total int
 }
+
+func AssertLogic(condition bool, message string) {
+	if !condition {
+		panic(fmt.Sprintf("Logic Error: %s\nPlease report this at: https://github.com/alanxoc3/concards/issues", message))
+	}
+}

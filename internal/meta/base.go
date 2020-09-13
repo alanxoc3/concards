@@ -31,9 +31,7 @@ type base struct {
 }
 
 func boundInt(num int, min int, max int) int {
-	if min > max {
-		panic("Logic error. Please report!")
-	}
+	internal.AssertLogic(min <= max, "min was greater than max")
 
 	if num > max {
 		return max
@@ -122,8 +120,6 @@ func (b *base) Streak() int         { return b.streak }
 
 func (b *base) Total() int {
 	sum := b.yesCount + b.noCount
-	if sum < 0 {
-		panic("Logic error. Please report to github.")
-	}
+	internal.AssertLogic(sum >= 0, "total overflowed")
 	return sum
 }
