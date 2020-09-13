@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"math"
 	"time"
+
+	"github.com/alanxoc3/concards/internal"
 )
 
 type Predict struct {
@@ -31,7 +33,7 @@ func (p *Predict) Exec(input bool) (*Predict, error) {
 
 	var next time.Time
 	if algFunc, exists := algs[p.name]; exists {
-		next = r.Next().Add(time.Duration(math.Min(algFunc(*r), MaxNextDuration)))
+		next = r.Next().Add(time.Duration(math.Min(algFunc(*r), internal.MaxNextDuration)))
 	} else {
 		return nil, fmt.Errorf("Algorithm doesn't exist.")
 	}

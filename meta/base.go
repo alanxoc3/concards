@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"strconv"
 	"time"
+
+	"github.com/alanxoc3/concards/internal"
 )
 
 type Meta interface {
-	Hash() Hash
+	Hash() internal.Hash
 	Next() time.Time
 	Curr() time.Time
 	YesCount() int
@@ -20,7 +22,7 @@ type Meta interface {
 }
 
 type base struct {
-	hash     Hash
+	hash     internal.Hash
 	next     time.Time
 	curr     time.Time
 	yesCount int
@@ -50,7 +52,7 @@ func getParam(arr []string, i int) string {
 	}
 }
 
-func hashOrZero(str string) (hash Hash) {
+func hashOrZero(str string) (hash internal.Hash) {
 	if len(str)%2 == 1 {
 		str += "0"
 	}
@@ -87,13 +89,13 @@ func newMetaFromStrings(strs ...string) *base {
 		intOrZero(getParam(strs, 5)))
 }
 
-func newBase(hash Hash, next time.Time, curr time.Time, yesCount int, noCount int, streak int) *base {
+func newBase(hash internal.Hash, next time.Time, curr time.Time, yesCount int, noCount int, streak int) *base {
 	curr = curr.UTC()
 	next = next.UTC()
 
-	yesCount = boundInt(yesCount, 0, MaxYesNoStreak)
-	noCount = boundInt(noCount, 0, MaxYesNoStreak)
-	streak = boundInt(streak, -MaxYesNoStreak, MaxYesNoStreak)
+	yesCount = boundInt(yesCount, 0, internal.MaxYesNoStreak)
+	noCount = boundInt(noCount, 0, internal.MaxYesNoStreak)
+	streak = boundInt(streak, -internal.MaxYesNoStreak, internal.MaxYesNoStreak)
 
 	// Streak can't be larger than yes or no count.
 	if streak > yesCount {
@@ -111,12 +113,12 @@ func (b *base) String() string {
 	return fmt.Sprintf("%s %s %s %d %d %d", b.Hash().String(), b.nextStr(), b.currStr(), b.yesCount, b.noCount, b.streak)
 }
 
-func (b *base) Hash() Hash      { return b.hash }
-func (b *base) Next() time.Time { return b.next }
-func (b *base) Curr() time.Time { return b.curr }
-func (b *base) YesCount() int   { return b.yesCount }
-func (b *base) NoCount() int    { return b.noCount }
-func (b *base) Streak() int     { return b.streak }
+func (b *base) Hash() internal.Hash { return b.hash }
+func (b *base) Next() time.Time     { return b.next }
+func (b *base) Curr() time.Time     { return b.curr }
+func (b *base) YesCount() int       { return b.yesCount }
+func (b *base) NoCount() int        { return b.noCount }
+func (b *base) Streak() int         { return b.streak }
 
 func (b *base) Total() int {
 	sum := b.yesCount + b.noCount

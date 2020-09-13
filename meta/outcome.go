@@ -3,6 +3,8 @@ package meta
 import (
 	"fmt"
 	"time"
+
+	"github.com/alanxoc3/concards/internal"
 )
 
 type Outcome struct {
@@ -78,8 +80,8 @@ func (r *Outcome) targetStr() string {
 	}
 }
 
-func (r *Outcome) RKey() RKey {
-   return RKey{ r.Hash(), r.Total() }
+func (r *Outcome) RKey() internal.RKey {
+	return internal.RKey{r.Hash(), r.Total()}
 }
 
 func (r *Outcome) String() string {

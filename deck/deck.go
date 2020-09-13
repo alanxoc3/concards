@@ -5,6 +5,7 @@ import (
 	"sort"
 
 	"github.com/alanxoc3/concards/card"
+	"github.com/alanxoc3/concards/internal"
 	"github.com/alanxoc3/concards/meta"
 )
 
@@ -16,11 +17,11 @@ func removeIndex(s []string, index int) []string {
 // cardMap maps checksums to cards.
 // predictMap maps checksums to cards.
 type Deck struct {
-	reviewStack []meta.Hash                 // Hashes to review ordered by date.
-	futureStack []meta.Hash                 // Hashes you have reviewed. Ordered by date.
-	predictMap  map[meta.Hash]*meta.Predict // All metas.
-	outcomeMap  map[meta.RKey]*meta.Outcome // Have reviewed.
-	cardMap     map[meta.Hash]*card.Card    // All cards in this session.
+	reviewStack []meta.Hash                     // Hashes to review ordered by date.
+	futureStack []meta.Hash                     // Hashes you have reviewed. Ordered by date.
+	predictMap  map[meta.Hash]*meta.Predict     // All metas.
+	outcomeMap  map[internal.RKey]*meta.Outcome // Have reviewed.
+	cardMap     map[meta.Hash]*card.Card        // All cards in this session.
 }
 
 func NewDeck() *Deck {
@@ -28,7 +29,7 @@ func NewDeck() *Deck {
 		reviewStack: []string{},
 		futureStack: []string{},
 		predictMap:  map[string]*meta.Predict{},
-		outcomeMap:  map[meta.ResultKey]meta.Result{},
+		outcomeMap:  map[internal.RKey]meta.Result{},
 		cardMap:     map[string]*card.Card{},
 	}
 }
