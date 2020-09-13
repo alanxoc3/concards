@@ -3,7 +3,7 @@ package meta_test
 import (
 	"testing"
 
-	"github.com/alanxoc3/concards/meta"
+	"github.com/alanxoc3/concards/internal/meta"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -30,10 +30,10 @@ func TestOutcomeStringFalse(t *testing.T) {
 
 func TestOutcomeAnswerClassification(t *testing.T) {
 	tests := []struct {
-		expect meta.AnswerClassification
+		expect       meta.AnswerClassification
 		expectStreak int
-		streak string
-		answer string
+		streak       string
+		answer       string
 	}{
 		{meta.YesWasYes, 2, "1", "1"},
 		{meta.YesWasNo, 0, "-1", "1"},

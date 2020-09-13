@@ -1,6 +1,6 @@
 package meta
 
-type AlgFunc func(Outcome) float64
+type algFunc func(Outcome) float64
 type AnswerClassification uint8
 
 const (
@@ -11,6 +11,6 @@ const (
 )
 
 // TODO: Remove this with GH-45.
-var algs = map[string]AlgFunc{
+var algs = map[string]algFunc{
 	"sm2": sm2Exec,
 }

@@ -9,13 +9,13 @@ import (
 
 type Outcome struct {
 	base
-	Target bool
+	target bool
 }
 
 func NewOutcomeFromPredict(p *Predict, target bool) *Outcome {
 	r := &Outcome{
 		base:   p.base,
-		Target: target,
+		target: target,
 	}
 
 	r.next = time.Now()
@@ -29,12 +29,12 @@ func NewOutcomeFromPredict(p *Predict, target bool) *Outcome {
 func NewOutcomeFromStrings(strs ...string) *Outcome {
 	return &Outcome{
 		base:   *newMetaFromStrings(strs...),
-		Target: getParam(strs, 6) == "1",
+		target: getParam(strs, 6) == "1",
 	}
 }
 
 func (r *Outcome) AnswerClassification() AnswerClassification {
-	if r.Target {
+	if r.target {
 		if r.streak < 0 {
 			return YesWasNo
 		} else {
@@ -63,17 +63,12 @@ func (r *Outcome) PredStreak() int {
 	return streak
 }
 
-func (r *Outcome) newCount(expecting bool, count int) int {
-	if expecting == r.Target {
-		count++
-	}
-	return count
-}
+func (r *Outcome) Target() bool { return r.target }
 
 func (r *Outcome) PredYesCount() int { return r.newCount(true, r.yesCount) }
 func (r *Outcome) PredNoCount() int  { return r.newCount(false, r.noCount) }
 func (r *Outcome) targetStr() string {
-	if r.Target {
+	if r.target {
 		return "1"
 	} else {
 		return "0"
@@ -87,3 +82,11 @@ func (r *Outcome) RKey() internal.RKey {
 func (r *Outcome) String() string {
 	return fmt.Sprintf("%s %s", r.base.String(), r.targetStr())
 }
+
+func (r *Outcome) newCount(expecting bool, count int) int {
+	if expecting == r.target {
+		count++
+	}
+	return count
+}
+

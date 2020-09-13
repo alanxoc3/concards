@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/alanxoc3/concards/meta"
+	"github.com/alanxoc3/concards/internal/meta"
 	"github.com/stretchr/testify/assert"
 )
 

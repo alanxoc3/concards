@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/alanxoc3/concards/meta"
+	"github.com/alanxoc3/concards/internal/meta"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -12,12 +12,12 @@ type metaCreate func(...string) meta.Meta
 type metaTestFunc func(*testing.T, metaCreate)
 
 func assertZero(t *testing.T, m meta.Meta) {
-   assert.Zero(t, m.Hash())
-   assert.True(t, m.Next().IsZero())
-   assert.True(t, m.Curr().IsZero())
-   assert.Zero(t, m.YesCount())
-   assert.Zero(t, m.NoCount())
-   assert.Zero(t, m.Streak())
+	assert.Zero(t, m.Hash())
+	assert.True(t, m.Next().IsZero())
+	assert.True(t, m.Curr().IsZero())
+	assert.Zero(t, m.YesCount())
+	assert.Zero(t, m.NoCount())
+	assert.Zero(t, m.Streak())
 }
 
 func testMetaFuncs(t *testing.T, createFunc metaCreate) {
@@ -33,11 +33,11 @@ var metaTestFuncs = map[string]metaTestFunc{
 		assert.NotZero(t, m.Hash())
 	},
 
-   "HashEqual": func(t *testing.T, cf metaCreate) {
-      p1 := cf("ff")
-      p2 := cf("ff00")
-      assert.True(t, p1.Hash() == p2.Hash())
-   },
+	"HashEqual": func(t *testing.T, cf metaCreate) {
+		p1 := cf("ff")
+		p2 := cf("ff00")
+		assert.True(t, p1.Hash() == p2.Hash())
+	},
 
 	"HashTooLong": func(t *testing.T, cf metaCreate) {
 		m := cf("ff0000000000000000000000000000ff11")
@@ -123,7 +123,7 @@ var metaTestFuncs = map[string]metaTestFunc{
 
 	"IsZeroNoParams": func(t *testing.T, cf metaCreate) {
 		m := cf()
-      assertZero(t, m)
+		assertZero(t, m)
 	},
 
 	"IsZeroBadParams": func(t *testing.T, cf metaCreate) {
