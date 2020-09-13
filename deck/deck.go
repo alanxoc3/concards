@@ -12,30 +12,30 @@ func removeIndex(s []string, index int) []string {
 	return append(s[:index], s[index+1:]...)
 }
 
-// refs contains checksums.
-// refsMap maps checksums to cards.
-// MetaMap maps checksums to cards.
+// reviewStack contains checksums.
+// cardMap maps checksums to cards.
+// predictMap maps checksums to cards.
 type Deck struct {
-	refs     []string                    // Hashes to review.
-	reviews  []string                    // Hashes you have reviewed. Ordered by date.
-	refsMap  map[string]*card.Card       // All cards in this session.
-	metaHist []meta.Result               // Meta history.
-	MetaMap  map[string]*meta.Prediction // All metas.
+	reviewStack []meta.Hash                 // Hashes to review ordered by date.
+	futureStack []meta.Hash                 // Hashes you have reviewed. Ordered by date.
+	predictMap  map[meta.Hash]*meta.Predict // All metas.
+	outcomeMap  map[meta.RKey]*meta.Outcome // Have reviewed.
+	cardMap     map[meta.Hash]*card.Card    // All cards in this session.
 }
 
 func NewDeck() *Deck {
 	return &Deck{
-		refs:     []string{},
-		reviews:  []string{},
-		refsMap:  map[string]*card.Card{},
-		metaHist: []meta.Result{},
-		MetaMap:  map[string]*meta.Prediction{},
+		reviewStack: []string{},
+		futureStack: []string{},
+		predictMap:  map[string]*meta.Predict{},
+		outcomeMap:  map[meta.ResultKey]meta.Result{},
+		cardMap:     map[string]*card.Card{},
 	}
 }
 
 func (d *Deck) Forget(i int) error {
-	if i >= 0 && i < len(d.refs) {
-		delete(d.MetaMap, d.refs[i])
+	if i >= 0 && i < len(d.reviewStack) {
+		delete(d.predictMap, d.reviewStack[i])
 		return nil
 	} else {
 		return fmt.Errorf("Can't forget. Index is out of bounds.")
@@ -44,9 +44,9 @@ func (d *Deck) Forget(i int) error {
 
 // Deletes from the deck.
 func (d *Deck) Drop(i int) error {
-	if i >= 0 && i < len(d.refs) {
-		delete(d.refsMap, d.refs[i])
-		d.refs = removeIndex(d.refs, i)
+	if i >= 0 && i < len(d.reviewStack) {
+		delete(d.cardMap, d.reviewStack[i])
+		d.reviewStack = removeIndex(d.reviewStack, i)
 		return nil
 	} else {
 		return fmt.Errorf("Can't delete. Index is out of bounds.")
@@ -54,12 +54,12 @@ func (d *Deck) Drop(i int) error {
 }
 
 func (d *Deck) Delay(i int) error {
-	if i >= 0 && i < len(d.refs) {
-		d.reviews = append(d.reviews, d.refs[i])
-		d.refs = removeIndex(d.refs, i)
+	if i >= 0 && i < len(d.reviewStack) {
+		d.futureStack = append(d.futureStack, d.reviewStack[i])
+		d.reviewStack = removeIndex(d.reviewStack, i)
 
-		sort.Slice(d.reviews, func(i, j int) bool {
-			return d.MetaMap[d.reviews[i]].Next().Before(d.MetaMap[d.reviews[j]].Next())
+		sort.Slice(d.futureStack, func(i, j int) bool {
+			return d.predictMap[d.futureStack[i]].Next().Before(d.predictMap[d.futureStack[j]].Next())
 		})
 		return nil
 	} else {
@@ -69,10 +69,10 @@ func (d *Deck) Delay(i int) error {
 
 func (d *Deck) AddCard(c *card.Card) error {
 	hash := c.HashStr()
-	_, exists := d.refsMap[hash]
+	_, exists := d.cardMap[hash]
 	if !exists {
-		d.refsMap[hash] = c
-		d.refs = append(d.refs, hash)
+		d.cardMap[hash] = c
+		d.reviewStack = append(d.reviewStack, hash)
 		return nil
 	} else {
 		return fmt.Errorf("card.Card already exists in deck")
@@ -85,16 +85,16 @@ func (d *Deck) InsertCard(c *card.Card, i int) error {
 		i = 0
 	}
 
-	_, exists := d.refsMap[hash]
+	_, exists := d.cardMap[hash]
 	if !exists {
-		d.refsMap[hash] = c
+		d.cardMap[hash] = c
 
 		if i >= d.Len() {
-			d.refs = append(d.refs, hash)
+			d.reviewStack = append(d.reviewStack, hash)
 		} else {
-			d.refs = append(d.refs, "")
-			copy(d.refs[i+1:], d.refs[i:])
-			d.refs[i] = hash
+			d.reviewStack = append(d.reviewStack, "")
+			copy(d.reviewStack[i+1:], d.reviewStack[i:])
+			d.reviewStack[i] = hash
 		}
 
 		return nil
@@ -117,17 +117,17 @@ func (d *Deck) AddNewCards(file string, sides string) error {
 }
 
 func (d *Deck) AddMeta(h string, m *meta.Prediction) {
-	d.MetaMap[h] = m
+	d.predictMap[h] = m
 }
 
 func (d *Deck) AddMetaIfNil(h string, m *meta.Prediction) {
-	if _, ok := d.MetaMap[h]; !ok {
+	if _, ok := d.predictMap[h]; !ok {
 		d.AddMeta(h, m)
 	}
 }
 
 func (d *Deck) Len() int {
-	return len(d.refs)
+	return len(d.reviewStack)
 }
 
 func (d *Deck) IsEmpty() bool {
@@ -135,14 +135,14 @@ func (d *Deck) IsEmpty() bool {
 }
 
 func (d *Deck) Swap(i, j int) {
-	d.refs[i], d.refs[j] = d.refs[j], d.refs[i]
+	d.reviewStack[i], d.reviewStack[j] = d.reviewStack[j], d.reviewStack[i]
 }
 
 func (d *Deck) Get(i int) (h string, c *card.Card, m *meta.Prediction) {
 	if i >= 0 && i < d.Len() {
-		h = d.refs[i]
-		c = d.refsMap[h]
-		m = d.MetaMap[h]
+		h = d.reviewStack[i]
+		c = d.cardMap[h]
+		m = d.predictMap[h]
 	}
 	return
 }
@@ -164,31 +164,31 @@ func (d *Deck) GetMeta(i int) (m *meta.Prediction) {
 
 func (d *Deck) Copy() *Deck {
 	n := NewDeck()
-	for _, v := range d.refs {
-		n.refs = append(n.refs, v)
+	for _, v := range d.reviewStack {
+		n.reviewStack = append(n.reviewStack, v)
 	}
-	for k, v := range d.refsMap {
-		n.refsMap[k] = v
+	for k, v := range d.cardMap {
+		n.cardMap[k] = v
 	}
-	for k, v := range d.MetaMap {
-		n.MetaMap[k] = v
+	for k, v := range d.predictMap {
+		n.predictMap[k] = v
 	}
 	return n
 }
 
 func (d *Deck) Clone(o *Deck) {
-	d.refs = []string{}
-	d.refsMap = map[string]*card.Card{}
-	d.MetaMap = map[string]*meta.Prediction{}
+	d.reviewStack = []string{}
+	d.cardMap = map[string]*card.Card{}
+	d.predictMap = map[string]*meta.Prediction{}
 
-	for _, v := range o.refs {
-		d.refs = append(d.refs, v)
+	for _, v := range o.reviewStack {
+		d.reviewStack = append(d.reviewStack, v)
 	}
-	for k, v := range o.refsMap {
-		d.refsMap[k] = v
+	for k, v := range o.cardMap {
+		d.cardMap[k] = v
 	}
-	for k, v := range o.MetaMap {
-		d.MetaMap[k] = v
+	for k, v := range o.predictMap {
+		d.predictMap[k] = v
 	}
 }
 
@@ -223,18 +223,18 @@ func (d *Deck) ExecTop(input bool, defaultAlg string) (*meta.Prediction, error) 
 }
 
 func (d *Deck) TopToEnd() {
-	if len(d.refs) > 1 {
-		d.refs = append(d.refs[1:], d.refs[0])
+	if len(d.reviewStack) > 1 {
+		d.reviewStack = append(d.reviewStack[1:], d.reviewStack[0])
 	}
 }
 
 func (d *Deck) TopTo(i int) {
-	if l := len(d.refs); l > 1 && i > 0 {
+	if l := len(d.reviewStack); l > 1 && i > 0 {
 		if i >= l {
 			i = l - 1
 		}
-		v := d.refs[0]
-		copy(d.refs, d.refs[1:i+1])
-		d.refs[i] = v
+		v := d.reviewStack[0]
+		copy(d.reviewStack, d.reviewStack[1:i+1])
+		d.reviewStack[i] = v
 	}
 }

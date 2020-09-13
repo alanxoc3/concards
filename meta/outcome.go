@@ -5,13 +5,13 @@ import (
 	"time"
 )
 
-type Result struct {
+type Outcome struct {
 	base
 	Target bool
 }
 
-func NewResultFromPrediction(p *Prediction, target bool) *Result {
-	r := &Result{
+func NewOutcomeFromPredict(p *Predict, target bool) *Outcome {
+	r := &Outcome{
 		base:   p.base,
 		Target: target,
 	}
@@ -24,14 +24,14 @@ func NewResultFromPrediction(p *Prediction, target bool) *Result {
 	return r
 }
 
-func NewResultFromStrings(strs ...string) *Result {
-	return &Result{
+func NewOutcomeFromStrings(strs ...string) *Outcome {
+	return &Outcome{
 		base:   *newMetaFromStrings(strs...),
 		Target: getParam(strs, 6) == "1",
 	}
 }
 
-func (r *Result) AnswerClassification() AnswerClassification {
+func (r *Outcome) AnswerClassification() AnswerClassification {
 	if r.Target {
 		if r.streak < 0 {
 			return YesWasNo
@@ -47,7 +47,7 @@ func (r *Result) AnswerClassification() AnswerClassification {
 	}
 }
 
-func (r *Result) PredStreak() int {
+func (r *Outcome) PredStreak() int {
 	// Streak Logic
 	streak := r.streak
 	switch r.AnswerClassification() {
@@ -61,16 +61,16 @@ func (r *Result) PredStreak() int {
 	return streak
 }
 
-func (r *Result) newCount(expecting bool, count int) int {
+func (r *Outcome) newCount(expecting bool, count int) int {
 	if expecting == r.Target {
 		count++
 	}
 	return count
 }
 
-func (r *Result) PredYesCount() int { return r.newCount(true, r.yesCount) }
-func (r *Result) PredNoCount() int  { return r.newCount(false, r.noCount) }
-func (r *Result) targetStr() string {
+func (r *Outcome) PredYesCount() int { return r.newCount(true, r.yesCount) }
+func (r *Outcome) PredNoCount() int  { return r.newCount(false, r.noCount) }
+func (r *Outcome) targetStr() string {
 	if r.Target {
 		return "1"
 	} else {
@@ -78,6 +78,10 @@ func (r *Result) targetStr() string {
 	}
 }
 
-func (r *Result) String() string {
+func (r *Outcome) RKey() RKey {
+   return RKey{ r.Hash(), r.Total() }
+}
+
+func (r *Outcome) String() string {
 	return fmt.Sprintf("%s %s", r.base.String(), r.targetStr())
 }

@@ -7,28 +7,28 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestResultBasics(t *testing.T) {
+func TestOutcomeBasics(t *testing.T) {
 	testMetaFuncs(t, func(strs ...string) meta.Meta {
-		return meta.NewResultFromStrings(strs...)
+		return meta.NewOutcomeFromStrings(strs...)
 	})
 }
 
-func TestResultStringBadInput(t *testing.T) {
-	r := meta.NewResultFromStrings("ff000000000000000000000000000000", "2020-01-01T00:00:00Z", "2020-01-01T00:00:00Z", "12", "12", "12", "alg")
+func TestOutcomeStringBadInput(t *testing.T) {
+	r := meta.NewOutcomeFromStrings("ff000000000000000000000000000000", "2020-01-01T00:00:00Z", "2020-01-01T00:00:00Z", "12", "12", "12", "alg")
 	assert.Equal(t, "ff000000000000000000000000000000 2020-01-01T00:00:00Z 2020-01-01T00:00:00Z 12 12 12 0", r.String())
 }
 
-func TestResultStringTrue(t *testing.T) {
-	r := meta.NewResultFromStrings("ff000000000000000000000000000000", "2020-01-01T00:00:00Z", "2020-01-01T00:00:00Z", "12", "12", "12", "1")
+func TestOutcomeStringTrue(t *testing.T) {
+	r := meta.NewOutcomeFromStrings("ff000000000000000000000000000000", "2020-01-01T00:00:00Z", "2020-01-01T00:00:00Z", "12", "12", "12", "1")
 	assert.Equal(t, "ff000000000000000000000000000000 2020-01-01T00:00:00Z 2020-01-01T00:00:00Z 12 12 12 1", r.String())
 }
 
-func TestResultStringFalse(t *testing.T) {
-	r := meta.NewResultFromStrings("ff000000000000000000000000000000", "2020-01-01T00:00:00Z", "2020-01-01T00:00:00Z", "12", "12", "12")
+func TestOutcomeStringFalse(t *testing.T) {
+	r := meta.NewOutcomeFromStrings("ff000000000000000000000000000000", "2020-01-01T00:00:00Z", "2020-01-01T00:00:00Z", "12", "12", "12")
 	assert.Equal(t, "ff000000000000000000000000000000 2020-01-01T00:00:00Z 2020-01-01T00:00:00Z 12 12 12 0", r.String())
 }
 
-func TestResultAnswerClassification(t *testing.T) {
+func TestOutcomeAnswerClassification(t *testing.T) {
 	tests := []struct {
 		expect meta.AnswerClassification
 		expectStreak int
@@ -44,7 +44,7 @@ func TestResultAnswerClassification(t *testing.T) {
 	}
 
 	for _, v := range tests {
-		r := meta.NewResultFromStrings("", "", "", "", "", v.streak, v.answer)
+		r := meta.NewOutcomeFromStrings("", "", "", "", "", v.streak, v.answer)
 		assert.Equal(t, v.expect, r.AnswerClassification())
 		assert.Equal(t, v.expectStreak, r.PredStreak())
 	}

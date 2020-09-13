@@ -1,7 +1,6 @@
 package meta
 
 import (
-	"bytes"
 	"encoding/hex"
 	"fmt"
 	"strconv"
@@ -9,22 +8,19 @@ import (
 )
 
 type Meta interface {
-	Hash() [16]byte
+	Hash() Hash
 	Next() time.Time
 	Curr() time.Time
 	YesCount() int
 	NoCount() int
 	Streak() int
 
-	HashStr() string
 	String() string
-
-	IsNew() bool
-	IsZero() bool
+	Total() int
 }
 
 type base struct {
-	hash     [16]byte
+	hash     Hash
 	next     time.Time
 	curr     time.Time
 	yesCount int
@@ -54,7 +50,7 @@ func getParam(arr []string, i int) string {
 	}
 }
 
-func hashOrZero(str string) (hash [16]byte) {
+func hashOrZero(str string) (hash Hash) {
 	if len(str)%2 == 1 {
 		str += "0"
 	}
@@ -91,7 +87,7 @@ func newMetaFromStrings(strs ...string) *base {
 		intOrZero(getParam(strs, 5)))
 }
 
-func newBase(hash [16]byte, next time.Time, curr time.Time, yesCount int, noCount int, streak int) *base {
+func newBase(hash Hash, next time.Time, curr time.Time, yesCount int, noCount int, streak int) *base {
 	curr = curr.UTC()
 	next = next.UTC()
 
@@ -111,19 +107,21 @@ func newBase(hash [16]byte, next time.Time, curr time.Time, yesCount int, noCoun
 
 func (b *base) nextStr() string { return b.next.Format(time.RFC3339) }
 func (b *base) currStr() string { return b.curr.Format(time.RFC3339) }
-func (b *base) HashStr() string { return fmt.Sprintf("%x", b.hash) }
 func (b *base) String() string {
-	return fmt.Sprintf("%s %s %s %d %d %d", b.HashStr(), b.nextStr(), b.currStr(), b.yesCount, b.noCount, b.streak)
+	return fmt.Sprintf("%s %s %s %d %d %d", b.Hash().String(), b.nextStr(), b.currStr(), b.yesCount, b.noCount, b.streak)
 }
 
-func (b *base) Hash() [16]byte  { return b.hash }
+func (b *base) Hash() Hash      { return b.hash }
 func (b *base) Next() time.Time { return b.next }
 func (b *base) Curr() time.Time { return b.curr }
 func (b *base) YesCount() int   { return b.yesCount }
 func (b *base) NoCount() int    { return b.noCount }
 func (b *base) Streak() int     { return b.streak }
 
-func (b *base) IsNew() bool { return b.yesCount == 0 && b.noCount == 0 && b.streak == 0 }
-func (b *base) IsZero() bool {
-	return bytes.Equal(b.hash[:], make([]byte, 16)) && b.next.IsZero() && b.curr.IsZero() && b.yesCount == 0 && b.noCount == 0 && b.streak == 0
+func (b *base) Total() int {
+	sum := b.yesCount + b.noCount
+	if sum < 0 {
+		panic("Logic error. Please report to github.")
+	}
+	return sum
 }

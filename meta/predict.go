@@ -6,28 +6,28 @@ import (
 	"time"
 )
 
-type Prediction struct {
+type Predict struct {
 	base
 	name string
 }
 
-func NewPredictionFromStrings(strs ...string) *Prediction {
-	return &Prediction{
+func NewPredictFromStrings(strs ...string) *Predict {
+	return &Predict{
 		base: *newMetaFromStrings(strs...),
 		name: getParam(strs, 6),
 	}
 }
 
-func NewDefaultPrediction(hash string, name string) *Prediction {
-	return &Prediction{
+func NewDefaultPredict(hash string, name string) *Predict {
+	return &Predict{
 		base: *newMetaFromStrings([]string{hash}...),
 		name: name,
 	}
 }
 
-func (p *Prediction) Exec(input bool) (*Prediction, error) {
+func (p *Predict) Exec(input bool) (*Predict, error) {
 	// Note that r.Next() has the current time.
-	r := NewResultFromPrediction(p, input)
+	r := NewOutcomeFromPredict(p, input)
 
 	var next time.Time
 	if algFunc, exists := algs[p.name]; exists {
@@ -36,7 +36,7 @@ func (p *Prediction) Exec(input bool) (*Prediction, error) {
 		return nil, fmt.Errorf("Algorithm doesn't exist.")
 	}
 
-	return &Prediction{
+	return &Predict{
 		*newBase(
 			r.Hash(),
 			next,
@@ -48,10 +48,10 @@ func (p *Prediction) Exec(input bool) (*Prediction, error) {
 	}, nil
 }
 
-func (b *Prediction) Name() string {
+func (b *Predict) Name() string {
 	return b.name
 }
 
-func (b *Prediction) String() string {
+func (b *Predict) String() string {
 	return fmt.Sprintf("%s %s", b.base.String(), b.name)
 }
