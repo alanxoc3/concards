@@ -34,7 +34,7 @@ func NewDeck() *Deck {
 }
 
 // Deletes from the deck.
-func (d *Deck) Drop(i int) error {
+func (d *Deck) drop(i int) error {
 	if i >= 0 && i < len(d.reviewStack) {
 		delete(d.cardMap, d.reviewStack[i])
 		d.reviewStack = removeIndex(d.reviewStack, i)
@@ -44,7 +44,7 @@ func (d *Deck) Drop(i int) error {
 	}
 }
 
-func (d *Deck) AddCard(c *card.Card) error {
+func (d *Deck) addCard(c *card.Card) error {
 	hash := c.Hash()
 	_, exists := d.cardMap[hash]
 	if !exists {
@@ -66,7 +66,7 @@ func (d *Deck) InsertCard(c *card.Card, i int) error {
 	if !exists {
 		d.cardMap[hash] = c
 
-		if i >= d.Len() {
+		if i >= d.ReviewLen() {
 			d.reviewStack = append(d.reviewStack, hash)
 		} else {
 			d.reviewStack = append(d.reviewStack, internal.Hash{})
@@ -80,63 +80,41 @@ func (d *Deck) InsertCard(c *card.Card, i int) error {
 	}
 }
 
-func (d *Deck) AddNewCards(file string, sides string) error {
-	if cards, err := card.NewCards(file, sides); err != nil {
-		return err
-	} else {
-		for _, c := range cards {
-			if addErr := d.AddCard(c); addErr != nil {
-				err = addErr
-			}
-		}
-		return err
-	}
+func (d *Deck) AddCards(cards ...*card.Card) {
+   for _, c := range cards {
+      hash := c.Hash()
+      if _, exist := d.cardMap[hash]; !exist {
+         d.cardMap[hash] = c
+         d.reviewStack = append(d.reviewStack, hash)
+      }
+   }
 }
 
-func (d *Deck) AddMeta(h internal.Hash, m *meta.Predict) {
-	d.predictMap[h] = m
+func (d *Deck) AddPredicts(predicts ...*meta.Predict) {
+   for _, p := range predicts {
+      h := p.Hash()
+      if _, exist := d.predictMap[h]; !exist {
+         d.predictMap[p.Hash()] = p
+      }
+   }
 }
 
-func (d *Deck) AddMetaIfNil(h internal.Hash, m *meta.Predict) {
-	if _, ok := d.predictMap[h]; !ok {
-		d.AddMeta(h, m)
-	}
+func (d *Deck) ReviewLen() int { return len(d.reviewStack) }
+func (d *Deck) FutureLen() int { return len(d.futureStack) }
+
+func (d *Deck) getHash(i int) *internal.Hash {
+	internal.AssertLogic(i >= 0 && i < d.ReviewLen(), "index out of bounds")
+	return &d.reviewStack[i]
 }
 
-func (d *Deck) Len() int {
-	return len(d.reviewStack)
+func (d *Deck) getCard(i int) *card.Card {
+	internal.AssertLogic(i >= 0 && i < d.ReviewLen(), "index out of bounds")
+	return d.cardMap[d.reviewStack[i]]
 }
 
-func (d *Deck) IsEmpty() bool {
-	return d.Len() == 0
-}
-
-func (d *Deck) Swap(i, j int) {
-	d.reviewStack[i], d.reviewStack[j] = d.reviewStack[j], d.reviewStack[i]
-}
-
-func (d *Deck) Get(i int) (h internal.Hash, c *card.Card, m *meta.Predict) {
-	if i >= 0 && i < d.Len() {
-		h = d.reviewStack[i]
-		c = d.cardMap[h]
-		m = d.predictMap[h]
-	}
-	return
-}
-
-func (d *Deck) GetHash(i int) (h internal.Hash) {
-	h, _, _ = d.Get(i)
-	return
-}
-
-func (d *Deck) GetCard(i int) (c *card.Card) {
-	_, c, _ = d.Get(i)
-	return
-}
-
-func (d *Deck) GetMeta(i int) (m *meta.Predict) {
-	_, _, m = d.Get(i)
-	return
+func (d *Deck) getPredict(i int) *meta.Predict {
+	internal.AssertLogic(i >= 0 && i < d.ReviewLen(), "index out of bounds")
+	return d.predictMap[d.reviewStack[i]]
 }
 
 func (d *Deck) Copy() *Deck {
@@ -170,48 +148,32 @@ func (d *Deck) Clone(o *Deck) {
 }
 
 // Top shortcuts
-func (d *Deck) Top() (internal.Hash, *card.Card, *meta.Predict) { return d.Get(0) }
-func (d *Deck) TopHash() internal.Hash                          { return d.GetHash(0) }
-func (d *Deck) TopCard() *card.Card                             { return d.GetCard(0) }
-func (d *Deck) TopMeta() *meta.Predict                          { return d.GetMeta(0) }
-func (d *Deck) DropTop() error                                  { return d.Drop(0) }
-
-func (d *Deck) TopMetaOrDefault(defaultAlg string) *meta.Predict {
-	m := d.TopMeta()
-	if m == nil {
-		return meta.NewDefaultPredict(d.TopHash(), defaultAlg)
-	}
-	return m
+func (d *Deck) TopHash() *internal.Hash {
+	if d.ReviewLen() == 0 { return nil
+   } else { return d.getHash(0) }
 }
 
-func (d *Deck) ExecTop(input bool, defaultAlg string) (*meta.Predict, error) {
-	h := d.TopHash()
-
-	if ma, e := d.TopMetaOrDefault(defaultAlg).Exec(input); e != nil {
-		d.DropTop()
-		return nil, e
-	} else {
-		d.AddMeta(h, ma)
-		// Move to other deck.
-		return ma, nil
-	}
+func (d *Deck) TopCard() *card.Card {
+	if d.ReviewLen() == 0 { return nil
+   } else { return d.getCard(0) }
 }
 
-func (d *Deck) TopToEnd() {
-	if len(d.reviewStack) > 1 {
-		d.reviewStack = append(d.reviewStack[1:], d.reviewStack[0])
-	}
+func (d *Deck) TopPredict() *meta.Predict {
+	if d.ReviewLen() == 0 { return nil
+   } else { return d.getPredict(0) }
 }
 
-func (d *Deck) TopTo(i int) {
-	if l := len(d.reviewStack); l > 1 && i > 0 {
-		if i >= l {
-			i = l - 1
-		}
-		v := d.reviewStack[0]
-		copy(d.reviewStack, d.reviewStack[1:i+1])
-		d.reviewStack[i] = v
-	}
+// TODO: don't depend on the drop method.
+func (d *Deck) DropTop() error { return d.drop(0) }
+
+func (d *Deck) ExecTop(input bool, defaultAlg string) (meta.Predict, error) {
+   if d.ReviewLen() == 0 { return *meta.NewPredictFromStrings(), fmt.Errorf("Tried to access card from an empty deck!") }
+   p := d.TopPredict()
+
+   // TODO: Move the card & create a meta outcome.
+	np := p.Exec(input);
+   d.predictMap[p.Hash()] = &np
+   return np, nil
 }
 
 func (d *Deck) PredictList() []meta.Predict {
@@ -220,4 +182,20 @@ func (d *Deck) PredictList() []meta.Predict {
 		predicts = append(predicts, *v)
 	}
 	return predicts
+}
+
+func (d *Deck) OutcomeList() []meta.Outcome {
+	outcomes := make([]meta.Outcome, len(d.outcomeMap))
+	for _, v := range d.outcomeMap {
+		outcomes = append(outcomes, *v)
+	}
+	return outcomes
+}
+
+func (d *Deck) CardList() []card.Card {
+	cards := make([]card.Card, len(d.cardMap))
+	for _, v := range d.cardMap {
+		cards = append(cards, *v)
+	}
+	return cards
 }

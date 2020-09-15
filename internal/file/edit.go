@@ -36,12 +36,16 @@ func EditCards(filename string, cfg *Config) (*deck.Deck, error) {
 
 // Assumes the deck is sorted how you want it to be sorted.
 func EditFile(d *deck.Deck, cfg *Config, rf DeckFunc, ef DeckFunc) error {
-	if d.IsEmpty() {
+	if d.ReviewLen() == 0 {
 		return fmt.Errorf("Error: The deck is empty.")
 	}
 
 	// We need to get information for the top card first.
-	curHash, curCard, curMeta := d.Top()
+   curHash := d.TopHash()
+   curCard := d.TopCard()
+   curMeta := d.TopPredict()
+   internal.AssertLogic(curHash != nil && curCard != nil && curMeta != nil, "no top info for non empty deck")
+
 	filename := curCard.File()
 
 	// Deck before editing.
@@ -61,18 +65,13 @@ func EditFile(d *deck.Deck, cfg *Config, rf DeckFunc, ef DeckFunc) error {
 
 	// Get only the cards that were created in the file.
 	deckAfter.OuterLeftJoin(deckBefore)
-
-	// Change the insert index based on if the current card was removed or not.
-	cardIndex := 0
-	if curHash == d.TopHash() {
-		cardIndex = 1
-	}
+   cl := deckAfter.CardList()
 
 	// Check if the current card was removed or not.
-	for i := deckAfter.Len() - 1; i >= 0; i-- {
-		newCard := deckAfter.GetCard(i)
-		d.InsertCard(newCard, cardIndex)
-		d.AddMetaIfNil(newCard.Hash(), curMeta)
+	for i := len(cl) - 1; i >= 0; i-- {
+		newCard := cl[i]
+      d.AddCards(&newCard)
+		d.AddPredicts(curMeta.Clone(newCard.Hash()))
 	}
 
 	return nil

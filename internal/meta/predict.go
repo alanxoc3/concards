@@ -27,18 +27,26 @@ func NewDefaultPredict(hash internal.Hash, name string) *Predict {
 	}
 }
 
-func (p *Predict) Exec(input bool) (*Predict, error) {
+func (p *Predict) Clone(h internal.Hash) *Predict {
+   np := *p
+   np.hash = h
+	return &np
+}
+
+func (p *Predict) Exec(input bool) Predict {
+   name := p.name
+
+   algFunc, exists := algs[p.name]
+   if !exists {
+      algFunc = sm2Exec
+      name = "sm2"
+   }
+
 	// Note that r.Next() has the current time.
 	r := NewOutcomeFromPredict(p, input)
+   next := r.Next().Add(time.Duration(math.Min(algFunc(*r), internal.MaxNextDuration)))
 
-	var next time.Time
-	if algFunc, exists := algs[p.name]; exists {
-		next = r.Next().Add(time.Duration(math.Min(algFunc(*r), internal.MaxNextDuration)))
-	} else {
-		return nil, fmt.Errorf("Algorithm doesn't exist.")
-	}
-
-	return &Predict{
+	return Predict{
 		*newBase(
 			r.Hash(),
 			next,
@@ -46,8 +54,8 @@ func (p *Predict) Exec(input bool) (*Predict, error) {
 			r.PredYesCount(),
 			r.PredNoCount(),
 			r.PredStreak(),
-		), p.Name(),
-	}, nil
+		), name,
+	}
 }
 
 func (b *Predict) Name() string {

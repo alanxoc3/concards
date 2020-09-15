@@ -46,18 +46,18 @@ func main() {
 	}
 
 	if c.IsPrint {
-		for i := 0; i < d.Len(); i++ {
-			fmt.Printf("@> %s\n", d.GetCard(i).String())
+      cards := d.CardList()
+      for _, c := range cards {
+			fmt.Printf("@> %s\n", c.String())
 		}
 
-		if d.Len() > 0 {
+		if len(cards) > 0 {
 			fmt.Printf("<@\n")
 		}
 		return
 	}
 
 	rand.Seed(time.Now().UTC().UnixNano())
-	d.Shuffle()
 	termboxgui.TermBoxRun(d, c)
 	_ = file.WriteMetasToFile(d, c.MetaFile)
 }

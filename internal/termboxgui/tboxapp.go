@@ -27,7 +27,7 @@ func TermBoxRun(d *deck.Deck, cfg *file.Config) error {
 	finishedEditing := false
 
 	save(d) // Save at beginning, and end of each editing command.
-	for d.Len() > 0 {
+	for d.ReviewLen() > 0 {
 		drawScreen(d, helpMode, cardShown, finishedEditing)
 		finishedEditing = false
 
@@ -94,7 +94,7 @@ func TermBoxRun(d *deck.Deck, cfg *file.Config) error {
 					}
 				} else if inp == " " || inp == "\r" {
 					cardShown++
-					if l := d.GetCard(0).Len(); cardShown > l {
+					if l := d.TopCard().Len(); cardShown > l {
 						cardShown = 1
 					}
 				}

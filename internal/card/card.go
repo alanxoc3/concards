@@ -17,9 +17,10 @@ type Card struct {
 	facts [][]string
 }
 
+// Returns a list of cards, or an empty list if there is an error.
 func NewCards(file string, sides string) ([]*Card, error) {
 	if file == "" {
-		return nil, fmt.Errorf("File not provided.")
+		return []*Card{}, fmt.Errorf("File not provided.")
 	}
 
 	fact := []string{}
@@ -50,7 +51,7 @@ func NewCards(file string, sides string) ([]*Card, error) {
 	if len(facts) > 0 {
 		return append([]*Card{&Card{file, facts}}, cards...), nil
 	} else {
-		return nil, fmt.Errorf("Question not provided.")
+		return []*Card{}, fmt.Errorf("Question not provided.")
 	}
 }
 

@@ -39,6 +39,10 @@ func (h Hash) String() string {
 	return fmt.Sprintf("%x", [16]byte(h))
 }
 
+func (h Hash) IsZero() bool {
+   return [16]byte{} == [16]byte(h)
+}
+
 type RKey struct {
 	Hash  Hash
 	Total int

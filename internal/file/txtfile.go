@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/alanxoc3/concards/internal"
+	"github.com/alanxoc3/concards/internal/card"
 	"github.com/alanxoc3/concards/internal/deck"
 )
 
@@ -47,7 +48,7 @@ func ReadCardsToDeckHelper(r io.Reader, d *deck.Deck, f string) {
 	// Initialization.
 	facts := []string{}
 	state := false
-	var td *deck.Deck
+	var td []*card.Card
 
 	// Scan by words.
 	scanner := bufio.NewScanner(r)
@@ -58,22 +59,21 @@ func ReadCardsToDeckHelper(r io.Reader, d *deck.Deck, f string) {
 
 		if state {
 			if t == internal.CBeg {
-				td.AddNewCards(f, strings.Join(facts, " "))
+				cards, _ := card.NewCards(f, strings.Join(facts, " "))
+            td = append(td, cards...)
 
 				facts = []string{}
 			} else if t == internal.CEnd {
-				td.AddNewCards(f, strings.Join(facts, " "))
-
-				for i := 0; i < td.Len(); i++ {
-					d.AddCard(td.GetCard(i))
-				}
+				cards, _ := card.NewCards(f, strings.Join(facts, " "))
+            td = append(td, cards...)
+            d.AddCards(td...)
 				state = false
 			} else {
 				facts = append(facts, t)
 			}
 		} else if t == internal.CBeg {
 			// create td
-			td = deck.NewDeck()
+			td = []*card.Card{}
 			state = true
 			facts = []string{}
 		}

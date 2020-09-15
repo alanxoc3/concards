@@ -9,7 +9,6 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/alanxoc3/concards/internal"
 	"github.com/alanxoc3/concards/internal/deck"
 	"github.com/alanxoc3/concards/internal/meta"
 )
@@ -33,22 +32,22 @@ func ReadMetasToDeckHelper(r io.Reader, d *deck.Deck) {
 	for lineScanner.Scan() {
 		strs := strings.Fields(lineScanner.Text())
 
-		// First field is a constant sized checksum.
-		if len(strs) > 0 && len(strs[0]) == 32 {
-			d.AddMeta(internal.NewHash(strs[0]), meta.NewPredictFromStrings(strs...))
+		// Only add if there is something on the line.
+		if len(strs) > 0 {
+			d.AddPredicts(meta.NewPredictFromStrings(strs...))
 		}
 	}
 }
 
 func WriteMetasToString(d *deck.Deck) string {
 	predicts := d.PredictList()
-   predictStrings := make([]string, len(predicts))
-   for _, v := range predicts {
-      predictStrings = append(predictStrings, v.String())
-   }
+	predictStrings := make([]string, len(predicts))
+	for _, v := range predicts {
+		predictStrings = append(predictStrings, v.String())
+	}
 
 	sort.Strings(predictStrings)
-   return strings.Join(predictStrings, "\n")
+	return strings.Join(predictStrings, "\n")
 }
 
 func WriteMetasToFile(d *deck.Deck, filename string) error {
