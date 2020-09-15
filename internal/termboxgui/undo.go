@@ -3,7 +3,7 @@ package termboxgui
 import (
 	"fmt"
 
-	"github.com/alanxoc3/concards/deck"
+	"github.com/alanxoc3/concards/internal/deck"
 )
 
 var stack []*deck.Deck = []*deck.Deck{}

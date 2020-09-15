@@ -1,7 +1,6 @@
 package meta
 
 import (
-	"encoding/hex"
 	"fmt"
 	"strconv"
 	"time"
@@ -50,17 +49,6 @@ func getParam(arr []string, i int) string {
 	}
 }
 
-func hashOrZero(str string) (hash internal.Hash) {
-	if len(str)%2 == 1 {
-		str += "0"
-	}
-
-	if x, err := hex.DecodeString(str); err == nil {
-		copy(hash[:], x)
-	}
-	return hash
-}
-
 func intOrZero(str string) int {
 	if x, err := strconv.Atoi(str); err != nil {
 		return 0
@@ -79,7 +67,7 @@ func timeOrZero(str string) time.Time {
 
 func newMetaFromStrings(strs ...string) *base {
 	return newBase(
-		hashOrZero(getParam(strs, 0)),
+		internal.NewHash(getParam(strs, 0)),
 		timeOrZero(getParam(strs, 1)),
 		timeOrZero(getParam(strs, 2)),
 		intOrZero(getParam(strs, 3)),

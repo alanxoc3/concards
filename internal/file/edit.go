@@ -5,8 +5,8 @@ import (
 	"os"
 	"os/exec"
 
-	"github.com/alanxoc3/concards/deck"
 	"github.com/alanxoc3/concards/internal"
+	"github.com/alanxoc3/concards/internal/deck"
 )
 
 type DeckFunc func(string, *Config) (*deck.Deck, error)
@@ -72,7 +72,7 @@ func EditFile(d *deck.Deck, cfg *Config, rf DeckFunc, ef DeckFunc) error {
 	for i := deckAfter.Len() - 1; i >= 0; i-- {
 		newCard := deckAfter.GetCard(i)
 		d.InsertCard(newCard, cardIndex)
-		d.AddMetaIfNil(newCard.HashStr(), curMeta)
+		d.AddMetaIfNil(newCard.Hash(), curMeta)
 	}
 
 	return nil

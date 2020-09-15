@@ -3,8 +3,8 @@ package termboxgui
 import (
 	"fmt"
 
-	"github.com/alanxoc3/concards/card"
-	"github.com/alanxoc3/concards/deck"
+	"github.com/alanxoc3/concards/internal/card"
+	"github.com/alanxoc3/concards/internal/deck"
 	runewidth "github.com/mattn/go-runewidth"
 	termbox "github.com/nsf/termbox-go"
 )

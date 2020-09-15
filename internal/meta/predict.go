@@ -20,9 +20,9 @@ func NewPredictFromStrings(strs ...string) *Predict {
 	}
 }
 
-func NewDefaultPredict(hash string, name string) *Predict {
+func NewDefaultPredict(hash internal.Hash, name string) *Predict {
 	return &Predict{
-		base: *newMetaFromStrings([]string{hash}...),
+		base: *newMetaFromStrings([]string{hash.String()}...),
 		name: name,
 	}
 }

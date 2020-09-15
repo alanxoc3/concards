@@ -1,8 +1,8 @@
 package termboxgui
 
 import (
-	"github.com/alanxoc3/concards/deck"
-	"github.com/alanxoc3/concards/file"
+	"github.com/alanxoc3/concards/internal/deck"
+	"github.com/alanxoc3/concards/internal/file"
 	termbox "github.com/nsf/termbox-go"
 )
 
@@ -62,16 +62,6 @@ func TermBoxRun(d *deck.Deck, cfg *file.Config) error {
 					updateStatMsg("Deleted.", termbox.ColorYellow)
 					cardShown = 1
 					d.DropTop()
-					save(d)
-				} else if inp == "f" {
-					updateStatMsg("Forgotten.", termbox.ColorYellow)
-					cardShown = 1
-					d.ForgetTop()
-					save(d)
-				} else if inp == "s" {
-					updateStatMsg("Skipped.", termbox.ColorYellow)
-					cardShown = 1
-					d.TopToEnd()
 					save(d)
 				} else if inp == "e" {
 					err := file.EditFile(d, cfg, file.ReadCards, file.EditCards)

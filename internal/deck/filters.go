@@ -5,7 +5,7 @@ import "time"
 type predicate func(int) bool
 
 func (d *Deck) filter(p predicate) {
-	for i := len(d.refs) - 1; i >= 0; i-- {
+	for i := len(d.reviewStack) - 1; i >= 0; i-- {
 		if p(i) {
 			d.Drop(i)
 		}
@@ -21,14 +21,14 @@ func (d *Deck) FilterNumber(param int) {
 
 func (d *Deck) FileIntersection(path string, otherDeck *Deck) {
 	d.filter(func(i int) bool {
-		_, contains := otherDeck.refsMap[d.refs[i]]
+		_, contains := otherDeck.predictMap[d.reviewStack[i]]
 		return d.GetCard(i).File() == path && !contains
 	})
 }
 
 func (d *Deck) OuterLeftJoin(otherDeck *Deck) {
 	d.filter(func(i int) bool {
-		_, contains := otherDeck.refsMap[d.refs[i]]
+		_, contains := otherDeck.predictMap[d.reviewStack[i]]
 		return contains
 	})
 }

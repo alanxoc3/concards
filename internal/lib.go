@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"encoding/hex"
 	"fmt"
 	"time"
 )
@@ -23,6 +24,16 @@ var KeyWords = map[string]bool{
 }
 
 type Hash [16]byte
+
+func NewHash(str string) (h Hash) {
+	if len(str)%2 == 1 {
+		str += "0"
+	}
+	if x, err := hex.DecodeString(str); err == nil {
+		copy(h[:], x)
+	}
+	return h
+}
 
 func (h Hash) String() string {
 	return fmt.Sprintf("%x", [16]byte(h))

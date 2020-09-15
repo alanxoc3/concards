@@ -9,8 +9,9 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/alanxoc3/concards/deck"
-	"github.com/alanxoc3/concards/meta"
+	"github.com/alanxoc3/concards/internal"
+	"github.com/alanxoc3/concards/internal/deck"
+	"github.com/alanxoc3/concards/internal/meta"
 )
 
 // Open opens filename and loads cards into new deck
@@ -34,33 +35,20 @@ func ReadMetasToDeckHelper(r io.Reader, d *deck.Deck) {
 
 		// First field is a constant sized checksum.
 		if len(strs) > 0 && len(strs[0]) == 32 {
-			d.AddMeta(strs[0], meta.NewPredictionFromStrings(strs...))
+			d.AddMeta(internal.NewHash(strs[0]), meta.NewPredictFromStrings(strs...))
 		}
 	}
 }
 
-func WriteMetasToString(d *deck.Deck) (fileStr string) {
-	// Copy keys
-	keys := make([]string, len(d.MetaMap))
+func WriteMetasToString(d *deck.Deck) string {
+	predicts := d.PredictList()
+   predictStrings := make([]string, len(predicts))
+   for _, v := range predicts {
+      predictStrings = append(predictStrings, v.String())
+   }
 
-	i := 0
-	for k := range d.MetaMap {
-		keys[i] = k
-		i++
-	}
-
-	// Sort keys
-	sort.Strings(keys)
-
-	// Create string
-	for _, k := range keys {
-		m := d.MetaMap[k]
-		if m != nil && m.String() != "" {
-			fileStr += k + " " + m.String() + "\n"
-		}
-	}
-
-	return
+	sort.Strings(predictStrings)
+   return strings.Join(predictStrings, "\n")
 }
 
 func WriteMetasToFile(d *deck.Deck, filename string) error {

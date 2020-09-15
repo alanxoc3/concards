@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/alanxoc3/concards/card"
-	"github.com/alanxoc3/concards/deck"
+	"github.com/alanxoc3/concards/internal"
+	"github.com/alanxoc3/concards/internal/deck"
 )
 
 // Open opens filename and loads cards into new deck
@@ -57,11 +57,11 @@ func ReadCardsToDeckHelper(r io.Reader, d *deck.Deck, f string) {
 		t := scanner.Text()
 
 		if state {
-			if t == card.CBeg {
+			if t == internal.CBeg {
 				td.AddNewCards(f, strings.Join(facts, " "))
 
 				facts = []string{}
-			} else if t == card.CEnd {
+			} else if t == internal.CEnd {
 				td.AddNewCards(f, strings.Join(facts, " "))
 
 				for i := 0; i < td.Len(); i++ {
@@ -71,7 +71,7 @@ func ReadCardsToDeckHelper(r io.Reader, d *deck.Deck, f string) {
 			} else {
 				facts = append(facts, t)
 			}
-		} else if t == card.CBeg {
+		} else if t == internal.CBeg {
 			// create td
 			td = deck.NewDeck()
 			state = true

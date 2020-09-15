@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
-	"github.com/alanxoc3/concards/deck"
-	"github.com/alanxoc3/concards/file"
-	"github.com/alanxoc3/concards/termboxgui"
 	"math/rand"
 	"os"
 	"time"
+
+	"github.com/alanxoc3/concards/internal/deck"
+	"github.com/alanxoc3/concards/internal/file"
+	"github.com/alanxoc3/concards/internal/termboxgui"
 )
 
 var version string = "snapshot"
