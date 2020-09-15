@@ -4,9 +4,14 @@ import (
 	"testing"
 	"time"
 
+	"github.com/alanxoc3/concards/internal"
 	"github.com/alanxoc3/concards/internal/meta"
 	"github.com/stretchr/testify/assert"
 )
+
+func newDefPred(h string, a string) *meta.Predict {
+	return meta.NewDefaultPredict(internal.NewHash(h), a)
+}
 
 func TestPredictBasics(t *testing.T) {
 	testMetaFuncs(t, func(strs ...string) meta.Meta {
@@ -25,7 +30,7 @@ func TestPredictStringEmpty(t *testing.T) {
 }
 
 func TestPredictDefault(t *testing.T) {
-	p := meta.NewDefaultPredict("ff", "hi")
+	p := newDefPred("ff", "hi")
 	assert.Equal(t, "ff000000000000000000000000000000", p.Hash().String())
 	assert.True(t, p.Next().IsZero())
 	assert.True(t, p.Curr().IsZero())
@@ -34,7 +39,7 @@ func TestPredictDefault(t *testing.T) {
 }
 
 func TestPredictIsNew(t *testing.T) {
-	p := meta.NewDefaultPredict("", "")
+	p := newDefPred("", "")
 	assert.Zero(t, p.Total())
 	assert.Zero(t, p.YesCount())
 	assert.Zero(t, p.NoCount())
@@ -42,29 +47,27 @@ func TestPredictIsNew(t *testing.T) {
 }
 
 func TestPredictExecErr(t *testing.T) {
-	p := meta.NewDefaultPredict("", "hi")
-	pp, err := p.Exec(true)
-	assert.Nil(t, pp)
-	assert.NotNil(t, err)
+	p := newDefPred("", "hi")
+	pp := p.Exec(true)
+	assert.Equal(t, "sm2", pp.Name())
 }
 
 func TestPredictExecErrIsNil(t *testing.T) {
-	p := meta.NewDefaultPredict("", "sm2")
-	pp, err := p.Exec(true)
+	p := newDefPred("", "sm2")
+	pp := p.Exec(true)
 	assert.NotNil(t, pp)
-	assert.Nil(t, err)
 }
 
 func TestPredictExecHash(t *testing.T) {
-	p := meta.NewDefaultPredict("ff", "sm2")
-	pp, _ := p.Exec(true)
+	p := newDefPred("ff", "sm2")
+	pp := p.Exec(true)
 	assert.Equal(t, "ff000000000000000000000000000000", pp.Hash().String())
 }
 
 func TestPredictExecCurr(t *testing.T) {
-	p := meta.NewDefaultPredict("", "sm2")
+	p := newDefPred("", "sm2")
 	tsOne := time.Now()
-	pp, _ := p.Exec(true)
+	pp := p.Exec(true)
 	tsTwo := time.Now()
 
 	assert.True(t, tsOne.Equal(pp.Next()) || tsOne.Before(pp.Curr()))
@@ -72,23 +75,23 @@ func TestPredictExecCurr(t *testing.T) {
 }
 
 func TestPredictExecYesCount(t *testing.T) {
-	p := meta.NewDefaultPredict("", "sm2")
-	pp, _ := p.Exec(true)
+	p := newDefPred("", "sm2")
+	pp := p.Exec(true)
 	assert.Equal(t, 1, pp.YesCount())
 	assert.Equal(t, 0, pp.NoCount())
 	assert.Equal(t, 1, pp.Streak())
 }
 
 func TestPredictExecNoCount(t *testing.T) {
-	p := meta.NewDefaultPredict("", "sm2")
-	pp, _ := p.Exec(false)
+	p := newDefPred("", "sm2")
+	pp := p.Exec(false)
 	assert.Equal(t, 1, pp.NoCount())
 	assert.Equal(t, 0, pp.YesCount())
 	assert.Equal(t, -1, pp.Streak())
 }
 
 func TestPredictExecName(t *testing.T) {
-	p := meta.NewDefaultPredict("", "sm2")
-	pp, _ := p.Exec(false)
+	p := newDefPred("", "sm2")
+	pp := p.Exec(false)
 	assert.Equal(t, "sm2", pp.Name())
 }
