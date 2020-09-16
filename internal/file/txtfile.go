@@ -10,11 +10,24 @@ import (
 
 	"github.com/alanxoc3/concards/internal"
 	"github.com/alanxoc3/concards/internal/card"
-	"github.com/alanxoc3/concards/internal/deck"
 )
 
+type cardList []*card.Card
+
+func cardListToMap(cl cardList) card.CardMap {
+	cm := card.CardMap{}
+	for _, c := range cl {
+      h := c.Hash()
+		if _, exist := cm[h]; !exist {
+			cm[h] = c
+		}
+	}
+	return cm
+}
+
 // Open opens filename and loads cards into new deck
-func ReadCardsToDeck(d *deck.Deck, filename string) error {
+func ReadCards(filename string) (card.CardMap, error) {
+	cl := cardList{}
 	err := filepath.Walk(filename, func(path string, info os.FileInfo, e error) error {
 		if e != nil {
 			return e
@@ -35,17 +48,18 @@ func ReadCardsToDeck(d *deck.Deck, filename string) error {
 			return fmt.Errorf("Error: Unable to open file \"%s\"", filename)
 		} else {
 			defer f.Close()
-			ReadCardsToDeckHelper(f, d, absPath)
+			cl = append(cl, readCardsFromReader(f, absPath)...)
 		}
 
 		return nil
 	})
 
-	return err
+	return cardListToMap(cl), err
 }
 
-func ReadCardsToDeckHelper(r io.Reader, d *deck.Deck, f string) {
+func readCardsFromReader(r io.Reader, f string) []*card.Card {
 	// Initialization.
+	cl := []*card.Card{}
 	facts := []string{}
 	state := false
 	var td []*card.Card
@@ -60,13 +74,13 @@ func ReadCardsToDeckHelper(r io.Reader, d *deck.Deck, f string) {
 		if state {
 			if t == internal.CBeg {
 				cards, _ := card.NewCards(f, strings.Join(facts, " "))
-            td = append(td, cards...)
+				td = append(td, cards...)
 
 				facts = []string{}
 			} else if t == internal.CEnd {
 				cards, _ := card.NewCards(f, strings.Join(facts, " "))
-            td = append(td, cards...)
-            d.AddCards(td...)
+				td = append(td, cards...)
+				cl = append(cl, td...)
 				state = false
 			} else {
 				facts = append(facts, t)
@@ -79,5 +93,5 @@ func ReadCardsToDeckHelper(r io.Reader, d *deck.Deck, f string) {
 		}
 	}
 
-	return
+	return cl
 }

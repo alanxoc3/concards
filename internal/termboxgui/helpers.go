@@ -2,6 +2,7 @@ package termboxgui
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/alanxoc3/concards/internal/card"
 	"github.com/alanxoc3/concards/internal/deck"
@@ -168,7 +169,7 @@ func tbprintStatMsg() {
 }
 
 func updateStatMsgAndCard(d *deck.Deck, input bool) {
-	m, err := d.ExecTop(input, "sm2")
+	m, err := d.ExecTop(input, time.Now())
 	if err != nil {
 		updateStatMsg("Problem reading the card :(.", termbox.ColorRed)
 	} else if input {

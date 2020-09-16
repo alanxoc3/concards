@@ -17,6 +17,8 @@ type Card struct {
 	facts [][]string
 }
 
+type CardMap map[internal.Hash]*Card
+
 // Returns a list of cards, or an empty list if there is an error.
 func NewCards(file string, sides string) ([]*Card, error) {
 	if file == "" {

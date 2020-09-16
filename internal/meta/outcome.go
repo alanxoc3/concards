@@ -12,15 +12,17 @@ type Outcome struct {
 	target bool
 }
 
-func NewOutcomeFromPredict(p *Predict, target bool) *Outcome {
+func NewOutcomeFromPredict(p *Predict, now time.Time, target bool) *Outcome {
 	r := &Outcome{
 		base:   p.base,
 		target: target,
 	}
 
-	r.next = time.Now()
+	r.next = now
+
+   // For new cards, the outcome makes more sense to be instant.
 	if r.curr.IsZero() {
-		r.curr = r.next
+		r.curr = now
 	}
 
 	return r

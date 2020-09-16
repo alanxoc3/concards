@@ -1,6 +1,7 @@
 package termboxgui
 
 import (
+	"github.com/alanxoc3/concards/internal/card"
 	"github.com/alanxoc3/concards/internal/deck"
 	"github.com/alanxoc3/concards/internal/file"
 	termbox "github.com/nsf/termbox-go"
@@ -64,7 +65,9 @@ func TermBoxRun(d *deck.Deck, cfg *file.Config) error {
 					d.DropTop()
 					save(d)
 				} else if inp == "e" {
-					err := file.EditFile(d, cfg, file.ReadCards, file.EditCards)
+					err := d.Edit(file.ReadCards, func(filename string) (card.CardMap, error) {
+						return file.EditCards(filename, cfg)
+					})
 
 					if err != nil {
 						updateStatMsg(err.Error(), termbox.ColorRed)

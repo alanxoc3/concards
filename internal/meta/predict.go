@@ -33,7 +33,7 @@ func (p *Predict) Clone(h internal.Hash) *Predict {
 	return &np
 }
 
-func (p *Predict) Exec(input bool) Predict {
+func (p *Predict) Exec(input bool, now time.Time) Predict {
    name := p.name
 
    algFunc, exists := algs[p.name]
@@ -43,7 +43,7 @@ func (p *Predict) Exec(input bool) Predict {
    }
 
 	// Note that r.Next() has the current time.
-	r := NewOutcomeFromPredict(p, input)
+	r := NewOutcomeFromPredict(p, now, input)
    next := r.Next().Add(time.Duration(math.Min(algFunc(*r), internal.MaxNextDuration)))
 
 	return Predict{

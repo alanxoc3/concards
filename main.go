@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
+	"sort"
 	"time"
 
 	"github.com/alanxoc3/concards/internal/deck"
@@ -15,7 +16,7 @@ var version string = "snapshot"
 
 func main() {
 	c := file.GenConfig(version)
-	d := deck.NewDeck()
+	d := deck.NewDeck(time.Now())
 
 	// We don't care if there is no meta data.
 	file.ReadMetasToDeck(c.MetaFile, d)
@@ -26,38 +27,47 @@ func main() {
 	}
 
 	for _, f := range c.Files {
-		if err := file.ReadCardsToDeck(d, f); err != nil {
+		if cm, err := file.ReadCards(f); err != nil {
 			fmt.Printf("Error: File \"%s\" does not exist!\n", f)
 			os.Exit(1)
-		}
+		} else {
+         for _, c := range cm {
+            d.AddCards(c)
+         }
+      }
 	}
 
 	if !c.IsMemorize {
-		d.FilterOutMemorize()
+		d.RemoveMemorize()
 	}
 	if !c.IsReview {
-		d.FilterOutReview()
+		d.RemoveReview()
 	}
 	if !c.IsDone {
-		d.FilterOutDone()
+		d.RemoveDone()
 	}
 	if c.Number > 0 {
-		d.FilterNumber(c.Number)
+		d.Truncate(c.Number)
 	}
 
 	if c.IsPrint {
-      cards := d.CardList()
-      for _, c := range cards {
-			fmt.Printf("@> %s\n", c.String())
+		lines := []string{}
+		for _, v := range d.CardList() {
+			lines = append(lines, v.String())
 		}
 
-		if len(cards) > 0 {
+		sort.Strings(lines)
+
+		for _, c := range lines {
+			fmt.Printf("@> %s\n", c)
+		}
+		if len(lines) > 0 {
 			fmt.Printf("<@\n")
 		}
 		return
 	}
 
-	rand.Seed(time.Now().UTC().UnixNano())
+	rand.Seed(time.Now().UTC().UnixNano()) // Used for algorithms.
 	termboxgui.TermBoxRun(d, c)
 	_ = file.WriteMetasToFile(d, c.MetaFile)
 }

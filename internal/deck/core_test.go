@@ -1,4 +1,4 @@
-package _test
+package deck_test
 
 /*
 // import "github.com/stretchr/testify/assert"
