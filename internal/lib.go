@@ -40,12 +40,7 @@ func (h Hash) String() string {
 }
 
 func (h Hash) IsZero() bool {
-   return [16]byte{} == [16]byte(h)
-}
-
-type RKey struct {
-	Hash  Hash
-	Total int
+	return [16]byte{} == [16]byte(h)
 }
 
 func AssertLogic(condition bool, message string) {

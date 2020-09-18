@@ -28,6 +28,16 @@ func TestOutcomeStringFalse(t *testing.T) {
 	assert.Equal(t, "ff000000000000000000000000000000 2020-01-01T00:00:00Z 2020-01-01T00:00:00Z 12 12 12 0", r.String())
 }
 
+func TestOutcomeTargetTrue(t *testing.T) {
+	r := meta.NewOutcomeFromStrings("ff000000000000000000000000000000", "2020-01-01T00:00:00Z", "2020-01-01T00:00:00Z", "12", "12", "12", "1")
+	assert.True(t, r.Target())
+}
+
+func TestOutcomeTargetFalse(t *testing.T) {
+	r := meta.NewOutcomeFromStrings("ff000000000000000000000000000000", "2020-01-01T00:00:00Z", "2020-01-01T00:00:00Z", "12", "12", "12", "0")
+	assert.False(t, r.Target())
+}
+
 func TestOutcomeAnswerClassification(t *testing.T) {
 	tests := []struct {
 		expect       meta.AnswerClassification

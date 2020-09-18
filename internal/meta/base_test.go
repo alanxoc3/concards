@@ -4,6 +4,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/alanxoc3/concards/internal"
 	"github.com/alanxoc3/concards/internal/meta"
 	"github.com/stretchr/testify/assert"
 )
@@ -124,6 +125,7 @@ var metaTestFuncs = map[string]metaTestFunc{
 	"IsZeroNoParams": func(t *testing.T, cf metaCreate) {
 		m := cf()
 		assertZero(t, m)
+		assertZero(t, m)
 	},
 
 	"IsZeroBadParams": func(t *testing.T, cf metaCreate) {
@@ -149,5 +151,10 @@ var metaTestFuncs = map[string]metaTestFunc{
 		m := cf("", "", "", "-2000000001")
 		assertZero(t, m)
 		assert.Equal(t, 0, m.YesCount())
+	},
+
+	"Key": func(t *testing.T, cf metaCreate) {
+		m := cf("ff", "", "", "1")
+		assert.Equal(t, meta.Key{internal.NewHash("ff"), m.Total()}, m.Key())
 	},
 }

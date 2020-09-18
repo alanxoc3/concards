@@ -3,8 +3,6 @@ package meta
 import (
 	"fmt"
 	"time"
-
-	"github.com/alanxoc3/concards/internal"
 )
 
 type Outcome struct {
@@ -20,7 +18,7 @@ func NewOutcomeFromPredict(p *Predict, now time.Time, target bool) *Outcome {
 
 	r.next = now
 
-   // For new cards, the outcome makes more sense to be instant.
+	// For new cards, the outcome makes more sense to be instant.
 	if r.curr.IsZero() {
 		r.curr = now
 	}
@@ -77,10 +75,6 @@ func (r *Outcome) targetStr() string {
 	}
 }
 
-func (r *Outcome) RKey() internal.RKey {
-	return internal.RKey{r.Hash(), r.Total()}
-}
-
 func (r *Outcome) String() string {
 	return fmt.Sprintf("%s %s", r.base.String(), r.targetStr())
 }
@@ -91,4 +85,3 @@ func (r *Outcome) newCount(expecting bool, count int) int {
 	}
 	return count
 }
-

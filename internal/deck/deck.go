@@ -17,7 +17,7 @@ type Deck struct {
 	reviewStack []internal.Hash                 // Hashes to review ordered by date.
 	futureStack []internal.Hash                 // Hashes you have reviewed. Ordered by date.
 	predictMap  map[internal.Hash]*meta.Predict // All metas.
-	outcomeMap  map[internal.RKey]*meta.Outcome // Have reviewed.
+	outcomeMap  map[meta.Key]*meta.Outcome      // Have reviewed.
 	cardMap     card.CardMap                    // All cards in this session.
 }
 
@@ -27,7 +27,7 @@ func NewDeck(now time.Time) *Deck {
 		reviewStack: []internal.Hash{},
 		futureStack: []internal.Hash{},
 		predictMap:  map[internal.Hash]*meta.Predict{},
-		outcomeMap:  map[internal.RKey]*meta.Outcome{},
+		outcomeMap:  map[meta.Key]*meta.Outcome{},
 		cardMap:     card.CardMap{},
 	}
 }

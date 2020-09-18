@@ -48,26 +48,26 @@ func TestPredictIsNew(t *testing.T) {
 
 func TestPredictExecErr(t *testing.T) {
 	p := newDefPred("", "hi")
-	pp := p.Exec(true)
+	pp := p.Exec(true, time.Now())
 	assert.Equal(t, "sm2", pp.Name())
 }
 
 func TestPredictExecErrIsNil(t *testing.T) {
 	p := newDefPred("", "sm2")
-	pp := p.Exec(true)
+	pp := p.Exec(true, time.Now())
 	assert.NotNil(t, pp)
 }
 
 func TestPredictExecHash(t *testing.T) {
 	p := newDefPred("ff", "sm2")
-	pp := p.Exec(true)
+	pp := p.Exec(true, time.Now())
 	assert.Equal(t, "ff000000000000000000000000000000", pp.Hash().String())
 }
 
 func TestPredictExecCurr(t *testing.T) {
 	p := newDefPred("", "sm2")
 	tsOne := time.Now()
-	pp := p.Exec(true)
+	pp := p.Exec(true, time.Now())
 	tsTwo := time.Now()
 
 	assert.True(t, tsOne.Equal(pp.Next()) || tsOne.Before(pp.Curr()))
@@ -76,7 +76,7 @@ func TestPredictExecCurr(t *testing.T) {
 
 func TestPredictExecYesCount(t *testing.T) {
 	p := newDefPred("", "sm2")
-	pp := p.Exec(true)
+	pp := p.Exec(true, time.Now())
 	assert.Equal(t, 1, pp.YesCount())
 	assert.Equal(t, 0, pp.NoCount())
 	assert.Equal(t, 1, pp.Streak())
@@ -84,7 +84,7 @@ func TestPredictExecYesCount(t *testing.T) {
 
 func TestPredictExecNoCount(t *testing.T) {
 	p := newDefPred("", "sm2")
-	pp := p.Exec(false)
+	pp := p.Exec(false, time.Now())
 	assert.Equal(t, 1, pp.NoCount())
 	assert.Equal(t, 0, pp.YesCount())
 	assert.Equal(t, -1, pp.Streak())
@@ -92,6 +92,11 @@ func TestPredictExecNoCount(t *testing.T) {
 
 func TestPredictExecName(t *testing.T) {
 	p := newDefPred("", "sm2")
-	pp := p.Exec(false)
+	pp := p.Exec(false, time.Now())
 	assert.Equal(t, "sm2", pp.Name())
+}
+
+func TestPredictClone(t *testing.T) {
+	p := newDefPred("ff", "sm2")
+   assert.Equal(t, p, p.Clone(internal.Hash{0xff}))
 }

@@ -16,7 +16,7 @@ func (d *Deck) cloneInfo(o *Deck) {
 		d.predictMap[k] = v
 	}
 
-	d.outcomeMap = map[internal.RKey]*meta.Outcome{}
+	d.outcomeMap = map[meta.Key]*meta.Outcome{}
 	for k, v := range o.outcomeMap {
 		d.outcomeMap[k] = v
 	}

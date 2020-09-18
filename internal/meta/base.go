@@ -8,6 +8,11 @@ import (
 	"github.com/alanxoc3/concards/internal"
 )
 
+type Key struct {
+	Hash  internal.Hash
+	Total int
+}
+
 type Meta interface {
 	Hash() internal.Hash
 	Next() time.Time
@@ -18,6 +23,7 @@ type Meta interface {
 
 	String() string
 	Total() int
+	Key() Key
 }
 
 type base struct {
@@ -110,4 +116,8 @@ func (b *base) Total() int {
 	sum := b.yesCount + b.noCount
 	internal.AssertLogic(sum >= 0, "total overflowed")
 	return sum
+}
+
+func (b *base) Key() Key {
+	return Key{b.Hash(), b.Total()}
 }
