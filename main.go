@@ -31,10 +31,10 @@ func main() {
 			fmt.Printf("Error: File \"%s\" does not exist!\n", f)
 			os.Exit(1)
 		} else {
-         for _, c := range cm {
-            d.AddCards(c)
-         }
-      }
+			for _, c := range cm {
+				d.AddCards(c)
+			}
+		}
 	}
 
 	if !c.IsMemorize {

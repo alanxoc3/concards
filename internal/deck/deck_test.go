@@ -1,5 +1,20 @@
 package deck_test
 
+import (
+	"testing"
+	"time"
+
+	"github.com/alanxoc3/concards/internal/deck"
+	"github.com/stretchr/testify/assert"
+)
+
+func TestNewDeck(t *testing.T) {
+	d := deck.NewDeck(time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC))
+	assert.Len(t, d.CardList(), 0)
+	assert.Len(t, d.OutcomeList(), 0)
+	assert.Len(t, d.PredictList(), 0)
+}
+
 /*
 // import "github.com/stretchr/testify/assert"
 import "github.com/alanxoc3/concards/core"
