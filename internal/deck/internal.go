@@ -22,15 +22,8 @@ func (d *Deck) cloneInfo(o *Deck) {
 	}
 }
 
-func (d *Deck) hashList() []internal.Hash {
-	hashes := []internal.Hash{}
-	hashes = append(hashes, d.reviewStack...)
-	hashes = append(hashes, d.futureStack...)
-	return hashes
-}
-
 func (d *Deck) filter(p predicate) {
-	hashes := d.hashList()
+	hashes := d.stack.hashList()
 	nd := &Deck{}
 	nd.cloneInfo(d)
 
@@ -48,36 +41,4 @@ func insertSorted(hs []internal.Hash, h internal.Hash, lessFunc func(int) bool) 
 	copy(hs[i+1:], hs[i:])
 	hs[i] = h
 	return hs
-}
-
-// Requires the card to have an entry in both the predictMap & cardMap.
-func (d *Deck) insertIntoReviewStack(h internal.Hash) {
-	next := d.predictMap[h].Next()
-	d.reviewStack = insertSorted(d.reviewStack, h, func(i int) bool {
-		return d.predictMap[d.reviewStack[i]].Next().Before(next)
-	})
-}
-
-// Requires the card to have an entry in both the predictMap & cardMap.
-func (d *Deck) insertIntoFutureStack(h internal.Hash) {
-	next := d.predictMap[h].Next()
-	d.futureStack = insertSorted(d.futureStack, h, func(i int) bool {
-		return d.predictMap[d.futureStack[i]].Next().After(next)
-	})
-}
-
-// Returns a new stack with the hash removed.
-func removeFromStack(stack []internal.Hash, h internal.Hash) []internal.Hash {
-	// TODO: Make this more effecient?
-	newStack := []internal.Hash{}
-	for _, v := range stack {
-		if v != h {
-			newStack = append(newStack, v)
-		}
-	}
-
-	if len(newStack) < len(stack) {
-		return newStack
-	}
-	return stack
 }

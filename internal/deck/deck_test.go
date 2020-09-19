@@ -4,15 +4,26 @@ import (
 	"testing"
 	"time"
 
+	"github.com/alanxoc3/concards/internal/card"
 	"github.com/alanxoc3/concards/internal/deck"
 	"github.com/stretchr/testify/assert"
 )
 
+var TEST_DATE time.Time = time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC)
+
 func TestNewDeck(t *testing.T) {
-	d := deck.NewDeck(time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC))
+	d := deck.NewDeck(TEST_DATE)
 	assert.Len(t, d.CardList(), 0)
 	assert.Len(t, d.OutcomeList(), 0)
 	assert.Len(t, d.PredictList(), 0)
+}
+
+func TestAddCardsTop(t *testing.T) {
+	d := deck.NewDeck(TEST_DATE)
+   c1, _ := card.NewCards(".", "hi : yo")
+	d.AddCards(c1...)
+   assert.Len(t, d.CardList(), 2)
+   assert.Equal(t, c1[0], d.TopCard())
 }
 
 /*

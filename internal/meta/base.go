@@ -24,6 +24,7 @@ type Meta interface {
 	String() string
 	Total() int
 	Key() Key
+	IsZero() bool
 }
 
 type base struct {
@@ -120,4 +121,8 @@ func (b *base) Total() int {
 
 func (b *base) Key() Key {
 	return Key{b.Hash(), b.Total()}
+}
+
+func (b *base) IsZero() bool {
+	return b.next.IsZero() && b.curr.IsZero() && b.Total() == 0
 }
