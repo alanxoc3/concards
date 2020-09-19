@@ -58,9 +58,10 @@ func (d *Deck) AddPredicts(predicts ...*meta.Predict) {
 		h := p.Hash()
 		if v, predExist := d.predictMap[h]; !predExist || v.IsZero() {
 			d.predictMap[h] = p
-         if _, cardExist := d.cardMap[h]; cardExist {
+         if _, cardExist := d.cardMap[h]; cardExist && !p.Next().IsZero() {
             d.stack.refreshHash(h, d.predictMap, d.now)
          }
+
       }
 	}
 }
@@ -137,7 +138,7 @@ func (d *Deck) ExecTop(input bool, now time.Time) (meta.Predict, error) {
 	d.stack.review = d.stack.review[1:]
 
 	// Step 6: Move over some things from the future stack.
-	for len(d.stack.future) > 0 && d.predictMap[d.stack.future[0]].Next().Before(d.now) {
+	for len(d.stack.future) > 0 && beforeOrEqual(d.predictMap[d.stack.future[0]].Next(), d.now) {
 		hashToReview := d.stack.future[0]
 		d.stack.future = d.stack.future[1:]
       d.stack.insertIntoReview(hashToReview, d.predictMap)
@@ -200,7 +201,7 @@ func (d *Deck) RemoveReview() {
 func (d *Deck) RemoveDone() {
 	d.filter(func(i int, h internal.Hash) bool {
 		p := d.predictMap[h]
-		return p.Total() == 0 || p.Next().Before(d.now)
+		return p.Total() == 0 || beforeOrEqual(p.Next(), d.now)
 	})
 }
 

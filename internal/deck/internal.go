@@ -2,6 +2,7 @@ package deck
 
 import (
 	"sort"
+	"time"
 
 	"github.com/alanxoc3/concards/internal"
 	"github.com/alanxoc3/concards/internal/meta"
@@ -41,4 +42,8 @@ func insertSorted(hs []internal.Hash, h internal.Hash, lessFunc func(int) bool) 
 	copy(hs[i+1:], hs[i:])
 	hs[i] = h
 	return hs
+}
+
+func beforeOrEqual(t1 time.Time, t2 time.Time) bool {
+	return t1.Before(t2) || t1.Equal(t2)
 }

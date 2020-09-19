@@ -39,7 +39,7 @@ func (s *stack) insertIntoFuture(h internal.Hash, m predictMap) {
 
 // Requires current card to have an entry in the predict map.
 func (s *stack) insert(h internal.Hash, m predictMap, now time.Time) {
-	if m[h].Next().Before(now) {
+	if beforeOrEqual(m[h].Next(), now) {
 		s.insertIntoReview(h, m)
 	} else {
 		s.insertIntoFuture(h, m)
