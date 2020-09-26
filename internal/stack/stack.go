@@ -20,10 +20,30 @@ func NewStack(t time.Time) Stack {
 }
 
 func (s *Stack) SetTime(t time.Time) {
-	s.mainKey = newMainKey(t)
+   s.mainKey = newMainKey(t)
 }
 
-func (s Stack) clone(o Stack) {
+func (s *Stack) Time() time.Time {
+   return s.mainKey.time
+}
+
+func (s *Stack) Top() *internal.Hash {
+	if len(s.review) > 0 {
+      print("BA ")
+		return &s.review[0]
+	}
+	return nil
+}
+
+func (s *Stack) Pop() {
+   if h := s.Top(); h != nil {
+      delete(s.mapper, *h)
+		s.future = removeHashFromSlice(s.future, *h)
+		s.review = removeHashFromSlice(s.review, *h)
+   }
+}
+
+func (s Stack) Clone(o Stack) {
 	s.mainKey = o.mainKey.clone()
 
 	s.review = make([]internal.Hash, len(o.review))
@@ -49,11 +69,11 @@ func (s *Stack) insertKey(h internal.Hash, k key) {
 	// Step 2: Add to the right stack.
 	if k.after(s.mainKey) {
 		s.future = insertSorted(s.future, h, func(i int) bool {
-			return s.mapper[s.future[i]].after(k)
+			return s.mapper[s.future[i]].before(k)
 		})
 	} else {
 		s.review = insertSorted(s.review, h, func(i int) bool {
-			return s.mapper[s.review[i]].before(k)
+			return s.mapper[s.review[i]].after(k)
 		})
 	}
 }
@@ -61,6 +81,7 @@ func (s *Stack) insertKey(h internal.Hash, k key) {
 // Requires current card to have an entry in the predict map.
 func (s *Stack) Insert(h internal.Hash, t time.Time) {
 	if _, exist := s.mapper[h]; !exist {
+      internal.AssertLogic(s.nextIndex >= 0, "next index should always be a natural number")
 		s.insertKey(h, key{t, s.nextIndex})
 		s.nextIndex += 1 // TODO: Add max, this could technically overflow.
 	}
@@ -88,28 +109,28 @@ func removeHashFromSlice(slice []internal.Hash, h internal.Hash) []internal.Hash
 	return slice
 }
 
-func (s *Stack) Update(h internal.Hash, t time.Time) {
+func (s *Stack) Update(h internal.Hash, t time.Time) bool {
 	if k, exist := s.mapper[h]; exist {
 		// Step 1: Delete from slices.
 		s.future = removeHashFromSlice(s.future, h)
 		s.review = removeHashFromSlice(s.review, h)
 
-		// Step 2: Re-insert into key map & lists, preserving insertion index.
+      // Step 2: Future stack to review stack.
+      for len(s.future) > 0 && s.mapper[s.future[0]].before(s.mainKey) {
+         hashToReview := s.future[0]
+         s.future = s.future[1:]
+         s.insertKey(hashToReview, key{t, s.mapper[hashToReview].index})
+      }
+
+		// Step 3: Re-insert into key map & lists, preserving insertion index.
 		s.insertKey(h, key{t, k.index})
-	}
+      return true
+   }
+   return false
 }
 
-// TODO do me pleeez.
-func (s *Stack) FutureToReview() {
-	if k, exist := s.mapper[h]; exist {
-		// Step 1: Delete from slices.
-		s.future = removeHashFromSlice(s.future, h)
-		s.review = removeHashFromSlice(s.review, h)
-
-		// Step 2: Re-insert into key map & lists, preserving insertion index.
-		s.insertKey(h, key{t, k.index})
-	}
-}
+func (s *Stack) ReviewLen() int { return len(s.review) }
+func (s *Stack) FutureLen() int { return len(s.future) }
 
 func insertSorted(hs []internal.Hash, h internal.Hash, lessFunc func(int) bool) []internal.Hash {
 	i := sort.Search(len(hs), lessFunc)

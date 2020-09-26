@@ -1,7 +1,6 @@
 package deck
 
 import (
-	"sort"
 	"time"
 
 	"github.com/alanxoc3/concards/internal"
@@ -11,7 +10,7 @@ import (
 type predicate func(int, internal.Hash) bool
 
 func (d *Deck) cloneInfo(o *Deck) {
-	d.now = o.now
+   d.stack.SetTime(o.stack.Time())
 	d.predictMap = map[internal.Hash]*meta.Predict{}
 	for k, v := range o.predictMap {
 		d.predictMap[k] = v
@@ -24,16 +23,16 @@ func (d *Deck) cloneInfo(o *Deck) {
 }
 
 func (d *Deck) filter(p predicate) {
-	hashes := d.stack.hashList()
-	nd := &Deck{}
-	nd.cloneInfo(d)
+	hashes := d.stack.List()
+	n := &Deck{}
+	n.cloneInfo(d)
 
 	for i, h := range hashes {
 		if p(i, h) {
-			nd.AddCards(d.cardMap[h])
+			n.AddCards(d.cardMap[h])
 		}
 	}
-	d.Clone(nd)
+	d.Clone(n)
 }
 
 func beforeOrEqual(t1 time.Time, t2 time.Time) bool {

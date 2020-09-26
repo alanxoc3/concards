@@ -15,6 +15,7 @@ import (
 // predictMap maps checksums to cards.
 type Deck struct {
 	stack      stack.Stack     // Review and future stacks.
+	cardMap    card.CardMap    // All cards.
 	predictMap meta.PredictMap // All metas.
 	outcomeMap meta.OutcomeMap // Have reviewed.
 }
@@ -22,6 +23,7 @@ type Deck struct {
 func NewDeck(now time.Time) *Deck {
 	return &Deck{
 		stack:      stack.NewStack(now),
+      cardMap:    map[internal.Hash]*card.Card{},
 		predictMap: map[internal.Hash]*meta.Predict{},
 		outcomeMap: map[meta.Key]*meta.Outcome{},
 	}
@@ -40,7 +42,11 @@ func (d *Deck) AddCards(cards ...*card.Card) {
 		}
 
 		// Step 3: Add to the stack.
-		d.stack.Insert(h, d.predictMap[h].Next())
+		if _, exist := d.cardMap[h]; !exist {
+			d.cardMap[h] = c
+		}
+
+      d.stack.Insert(h, d.predictMap[h].Next())
 	}
 }
 
@@ -55,12 +61,12 @@ func (d *Deck) AddPredicts(predicts ...*meta.Predict) {
 	}
 }
 
-func (d *Deck) ReviewLen() int { return len(d.stack.review) }
-func (d *Deck) FutureLen() int { return len(d.stack.future) }
+func (d *Deck) ReviewLen() int { return d.stack.ReviewLen() }
+func (d *Deck) FutureLen() int { return d.stack.FutureLen() }
 
 // Clones a deck into this deck.
 func (d *Deck) Clone(o *Deck) {
-	d.stack.clone(o.stack)
+	d.stack.Clone(o.stack)
 	d.cloneInfo(o)
 }
 
@@ -72,68 +78,52 @@ func (d *Deck) Copy() *Deck {
 
 // Top shortcuts
 func (d *Deck) TopHash() *internal.Hash {
-	if len(d.stack.review) > 0 {
-		return &d.stack.review[0]
-	}
-	return nil
+   return d.stack.Top()
 }
 
 func (d *Deck) TopCard() *card.Card {
-	if len(d.stack.review) > 0 {
-		return d.stack.cardMap[d.stack.review[0]]
-	}
+   if h := d.TopHash(); h != nil {
+		return d.cardMap[*h]
+   }
 	return nil
 }
 
 func (d *Deck) TopPredict() *meta.Predict {
-	if len(d.stack.review) > 0 {
-		return d.predictMap[d.stack.review[0]]
-	}
+   if h := d.TopHash(); h != nil {
+		return d.predictMap[*h]
+   }
 	return nil
 }
 
 // Removes from both the internal map and the slice.
 func (d *Deck) DropTop() {
-	if len(d.stack.review) > 0 {
-		delete(d.stack.cardMap, d.stack.review[0])
-		d.stack.review = d.stack.review[1:]
+   if h := d.TopHash(); h != nil {
+		delete(d.cardMap, *h)
+      d.stack.Pop()
 	}
 }
 
 // TODO: Concurrency locks for thread safety?
 func (d *Deck) ExecTop(input bool, now time.Time) (meta.Predict, error) {
 	// Step 1: Error if the deck is empty.
-	if len(d.stack.review) == 0 {
+	if d.stack.ReviewLen() == 0 {
 		return *meta.NewPredictFromStrings(), fmt.Errorf("Tried to access card from an empty deck!")
 	}
 
-	// Step 2: Set the time.
+	// Step 2: Exec the predict value.
+	np := d.TopPredict().Exec(input, now)
+
+	// Step 3: Save the new prediction.
+	d.predictMap[np.Hash()] = &np
+
+   // Step 4: Set the current time.
    d.stack.SetTime(now)
 
-	// Step 3: Exec the predict value.
-	p := d.TopPredict()
-	np := p.Exec(input, now)
+   // Step 5: Update the stack.
+   updateStatus := d.stack.Update(np.Hash(), np.Next())
+   internal.AssertLogic(updateStatus, "stack didn't contain hash")
 
-	// Step 4: Save the new prediction.
-	d.predictMap[p.Hash()] = &np
-
-   d.stack.Update(p.Hash(), np.Next())
-
-	// Step 5: Pop the card off the review stack.
-	hashToFuture := d.stack.review[0]
-	d.stack.review = d.stack.review[1:]
-
-	// Step 6: Move over some things from the future stack.
-	for len(d.stack.future) > 0 && beforeOrEqual(d.predictMap[d.stack.future[0]].Next(), d.now) {
-		hashToReview := d.stack.future[0]
-		d.stack.future = d.stack.future[1:]
-		d.stack.insertIntoReview(hashToReview, d.predictMap)
-	}
-
-	// Step 7: Add the passed card to the future stack.
-	d.stack.insertIntoFuture(hashToFuture, d.predictMap)
-
-	return np, nil
+   return np, nil
 }
 
 // Used to write to the predict file.
@@ -157,8 +147,8 @@ func (d *Deck) OutcomeList() []meta.Outcome {
 // Used for printing the cards.
 func (d *Deck) CardList() []card.Card {
 	cards := []card.Card{}
-	for _, v := range d.stack.hashList() {
-		cards = append(cards, *d.stack.cardMap[v])
+	for _, v := range d.stack.List() {
+		cards = append(cards, *d.cardMap[v])
 	}
 	return cards
 }
@@ -180,14 +170,14 @@ func (d *Deck) RemoveMemorize() {
 func (d *Deck) RemoveReview() {
 	d.filter(func(i int, h internal.Hash) bool {
 		p := d.predictMap[h]
-		return p.Total() == 0 || p.Next().After(d.now)
+		return p.Total() == 0 || p.Next().After(d.stack.Time())
 	})
 }
 
 func (d *Deck) RemoveDone() {
 	d.filter(func(i int, h internal.Hash) bool {
 		p := d.predictMap[h]
-		return p.Total() == 0 || beforeOrEqual(p.Next(), d.now)
+		return p.Total() == 0 || beforeOrEqual(p.Next(), d.stack.Time())
 	})
 }
 
