@@ -7,28 +7,23 @@ import (
 	"github.com/alanxoc3/concards/internal"
 	"github.com/alanxoc3/concards/internal/card"
 	"github.com/alanxoc3/concards/internal/meta"
+	"github.com/alanxoc3/concards/internal/stack"
 )
-
-type predictMap map[internal.Hash]*meta.Predict
 
 // stack.review contains checksums.
 // cardMap maps checksums to cards.
 // predictMap maps checksums to cards.
 type Deck struct {
-	now         time.Time                  // Last cached time.
-   stack       stack                      // Review and future stacks.
-	predictMap  predictMap                 // All metas.
-	outcomeMap  map[meta.Key]*meta.Outcome // Have reviewed.
-	cardMap     card.CardMap               // All cards in this session.
+	stack      stack.Stack     // Review and future stacks.
+	predictMap meta.PredictMap // All metas.
+	outcomeMap meta.OutcomeMap // Have reviewed.
 }
 
 func NewDeck(now time.Time) *Deck {
 	return &Deck{
-		now:         now,
-      stack:       stack{},
-		predictMap:  map[internal.Hash]*meta.Predict{},
-		outcomeMap:  map[meta.Key]*meta.Outcome{},
-		cardMap:     card.CardMap{},
+		stack:      stack.NewStack(now),
+		predictMap: map[internal.Hash]*meta.Predict{},
+		outcomeMap: map[meta.Key]*meta.Outcome{},
 	}
 }
 
@@ -44,11 +39,8 @@ func (d *Deck) AddCards(cards ...*card.Card) {
 			d.predictMap[h] = meta.NewDefaultPredict(h, "sm2")
 		}
 
-		// Step 3: Add the card only if it doesn't already exist.
-		if _, exist := d.cardMap[h]; !exist {
-			d.cardMap[h] = c
-         d.stack.insert(h, d.predictMap, d.now)
-		}
+		// Step 3: Add to the stack.
+		d.stack.Insert(h, d.predictMap[h].Next())
 	}
 }
 
@@ -58,11 +50,8 @@ func (d *Deck) AddPredicts(predicts ...*meta.Predict) {
 		h := p.Hash()
 		if v, predExist := d.predictMap[h]; !predExist || v.IsZero() {
 			d.predictMap[h] = p
-         if _, cardExist := d.cardMap[h]; cardExist && !p.Next().IsZero() {
-            d.stack.refreshHash(h, d.predictMap, d.now)
-         }
-
-      }
+			d.stack.Update(h, p.Next())
+		}
 	}
 }
 
@@ -71,13 +60,8 @@ func (d *Deck) FutureLen() int { return len(d.stack.future) }
 
 // Clones a deck into this deck.
 func (d *Deck) Clone(o *Deck) {
-   d.stack.clone(o.stack)
+	d.stack.clone(o.stack)
 	d.cloneInfo(o)
-
-	d.cardMap = card.CardMap{}
-	for k, v := range o.cardMap {
-		d.cardMap[k] = v
-	}
 }
 
 func (d *Deck) Copy() *Deck {
@@ -96,7 +80,7 @@ func (d *Deck) TopHash() *internal.Hash {
 
 func (d *Deck) TopCard() *card.Card {
 	if len(d.stack.review) > 0 {
-		return d.cardMap[d.stack.review[0]]
+		return d.stack.cardMap[d.stack.review[0]]
 	}
 	return nil
 }
@@ -111,7 +95,7 @@ func (d *Deck) TopPredict() *meta.Predict {
 // Removes from both the internal map and the slice.
 func (d *Deck) DropTop() {
 	if len(d.stack.review) > 0 {
-		delete(d.cardMap, d.stack.review[0])
+		delete(d.stack.cardMap, d.stack.review[0])
 		d.stack.review = d.stack.review[1:]
 	}
 }
@@ -124,14 +108,16 @@ func (d *Deck) ExecTop(input bool, now time.Time) (meta.Predict, error) {
 	}
 
 	// Step 2: Set the time.
-	d.now = now
+   d.stack.SetTime(now)
 
 	// Step 3: Exec the predict value.
 	p := d.TopPredict()
-	np := p.Exec(input, d.now)
+	np := p.Exec(input, now)
 
 	// Step 4: Save the new prediction.
 	d.predictMap[p.Hash()] = &np
+
+   d.stack.Update(p.Hash(), np.Next())
 
 	// Step 5: Pop the card off the review stack.
 	hashToFuture := d.stack.review[0]
@@ -141,7 +127,7 @@ func (d *Deck) ExecTop(input bool, now time.Time) (meta.Predict, error) {
 	for len(d.stack.future) > 0 && beforeOrEqual(d.predictMap[d.stack.future[0]].Next(), d.now) {
 		hashToReview := d.stack.future[0]
 		d.stack.future = d.stack.future[1:]
-      d.stack.insertIntoReview(hashToReview, d.predictMap)
+		d.stack.insertIntoReview(hashToReview, d.predictMap)
 	}
 
 	// Step 7: Add the passed card to the future stack.
@@ -172,7 +158,7 @@ func (d *Deck) OutcomeList() []meta.Outcome {
 func (d *Deck) CardList() []card.Card {
 	cards := []card.Card{}
 	for _, v := range d.stack.hashList() {
-		cards = append(cards, *d.cardMap[v])
+		cards = append(cards, *d.stack.cardMap[v])
 	}
 	return cards
 }

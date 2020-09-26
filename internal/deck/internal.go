@@ -36,14 +36,6 @@ func (d *Deck) filter(p predicate) {
 	d.Clone(nd)
 }
 
-func insertSorted(hs []internal.Hash, h internal.Hash, lessFunc func(int) bool) []internal.Hash {
-	i := sort.Search(len(hs), lessFunc)
-	hs = append(hs, internal.Hash{})
-	copy(hs[i+1:], hs[i:])
-	hs[i] = h
-	return hs
-}
-
 func beforeOrEqual(t1 time.Time, t2 time.Time) bool {
 	return t1.Before(t2) || t1.Equal(t2)
 }

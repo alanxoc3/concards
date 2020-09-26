@@ -8,6 +8,8 @@ import (
 	"github.com/alanxoc3/concards/internal"
 )
 
+type PredictMap map[internal.Hash]*Predict
+
 type Predict struct {
 	base
 	name string

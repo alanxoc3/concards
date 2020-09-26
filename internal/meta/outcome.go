@@ -5,6 +5,8 @@ import (
 	"time"
 )
 
+type OutcomeMap map[Key]*Outcome
+
 type Outcome struct {
 	base
 	target bool
