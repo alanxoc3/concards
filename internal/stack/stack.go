@@ -29,7 +29,6 @@ func (s *Stack) Time() time.Time {
 
 func (s *Stack) Top() *internal.Hash {
 	if len(s.review) > 0 {
-      print("BA ")
 		return &s.review[0]
 	}
 	return nil
@@ -38,12 +37,11 @@ func (s *Stack) Top() *internal.Hash {
 func (s *Stack) Pop() {
    if h := s.Top(); h != nil {
       delete(s.mapper, *h)
-		s.future = removeHashFromSlice(s.future, *h)
-		s.review = removeHashFromSlice(s.review, *h)
+      s.review = s.review[1:]
    }
 }
 
-func (s Stack) Clone(o Stack) {
+func (s *Stack) Clone(o Stack) {
 	s.mainKey = o.mainKey.clone()
 
 	s.review = make([]internal.Hash, len(o.review))
