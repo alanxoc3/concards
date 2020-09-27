@@ -128,7 +128,7 @@ func (d *Deck) ExecTop(input bool, now time.Time) (meta.Predict, error) {
 
 // Used to write to the predict file.
 func (d *Deck) PredictList() []meta.Predict {
-	predicts := make([]meta.Predict, len(d.predictMap))
+	predicts := []meta.Predict{}
 	for _, v := range d.predictMap {
 		predicts = append(predicts, *v)
 	}
@@ -137,7 +137,7 @@ func (d *Deck) PredictList() []meta.Predict {
 
 // Used to write to the outcome file.
 func (d *Deck) OutcomeList() []meta.Outcome {
-	outcomes := make([]meta.Outcome, len(d.outcomeMap))
+	outcomes := []meta.Outcome{}
 	for _, v := range d.outcomeMap {
 		outcomes = append(outcomes, *v)
 	}

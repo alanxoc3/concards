@@ -4,13 +4,14 @@ import (
 	"testing"
 	"time"
 
+	"github.com/alanxoc3/concards/internal"
 	"github.com/alanxoc3/concards/internal/card"
 	"github.com/alanxoc3/concards/internal/deck"
 	"github.com/alanxoc3/concards/internal/meta"
 	"github.com/stretchr/testify/assert"
 )
 
-var ONE_DATE  time.Time = time.Date(1, 1, 1, 0, 0, 0, 1, time.UTC)
+var ONE_DATE time.Time = time.Date(1, 1, 1, 0, 0, 0, 1, time.UTC)
 
 func TestNewDeck(t *testing.T) {
 	d := deck.NewDeck(ONE_DATE)
@@ -31,9 +32,26 @@ func TestAddCardsPredictSameNext(t *testing.T) {
 	d := deck.NewDeck(ONE_DATE)
 	c1, _ := card.NewCards(".", "hi : yo")
 	d.AddCards(c1...)
-   p := meta.NewPredictFromStrings(c1[0].Hash().String(), "", "2020-01-01T00:00:00Z")
+	p := meta.NewPredictFromStrings(c1[0].Hash().String(), "", "2020-01-01T00:00:00Z")
 	d.AddPredicts(p)
 	assert.Equal(t, 2, d.ReviewLen())
+	assert.Equal(t, 0, d.FutureLen())
 	assert.Equal(t, p.Hash(), *d.TopHash())
 	assert.Equal(t, p, d.TopPredict())
+}
+
+func TestCardList(t *testing.T) {
+	d := deck.NewDeck(ONE_DATE)
+	c, _ := card.NewCards(".", "hi : yo")
+	d.AddCards(c...)
+
+	assert.Equal(t, []card.Card{*c[0], *c[1]}, d.CardList())
+}
+
+func TestPredictList(t *testing.T) {
+	d := deck.NewDeck(ONE_DATE)
+	h := internal.NewHash("fad")
+	p := meta.NewPredictFromStrings(h.String(), "", "2020-01-01T00:00:00Z")
+	d.AddPredicts(p)
+	assert.Equal(t, []meta.Predict{*p}, d.PredictList())
 }
