@@ -51,7 +51,7 @@ func TestCardList(t *testing.T) {
 	c, _ := card.NewCards(".", "hi : yo")
 	d.AddCards(c...)
 
-	assert.Equal(t, []card.Card{*c[0], *c[1]}, d.CardList())
+	assert.Equal(t, c, d.CardList())
 }
 
 func TestPredictList(t *testing.T) {
@@ -59,7 +59,7 @@ func TestPredictList(t *testing.T) {
 	h := internal.NewHash("fad")
 	p := meta.NewPredictFromStrings(h.String(), "2020-01-01T00:00:00Z")
 	d.AddPredicts(p)
-	assert.Equal(t, []meta.Predict{*p}, d.PredictList())
+	assert.Equal(t, []*meta.Predict{p}, d.PredictList())
 }
 
 func TestRemove(t *testing.T) {
@@ -96,4 +96,26 @@ func TestRemove(t *testing.T) {
 		assert.Equal(t, h1, *d.TopHash())
 		assert.Len(t, d.CardList(), 1)
 	})
+}
+
+func TestExecFuture(t *testing.T) {
+	h1 := internal.NewHash("55746153a816f94836725a939a5cac37")
+	h2 := internal.NewHash("abad2c2e5be5c33bc319ce038e3f2108")
+   h3 := internal.NewHash("a64332565db9aebe4f2edc4f1c125610")
+   cards, _ := card.NewCards(".", "hi : yo : me")
+
+   d := deck.NewDeck(time.Date(2020,1,1,0,0,0,0,time.UTC))
+   d.AddCards(cards...)
+   d.AddPredicts(
+      meta.NewPredictFromStrings(h1.String(), "2020-01-02T00:00:00Z"),
+      meta.NewPredictFromStrings(h2.String()),
+      meta.NewPredictFromStrings(h3.String()),
+   )
+
+   assert.Equal(t, 1, d.FutureLen())
+   assert.Equal(t, h2, *d.TopHash())
+   d.ExecTop(false, time.Date(2020,1,3,0,0,0,0,time.UTC))
+
+   assert.Equal(t, h1, *d.TopHash())
+   assert.Equal(t, 1, d.FutureLen())
 }

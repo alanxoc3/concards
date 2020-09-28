@@ -7,12 +7,16 @@ type key struct {
 	index int
 }
 
-func (k key) before(o key) bool {
-	return k.time.Before(o.time) || k.time.Equal(o.time) && k.index < o.index
+func (k key) reviewLess(o key) bool {
+	return k.time.Before(o.time) || k.time.Equal(o.time) && k.index > o.index
 }
 
-func (k key) after(o key) bool {
-	return k.time.After(o.time) || k.time.Equal(o.time) && k.index > o.index
+func (k key) futureLess(o key) bool {
+	return k.time.After(o.time) || k.time.Equal(o.time) && k.index < o.index
+}
+
+func (k key) beforeTime(o key) bool {
+	return k.time.Before(o.time)
 }
 
 func (k key) clone() key {

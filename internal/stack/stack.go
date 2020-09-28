@@ -65,13 +65,13 @@ func (s *Stack) insertKey(h internal.Hash, k key) {
 	s.mapper[h] = k
 
 	// Step 2: Add to the right stack.
-	if k.after(s.mainKey) {
-		s.future = insertSorted(s.future, h, func(i int) bool {
-			return s.mapper[s.future[i]].before(k)
+	if k.beforeTime(s.mainKey) {
+		s.review = insertSorted(s.review, h, func(i int) bool {
+			return s.mapper[s.review[i]].reviewLess(k)
 		})
 	} else {
-		s.review = insertSorted(s.review, h, func(i int) bool {
-			return s.mapper[s.review[i]].after(k)
+		s.future = insertSorted(s.future, h, func(i int) bool {
+			return s.mapper[s.future[i]].futureLess(k)
 		})
 	}
 }
@@ -114,10 +114,10 @@ func (s *Stack) Update(h internal.Hash, t time.Time) bool {
 		s.review = removeHashFromSlice(s.review, h)
 
       // Step 2: Future stack to review stack.
-      for len(s.future) > 0 && s.mapper[s.future[0]].before(s.mainKey) {
+      for len(s.future) > 0 && s.mapper[s.future[0]].beforeTime(s.mainKey) {
          hashToReview := s.future[0]
          s.future = s.future[1:]
-         s.insertKey(hashToReview, key{t, s.mapper[hashToReview].index})
+         s.insertKey(hashToReview, s.mapper[hashToReview])
       }
 
 		// Step 3: Re-insert into key map & lists, preserving insertion index.

@@ -109,3 +109,21 @@ func TestUpdate(t *testing.T) {
    assert.Equal(t, 1, s.FutureLen())
    assert.Equal(t, f, *s.Top())
 }
+
+func TestUpdateFutureToReview(t *testing.T) {
+	s := stack.NewStack(time.Date(2020,1,1,0,0,0,0,time.UTC))
+   f := internal.NewHash("f")
+   e := internal.NewHash("e")
+   d := internal.NewHash("d")
+
+   s.Insert(f, time.Date(2020,1,1,0,0,0,1,time.UTC))
+   s.Insert(e, time.Date(2019,1,1,0,0,0,0,time.UTC))
+   s.Insert(d, time.Date(2019,1,1,0,0,0,0,time.UTC))
+   assert.Equal(t, 1, s.FutureLen())
+
+   s.SetTime(time.Date(2020,1,1,0,0,0,2,time.UTC))
+   s.Update(e, ONE_DATE)
+
+   assert.Equal(t, 0, s.FutureLen())
+   assert.Equal(t, f, *s.Top())
+}
