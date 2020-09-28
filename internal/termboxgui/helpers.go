@@ -122,22 +122,18 @@ func tbprintStatusbar(d *deck.Deck) {
 }
 
 func displayHelpMode(color termbox.Attribute) {
-	str2 := "[d]elete: Remove card from session.\n" +
-		"[e]dit:   Open card in editor.\n" +
-		"[f]orget: Reset card's progress.\n" +
-		"[h]elp:   Toggle this menu.\n" +
-		"[k]now:   Ask again in 1000 years.\n" +
-		"[q]uit:   Exit the program.\n" +
-		"[r]edo:   Redo the undo.\n" +
-		"[s]kip:   Put the card at the end.\n" +
-		"[u]ndo:   Undo last action.\n" +
-		"[w]rite:  Write state to meta file.\n" +
-		"\n" +
-		"[1]: No!\n" +
-		"[2]: Idk!\n" +
-		"[3]: Yes!\n" +
-		"\n" +
-		"[space,enter]: Reveal next side.\n"
+	helpStr := `[d]elete: Remove card from session.
+[e]dit:   Open card in editor.
+[h]elp:   Toggle this menu.
+[q]uit:   Exit the program.
+[r]edo:   Redo the undo.
+[u]ndo:   Undo last action.
+[w]rite:  Write state to meta file.
+
+[1]: No!
+[2]: Yes!
+
+[space,enter]: Reveal next side.`
 	// 12 lines, longest line is 36 characters
 
 	w, h := termbox.Size()
@@ -153,7 +149,7 @@ func displayHelpMode(color termbox.Attribute) {
 		y = 0
 	}
 
-	tbprint(x, y, color, coldef, str2)
+	tbprint(x, y, color, coldef, helpStr)
 }
 
 func displayCardMode(c *card.Card, showAnswer int) {
