@@ -181,7 +181,7 @@ func (d *Deck) RemoveDone() {
 	})
 }
 
-type CardsFunc func(string) (card.CardMap, error)
+type CardsFunc func(string) ([]*card.Card, error)
 
 // TODO: Concurrency locks for thread safety?
 func (d *Deck) Edit(rf CardsFunc, ef CardsFunc) error {
@@ -199,24 +199,24 @@ func (d *Deck) Edit(rf CardsFunc, ef CardsFunc) error {
 	filename := curCard.File()
 
 	// Step 3: Get the current state of the file before editing it.
-	beforeMap, e := rf(filename)
-	if e != nil {
-		return e
-	}
+	beforeList, e := rf(filename)
+	if e != nil { return e }
 
 	// Step 4: Execute the edit function.
-	afterMap, e := ef(filename)
+	afterList, e := ef(filename)
 	if e != nil {
 		return e
 	}
 
 	// Step 5: Remove cards that no longer exist.
+   afterMap := cardListToMap(afterList)
 	d.filter(func(i int, h internal.Hash) bool {
 		_, contains := afterMap[h]
 		return afterMap[h].File() != filename || contains
 	})
 
 	// Step 6: Add all the cards new after editing.
+   beforeMap := cardListToMap(beforeList)
 	for k, v := range afterMap {
 		if _, exist := beforeMap[k]; !exist {
 			if _, exist := d.predictMap[k]; !exist {

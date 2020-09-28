@@ -44,7 +44,7 @@ func TermBoxRun(d *deck.Deck, cfg *file.Config) error {
 			} else if inp == "h" {
 				helpMode = !helpMode
 			} else if inp == "w" {
-				err = file.WriteMetasToFile(d, cfg.MetaFile)
+				err = file.WritePredictsToFile(d, cfg.MetaFile)
 				if err != nil {
 					updateStatMsg(err.Error(), termbox.ColorRed)
 				} else {
@@ -65,7 +65,7 @@ func TermBoxRun(d *deck.Deck, cfg *file.Config) error {
 					d.DropTop()
 					save(d)
 				} else if inp == "e" {
-					err := d.Edit(file.ReadCards, func(filename string) (card.CardMap, error) {
+					err := d.Edit(file.ReadCardsFromFile, func(filename string) ([]*card.Card, error) {
 						return file.EditCards(filename, cfg)
 					})
 

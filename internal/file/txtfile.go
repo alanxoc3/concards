@@ -12,22 +12,9 @@ import (
 	"github.com/alanxoc3/concards/internal/card"
 )
 
-type cardList []*card.Card
-
-func cardListToMap(cl cardList) card.CardMap {
-	cm := card.CardMap{}
-	for _, c := range cl {
-      h := c.Hash()
-		if _, exist := cm[h]; !exist {
-			cm[h] = c
-		}
-	}
-	return cm
-}
-
 // Open opens filename and loads cards into new deck
-func ReadCards(filename string) (card.CardMap, error) {
-	cl := cardList{}
+func ReadCardsFromFile(filename string) ([]*card.Card, error) {
+	cl := []*card.Card{}
 	err := filepath.Walk(filename, func(path string, info os.FileInfo, e error) error {
 		if e != nil {
 			return e
@@ -48,16 +35,16 @@ func ReadCards(filename string) (card.CardMap, error) {
 			return fmt.Errorf("Error: Unable to open file \"%s\"", filename)
 		} else {
 			defer f.Close()
-			cl = append(cl, readCardsFromReader(f, absPath)...)
+			cl = append(cl, ReadCardsFromReader(f, absPath)...)
 		}
 
 		return nil
 	})
 
-	return cardListToMap(cl), err
+	return cl, err
 }
 
-func readCardsFromReader(r io.Reader, f string) []*card.Card {
+func ReadCardsFromReader(r io.Reader, f string) []*card.Card {
 	// Initialization.
 	cl := []*card.Card{}
 	facts := []string{}

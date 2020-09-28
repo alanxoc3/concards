@@ -19,16 +19,21 @@ func main() {
 	d := deck.NewDeck(time.Now())
 
 	// We don't care if there is no meta data.
-	file.ReadMetasToDeck(c.MetaFile, d)
+   if predicts, err := file.ReadPredictsFromFile(c.MetaFile); err != nil {
+      fmt.Fprintf(os.Stderr, "Error: Unable to open meta file \"%s\".", c.MetaFile)
+      os.Exit(1)
+   } else {
+      d.AddPredicts(predicts...)
+   }
 
 	if len(c.Files) == 0 {
-		fmt.Printf("Error: You didn't provide any files to parse.\n")
+		fmt.Fprintf(os.Stderr, "Error: You didn't provide any files to parse.\n")
 		os.Exit(1)
 	}
 
 	for _, f := range c.Files {
-		if cm, err := file.ReadCards(f); err != nil {
-			fmt.Printf("Error: File \"%s\" does not exist!\n", f)
+		if cm, err := file.ReadCardsFromFile(f); err != nil {
+			fmt.Fprintf(os.Stderr, "Error: File \"%s\" does not exist!\n", f)
 			os.Exit(1)
 		} else {
 			for _, c := range cm {
@@ -69,5 +74,5 @@ func main() {
 
 	rand.Seed(time.Now().UTC().UnixNano()) // Used for algorithms.
 	termboxgui.TermBoxRun(d, c)
-	_ = file.WriteMetasToFile(d, c.MetaFile)
+	_ = file.WritePredictsToFile(d, c.MetaFile)
 }

@@ -9,7 +9,7 @@ import (
 	"github.com/alanxoc3/concards/internal/card"
 )
 
-func EditCards(filename string, cfg *Config) (card.CardMap, error) {
+func EditCards(filename string, cfg *Config) ([]*card.Card, error) {
 	internal.AssertLogic(cfg != nil, "config was nil when passed to edit function")
 
 	// Load the file with your favorite editor.
@@ -21,5 +21,5 @@ func EditCards(filename string, cfg *Config) (card.CardMap, error) {
 		return nil, fmt.Errorf("Error: The editor returned an error code.")
 	}
 
-	return ReadCards(filename)
+	return ReadCardsFromFile(filename)
 }

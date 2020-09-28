@@ -32,7 +32,7 @@ func TestAddCardsPredictSameNext(t *testing.T) {
 	d := deck.NewDeck(ONE_DATE)
 	c1, _ := card.NewCards(".", "hi : yo")
 	d.AddCards(c1...)
-	p := meta.NewPredictFromStrings(c1[0].Hash().String(), "", "2020-01-01T00:00:00Z")
+	p := meta.NewPredictFromStrings(c1[0].Hash().String(), "2020-01-01T00:00:00Z")
 	d.AddPredicts(p)
 	assert.Equal(t, 2, d.ReviewLen())
 	assert.Equal(t, 0, d.FutureLen())
@@ -51,7 +51,16 @@ func TestCardList(t *testing.T) {
 func TestPredictList(t *testing.T) {
 	d := deck.NewDeck(ONE_DATE)
 	h := internal.NewHash("fad")
-	p := meta.NewPredictFromStrings(h.String(), "", "2020-01-01T00:00:00Z")
+	p := meta.NewPredictFromStrings(h.String(), "2020-01-01T00:00:00Z")
+	d.AddPredicts(p)
+	assert.Equal(t, []meta.Predict{*p}, d.PredictList())
+}
+
+// TODO! Do this!
+func TestFilterMemorize(t *testing.T) {
+	d := deck.NewDeck(ONE_DATE)
+	h := internal.NewHash("fad")
+	p := meta.NewPredictFromStrings(h.String(), "2020-01-01T00:00:00Z")
 	d.AddPredicts(p)
 	assert.Equal(t, []meta.Predict{*p}, d.PredictList())
 }
