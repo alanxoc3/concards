@@ -70,7 +70,7 @@ Here are a few example concards:
    can save typing.
 
 @> Can a concard have more than 2 sides?
- | Yes. | Yes it can.
+ | Yes
 
 @> What does a concard look like?
  | \@> It could look like this \| What does a concard look like? \<@
