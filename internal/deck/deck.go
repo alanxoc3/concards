@@ -133,28 +133,28 @@ func (d *Deck) ExecTop(input bool, now time.Time) (meta.Predict, error) {
 }
 
 // Used to write to the predict file.
-func (d *Deck) PredictList() []meta.Predict {
-	predicts := []meta.Predict{}
+func (d *Deck) PredictList() []*meta.Predict {
+	predicts := []*meta.Predict{}
 	for _, v := range d.predictMap {
-		predicts = append(predicts, *v)
+		predicts = append(predicts, v)
 	}
 	return predicts
 }
 
 // Used to write to the outcome file.
-func (d *Deck) OutcomeList() []meta.Outcome {
-	outcomes := []meta.Outcome{}
+func (d *Deck) OutcomeList() []*meta.Outcome {
+	outcomes := []*meta.Outcome{}
 	for _, v := range d.outcomeMap {
-		outcomes = append(outcomes, *v)
+		outcomes = append(outcomes, v)
 	}
 	return outcomes
 }
 
 // Used for printing the cards.
-func (d *Deck) CardList() []card.Card {
-	cards := []card.Card{}
+func (d *Deck) CardList() []*card.Card {
+	cards := []*card.Card{}
 	for _, v := range d.stack.List() {
-		cards = append(cards, *d.cardMap[v])
+		cards = append(cards, d.cardMap[v])
 	}
 	return cards
 }

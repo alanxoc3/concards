@@ -9,7 +9,6 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/alanxoc3/concards/internal/deck"
 	"github.com/alanxoc3/concards/internal/meta"
 )
 
@@ -27,22 +26,22 @@ func ReadPredictsFromReader(r io.Reader) []*meta.Predict {
 	// Scan by words.
 	lineScanner := bufio.NewScanner(r)
 	lineScanner.Split(bufio.ScanLines)
-   list := []*meta.Predict{}
+	list := []*meta.Predict{}
 
 	for lineScanner.Scan() {
 		strs := strings.Fields(lineScanner.Text())
 
 		// Only add if there is something on the line.
 		if len(strs) > 0 {
-         list = append(list, meta.NewPredictFromStrings(strs...))
+			list = append(list, meta.NewPredictFromStrings(strs...))
 		}
 	}
 
-   return list
+	return list
 }
 
-func WritePredictsToFile(d *deck.Deck, filename string) error {
-	str := []byte(WritePredictsToString(d))
+func WritePredictsToFile(l []*meta.Predict, filename string) error {
+	str := []byte(WritePredictsToString(l))
 	err := ioutil.WriteFile(filename, str, 0644)
 	if err != nil {
 		return fmt.Errorf("Error: Writing to \"%s\" failed.", filename)
@@ -51,10 +50,9 @@ func WritePredictsToFile(d *deck.Deck, filename string) error {
 	return nil
 }
 
-func WritePredictsToString(d *deck.Deck) string {
-	predicts := d.PredictList()
-	predictStrings := make([]string, len(predicts))
-	for _, v := range predicts {
+func WritePredictsToString(l []*meta.Predict) string {
+	predictStrings := []string{}
+	for _, v := range l {
 		predictStrings = append(predictStrings, v.String())
 	}
 
