@@ -11,7 +11,6 @@ import (
 type predicate func(int, internal.Hash) bool
 
 func (d *Deck) cloneInfo(o *Deck) {
-	d.stack.SetTime(o.stack.Time())
 	d.predictMap = map[internal.Hash]*meta.Predict{}
 	for k, v := range o.predictMap {
 		d.predictMap[k] = v
@@ -25,7 +24,7 @@ func (d *Deck) cloneInfo(o *Deck) {
 
 func (d *Deck) filter(p predicate) {
 	hashes := d.stack.List()
-	n := &Deck{}
+	n := NewDeck(d.stack.Time())
 	n.cloneInfo(d)
 
 	for i, h := range hashes {

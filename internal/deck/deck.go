@@ -67,6 +67,12 @@ func (d *Deck) FutureLen() int { return d.stack.FutureLen() }
 // Clones a deck into this deck.
 func (d *Deck) Clone(o *Deck) {
 	d.stack.Clone(o.stack)
+
+	d.cardMap = map[internal.Hash]*card.Card{}
+	for k, v := range o.cardMap {
+		d.cardMap[k] = v
+	}
+
 	d.cloneInfo(o)
 }
 
