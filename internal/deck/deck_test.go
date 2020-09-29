@@ -119,3 +119,46 @@ func TestExecFuture(t *testing.T) {
    assert.Equal(t, h1, *d.TopHash())
    assert.Equal(t, 1, d.FutureLen())
 }
+
+func TestEdit(t *testing.T) {
+   commonDeck := deck.NewDeck(time.Date(2020,1,1,0,0,0,0,time.UTC))
+   cards, _ := card.NewCards(".", "hi | yo")
+   commonDeck.AddCards(cards...)
+
+	t.Run("New", func(t *testing.T) {
+      d := commonDeck.Copy()
+      d.Edit(func(s string) ([]*card.Card, error) {
+         return cards, nil
+      }, func(s string) ([]*card.Card, error) {
+         return card.NewCards(".", "hi : yo")
+      })
+
+      assert.Equal(t, 2, d.ReviewLen())
+      assert.Equal(t, cards[0], d.TopCard())
+	})
+
+	t.Run("Replace", func(t *testing.T) {
+      d := commonDeck.Copy()
+      c, _ := card.NewCards(".", "yo | hi")
+
+      d.Edit(func(s string) ([]*card.Card, error) {
+         return cards, nil
+      }, func(s string) ([]*card.Card, error) {
+         return c, nil
+      })
+
+      assert.Equal(t, 1, d.ReviewLen())
+      assert.Equal(t, c[0], d.TopCard())
+   })
+
+   t.Run("Delete", func(t *testing.T) {
+      d := commonDeck.Copy()
+      d.Edit(func(s string) ([]*card.Card, error) {
+         return cards, nil
+      }, func(s string) ([]*card.Card, error) {
+         return []*card.Card{}, nil
+      })
+
+      assert.Equal(t, 0, d.ReviewLen())
+   })
+}

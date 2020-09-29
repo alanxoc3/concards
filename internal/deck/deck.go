@@ -218,7 +218,7 @@ func (d *Deck) Edit(rf CardsFunc, ef CardsFunc) error {
    afterMap := cardListToMap(afterList)
 	d.filter(func(i int, h internal.Hash) bool {
 		_, contains := afterMap[h]
-		return afterMap[h].File() != filename || contains
+		return d.cardMap[h].File() != filename || contains
 	})
 
 	// Step 6: Add all the cards new after editing.
