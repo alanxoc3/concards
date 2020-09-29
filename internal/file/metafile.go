@@ -53,7 +53,9 @@ func WritePredictsToFile(l []*meta.Predict, filename string) error {
 func WritePredictsToString(l []*meta.Predict) string {
 	predictStrings := []string{}
 	for _, v := range l {
-		predictStrings = append(predictStrings, v.String())
+      if !v.IsZero() {
+         predictStrings = append(predictStrings, v.String())
+      }
 	}
 
 	sort.Strings(predictStrings)
