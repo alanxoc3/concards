@@ -57,12 +57,12 @@ func GenConfig(version string) *Config {
 	parser := argparse.NewParser("concards", "Concards is a simple CLI based SRS flashcard app.")
 
 	// Create flags
-	fVersion := parser.Flag("V", "version", &argparse.Options{Help: "Concards build information."})
-	fReview := parser.Flag("r", "review", &argparse.Options{Help: "Show cards available to be reviewed."})
-	fMemorize := parser.Flag("m", "memorize", &argparse.Options{Help: "Show cards available to be memorized."})
-	fDone := parser.Flag("d", "done", &argparse.Options{Help: "Show cards not available to be reviewed or memorized."})
-	fPrint := parser.Flag("p", "print", &argparse.Options{Help: "Prints all cards, one line per card."})
-	fNumber := parser.Int("n", "number", &argparse.Options{Default: 0, Help: "How many cards to review."})
+	fVersion := parser.Flag("V", "version", &argparse.Options{Help: "Concards build information"})
+	fReview := parser.Flag("r", "review", &argparse.Options{Help: "Show cards available to be reviewed"})
+	fMemorize := parser.Flag("m", "memorize", &argparse.Options{Help: "Show cards available to be memorized"})
+	fDone := parser.Flag("d", "done", &argparse.Options{Help: "Show cards not available to be reviewed or memorized"})
+	fPrint := parser.Flag("p", "print", &argparse.Options{Help: "Prints all cards, one line per card"})
+	fNumber := parser.Int("n", "number", &argparse.Options{Default: 0, Help: "How many cards to review"})
 	fEditor := parser.String("E", "editor", &argparse.Options{Default: getDefaultEditor(), Help: "Which editor to use. Defaults to \"$EDITOR\""})
 	fMeta := parser.String("M", "meta", &argparse.Options{Default: getDefaultMeta(), Help: "Path to meta file. Defaults to \"$CONCARDS_META\" or \"~/.concards-meta\""})
 
@@ -109,6 +109,7 @@ func GenConfig(version string) *Config {
 	if !c.IsReview && !c.IsMemorize && !c.IsDone {
 		c.IsReview = true
 		c.IsMemorize = true
+		c.IsDone = true
 	}
 
 	return c

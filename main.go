@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
-	"sort"
 	"time"
 
 	"github.com/alanxoc3/concards/internal/deck"
@@ -19,12 +18,12 @@ func main() {
 	d := deck.NewDeck(time.Now())
 
 	// We don't care if there is no meta data.
-   if predicts, err := file.ReadPredictsFromFile(c.MetaFile); err != nil {
-      fmt.Fprintf(os.Stderr, "Error: Unable to open meta file \"%s\".", c.MetaFile)
-      os.Exit(1)
-   } else {
-      d.AddPredicts(predicts...)
-   }
+	if predicts, err := file.ReadPredictsFromFile(c.MetaFile); err != nil {
+		fmt.Fprintf(os.Stderr, "Error: Unable to open meta file \"%s\".", c.MetaFile)
+		os.Exit(1)
+	} else {
+		d.AddPredicts(predicts...)
+	}
 
 	if len(c.Files) == 0 {
 		fmt.Fprintf(os.Stderr, "Error: You didn't provide any files to parse.\n")
@@ -56,19 +55,16 @@ func main() {
 	}
 
 	if c.IsPrint {
-		lines := []string{}
-		for _, v := range d.CardList() {
-			lines = append(lines, v.String())
-		}
-
-		sort.Strings(lines)
+		lines := d.CardList()
 
 		for _, c := range lines {
 			fmt.Printf("@> %s\n", c)
 		}
+
 		if len(lines) > 0 {
 			fmt.Printf("<@\n")
 		}
+
 		return
 	}
 
