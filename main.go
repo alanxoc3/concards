@@ -2,61 +2,73 @@ package main
 
 import (
 	"fmt"
-	"github.com/alanxoc3/concards/core"
-	"github.com/alanxoc3/concards/file"
-	"github.com/alanxoc3/concards/termboxgui"
 	"math/rand"
 	"os"
 	"time"
+
+	"github.com/alanxoc3/concards/internal/deck"
+	"github.com/alanxoc3/concards/internal/file"
+	"github.com/alanxoc3/concards/internal/termboxgui"
 )
 
-var version string
+var version string = "snapshot"
 
 func main() {
 	c := file.GenConfig(version)
-	d := core.NewDeck()
+	d := deck.NewDeck(time.Now())
 
 	// We don't care if there is no meta data.
-	file.ReadMetasToDeck(c.MetaFile, d)
+	if predicts, err := file.ReadPredictsFromFile(c.MetaFile); err != nil {
+		fmt.Fprintf(os.Stderr, "Error: Unable to open meta file \"%s\".", c.MetaFile)
+		os.Exit(1)
+	} else {
+		d.AddPredicts(predicts...)
+	}
 
 	if len(c.Files) == 0 {
-		fmt.Printf("Error: You didn't provide any files to parse.\n")
+		fmt.Fprintf(os.Stderr, "Error: You didn't provide any files to parse.\n")
 		os.Exit(1)
 	}
 
 	for _, f := range c.Files {
-		if err := file.ReadCardsToDeck(d, f); err != nil {
-			fmt.Printf("Error: File \"%s\" does not exist!\n", f)
+		if cm, err := file.ReadCardsFromFile(f); err != nil {
+			fmt.Fprintf(os.Stderr, "Error: File \"%s\" does not exist!\n", f)
 			os.Exit(1)
+		} else {
+			for _, c := range cm {
+				d.AddCards(c)
+			}
 		}
 	}
 
 	if !c.IsMemorize {
-		d.FilterOutMemorize()
+		d.RemoveMemorize()
 	}
 	if !c.IsReview {
-		d.FilterOutReview()
+		d.RemoveReview()
 	}
 	if !c.IsDone {
-		d.FilterOutDone()
+		d.RemoveDone()
 	}
 	if c.Number > 0 {
-		d.FilterNumber(c.Number)
+		d.Truncate(c.Number)
 	}
 
 	if c.IsPrint {
-		for i := 0; i < d.Len(); i++ {
-			fmt.Printf("@> %s\n", d.GetCard(i).String())
+		lines := d.CardList()
+
+		for _, c := range lines {
+			fmt.Printf("@> %s\n", c)
 		}
 
-		if d.Len() > 0 {
+		if len(lines) > 0 {
 			fmt.Printf("<@\n")
 		}
+
 		return
 	}
 
-	rand.Seed(time.Now().UTC().UnixNano())
-	d.Shuffle()
+	rand.Seed(time.Now().UTC().UnixNano()) // Used for algorithms.
 	termboxgui.TermBoxRun(d, c)
-	_ = file.WriteMetasToFile(d, c.MetaFile)
+	_ = file.WritePredictsToFile(d.PredictList(), c.MetaFile)
 }

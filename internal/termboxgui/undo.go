@@ -3,14 +3,14 @@ package termboxgui
 import (
 	"fmt"
 
-	"github.com/alanxoc3/concards/core"
+	"github.com/alanxoc3/concards/internal/deck"
 )
 
-var stack []*core.Deck = []*core.Deck{}
+var stack []*deck.Deck = []*deck.Deck{}
 var stackLocation = 0
 
 // Saves the deck onto the change stack.
-func save(d *core.Deck) {
+func save(d *deck.Deck) {
 	if len(stack) > 0 {
 		// Slice is exclusive, hence the +1
 		stack = stack[:stackLocation+1]
@@ -21,7 +21,7 @@ func save(d *core.Deck) {
 }
 
 // Returns the state of the deck, error if there are no more redo operations.
-func redo() (*core.Deck, error) {
+func redo() (*deck.Deck, error) {
 	if stackLocation+1 < len(stack) {
 		stackLocation++
 		d := stack[stackLocation]
@@ -33,7 +33,7 @@ func redo() (*core.Deck, error) {
 }
 
 // Returns the state of the deck, error if there are no more undo operations.
-func undo() (*core.Deck, error) {
+func undo() (*deck.Deck, error) {
 	if stackLocation > 0 {
 		stackLocation--
 		d := stack[stackLocation]

@@ -2,8 +2,10 @@ package termboxgui
 
 import (
 	"fmt"
+	"time"
 
-	"github.com/alanxoc3/concards/core"
+	"github.com/alanxoc3/concards/internal/card"
+	"github.com/alanxoc3/concards/internal/deck"
 	runewidth "github.com/mattn/go-runewidth"
 	termbox "github.com/nsf/termbox-go"
 )
@@ -97,7 +99,7 @@ func tbvertical(x int, color termbox.Attribute) {
 	}
 }
 
-func tbprintCard(c *core.Card, amount int) {
+func tbprintCard(c *card.Card, amount int) {
 	y := 0
 
 	for i := 0; i < c.Len() && i < amount; i++ {
@@ -110,33 +112,28 @@ func tbprintCard(c *core.Card, amount int) {
 	}
 }
 
-func tbprintStatusbar(d *core.Deck) {
+func tbprintStatusbar(d *deck.Deck) {
 	_, h := termbox.Size()
 	color := termbox.ColorBlue
 	tbhorizontal(h-2, color)
-	msg := fmt.Sprintf("%d cards - %s", d.Len(), d.TopCard().GetFile())
+	msg := fmt.Sprintf("%d/%d cards - %s", d.ReviewLen(), d.FutureLen(), d.TopCard().File())
 
 	tbprint(0, h-2, termbox.ColorWhite|termbox.AttrBold, color, msg)
 }
 
 func displayHelpMode(color termbox.Attribute) {
-	str2 := "              Controls\n" +
-		"------------------------------------\n" +
-		"e, EDIT   - the current card\n" +
-		"d, DELETE - delete the current card\n" +
-		"s, SKIP   - skips the current card\n" +
-		"f, FORGET - removes card's progress\n" +
-		"w, WRITE  - your cards to their files\n" +
-		"q, QUIT   - the program\n" +
-		"h, HELP   - toggle this menu\n" +
-		"u, UNDO   - you messed up\n" +
-		"r, REDO   - maybe not\n" +
-		"\n" +
-		"1, INPUT 1 - Not a clue.\n" +
-		"2, INPUT 2 - Sounds familiar.\n" +
-		"3, INPUT 3 - I know it!\n" +
-		"\n" +
-		"<space> or <enter> - reveal card\n"
+	helpStr := `[d]elete: Remove card from session.
+[e]dit:   Open card in editor.
+[h]elp:   Toggle this menu.
+[q]uit:   Exit the program.
+[r]edo:   Redo the undo.
+[u]ndo:   Undo last action.
+[w]rite:  Write state to meta file.
+
+[1]: No!
+[2]: Yes!
+
+[space,enter]: Reveal next side.`
 	// 12 lines, longest line is 36 characters
 
 	w, h := termbox.Size()
@@ -152,10 +149,10 @@ func displayHelpMode(color termbox.Attribute) {
 		y = 0
 	}
 
-	tbprint(x, y, color, coldef, str2)
+	tbprint(x, y, color, coldef, helpStr)
 }
 
-func displayCardMode(c *core.Card, showAnswer int) {
+func displayCardMode(c *card.Card, showAnswer int) {
 	tbprintCard(c, showAnswer)
 }
 
@@ -167,25 +164,16 @@ func tbprintStatMsg() {
 	tbprint(0, h-1, statMsgCol, color, statMsg)
 }
 
-func updateStatMsgAndCard(d *core.Deck, k core.Know) {
-	h, _, m := d.Top()
-	if m == nil {
-		m = core.NewDefaultMeta("sm2")
+func updateStatMsgAndCard(d *deck.Deck, input bool) {
+	m, err := d.ExecTop(input, time.Now())
+	if err != nil {
+		updateStatMsg("Problem reading the card :(.", termbox.ColorRed)
+	} else if input {
+		time := m.Next().Format("Mon 2 Jan 2006 @ 15:04")
+		updateStatMsg(fmt.Sprintf("Yes! Next review is %s.", time), termbox.ColorCyan)
+	} else {
+		updateStatMsg("No! Try again soon.", termbox.ColorRed)
 	}
-
-	if k == core.NO {
-		m, _ = m.Exec(core.NO)
-		updateStatMsg("Not a clue, card put to the back of the pile.", termbox.ColorRed)
-	} else if k == core.IDK {
-		m, _ = m.Exec(core.IDK)
-		updateStatMsg("Sounds familiar, card put to the back of the pile.", termbox.ColorYellow)
-	} else if k == core.YES {
-		m, _ = m.Exec(core.YES)
-		time := m.Next.Format("Mon 2 Jan 2006 @ 15:04")
-		updateStatMsg(fmt.Sprintf("I know it! Next review is %s.", time), termbox.ColorCyan)
-	}
-
-	d.AddMeta(h, m)
 }
 
 func updateStatMsg(msg string, color termbox.Attribute) {

@@ -1,0 +1,70 @@
+#!/usr/bin/env python3
+# Concards transition from v0.6.0 to v0.7.0 script.
+# By Alan Morgan
+#
+# The metadata file changed in this version. This script will use the sm2 rank
+# to figure out the current date, as well as make a guess for a yes and no
+# count. The code here isn't the prettiest, but it works fine.
+#
+# The file output is printed straight to stdout, so just redirect the output
+# into a file and you will be good to go.
+
+import csv
+import sys
+import re
+from datetime import datetime, timezone, timedelta
+
+if len(sys.argv) != 2:
+    print("script <input-file>")
+    sys.exit(1)
+
+infile  = sys.argv[1]
+
+def timeToIsoString(t):
+    return re.sub(r'\+00:00', 'Z', t.astimezone(timezone.utc).isoformat())
+
+with open(infile, mode ='r') as f:
+    csvFile = csv.reader(f, delimiter=' ')
+    for m in csvFile:
+        HASH = m[0]
+        NEXT = datetime.fromisoformat(m[1])
+        CURR = datetime.fromisoformat(m[1])
+        YES = 0
+        NO = 0
+        STREAK = int(m[2])
+        ALG    = m[3]
+        RANK   = float(m[4])
+        nextday = 1
+
+        if STREAK > 0:
+            YES = STREAK
+            teststreak = STREAK-1
+            nextday = 1
+            if teststreak >= 1: nextday += 5
+            if teststreak >= 2:
+                for x in range(2,teststreak+1):
+                    nextday *= RANK
+        elif STREAK <= 0:
+            NO = -STREAK
+            nextday = 0
+
+        CURR = CURR - timedelta(days=int(nextday))
+
+        newrank = 2.5 + .11*YES -.29*NO + .06*STREAK
+        while not (RANK - .05 <= newrank <= RANK + .05):
+            if STREAK < 0 and YES >= NO: break
+
+            if YES == 0 and STREAK < 0 and NO > -STREAK:
+                newrank += .11
+                YES += 1
+            elif NO == 0 and STREAK > 0 and YES > STREAK:
+                newrank -= .29
+                NO += 1
+            elif newrank < RANK:
+                newrank += .11
+                YES += 1
+            elif newrank > RANK:
+                newrank -= .29
+                NO += 1
+
+        print('{} {} {} {} {} {} {}'.format(HASH, timeToIsoString(NEXT), timeToIsoString(CURR), YES, NO, STREAK, ALG))

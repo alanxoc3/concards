@@ -8,11 +8,13 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/alanxoc3/concards/core"
+	"github.com/alanxoc3/concards/internal"
+	"github.com/alanxoc3/concards/internal/card"
 )
 
 // Open opens filename and loads cards into new deck
-func ReadCardsToDeck(d *core.Deck, filename string) error {
+func ReadCardsFromFile(filename string) ([]*card.Card, error) {
+	cl := []*card.Card{}
 	err := filepath.Walk(filename, func(path string, info os.FileInfo, e error) error {
 		if e != nil {
 			return e
@@ -33,20 +35,21 @@ func ReadCardsToDeck(d *core.Deck, filename string) error {
 			return fmt.Errorf("Error: Unable to open file \"%s\"", filename)
 		} else {
 			defer f.Close()
-			ReadCardsToDeckHelper(f, d, absPath)
+			cl = append(cl, ReadCardsFromReader(f, absPath)...)
 		}
 
 		return nil
 	})
 
-	return err
+	return cl, err
 }
 
-func ReadCardsToDeckHelper(r io.Reader, d *core.Deck, f string) {
+func ReadCardsFromReader(r io.Reader, f string) []*card.Card {
 	// Initialization.
+	cl := []*card.Card{}
 	facts := []string{}
 	state := false
-	var td *core.Deck
+	var td []*card.Card
 
 	// Scan by words.
 	scanner := bufio.NewScanner(r)
@@ -56,27 +59,26 @@ func ReadCardsToDeckHelper(r io.Reader, d *core.Deck, f string) {
 		t := scanner.Text()
 
 		if state {
-			if t == core.CBeg {
-				td.AddNewCards(f, strings.Join(facts, " "))
+			if t == internal.CBeg {
+				cards, _ := card.NewCards(f, strings.Join(facts, " "))
+				td = append(td, cards...)
 
 				facts = []string{}
-			} else if t == core.CEnd {
-				td.AddNewCards(f, strings.Join(facts, " "))
-
-				for i := 0; i < td.Len(); i++ {
-					d.AddCard(td.GetCard(i))
-				}
+			} else if t == internal.CEnd {
+				cards, _ := card.NewCards(f, strings.Join(facts, " "))
+				td = append(td, cards...)
+				cl = append(cl, td...)
 				state = false
 			} else {
 				facts = append(facts, t)
 			}
-		} else if t == core.CBeg {
+		} else if t == internal.CBeg {
 			// create td
-			td = core.NewDeck()
+			td = []*card.Card{}
 			state = true
 			facts = []string{}
 		}
 	}
 
-	return
+	return cl
 }
