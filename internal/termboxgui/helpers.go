@@ -116,7 +116,7 @@ func tbprintStatusbar(d *deck.Deck) {
 	_, h := termbox.Size()
 	color := termbox.ColorBlue
 	tbhorizontal(h-2, color)
-	msg := fmt.Sprintf("%d cards - %s", d.ReviewLen(), d.TopCard().File())
+	msg := fmt.Sprintf("%d/%d cards - %s", d.ReviewLen(), d.FutureLen(), d.TopCard().File())
 
 	tbprint(0, h-2, termbox.ColorWhite|termbox.AttrBold, color, msg)
 }
