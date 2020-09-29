@@ -34,6 +34,24 @@ func TestAddCardsTop(t *testing.T) {
 	assert.Equal(t, c1[0], d.TopCard())
 }
 
+func TestDropTop(t *testing.T) {
+	d := deck.NewDeck(ONE_DATE)
+	c1, _ := card.NewCards(".", "hi : yo")
+	d.AddCards(c1...)
+   d.DropTop()
+	assert.Equal(t, c1[1], d.TopCard())
+	assert.Len(t, d.CardList(), 1)
+}
+
+func TestTruncate(t *testing.T) {
+	d := deck.NewDeck(ONE_DATE)
+	c1, _ := card.NewCards(".", "hi : yo")
+	d.AddCards(c1...)
+   d.Truncate(1)
+	assert.Equal(t, c1[0], d.TopCard())
+	assert.Len(t, d.CardList(), 1)
+}
+
 func TestAddCardsPredictSameNext(t *testing.T) {
 	d := deck.NewDeck(ONE_DATE)
 	c1, _ := card.NewCards(".", "hi : yo")
