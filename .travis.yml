@@ -12,7 +12,7 @@ script:
   - echo Building Concards $CONCARDS_VERSION
   - go get github.com/mattn/goveralls
   - go test -v ./...
-  - "$GOPATH/bin/goveralls -service=travis-ci"
+  - "$GOPATH/bin/goveralls -service=travis-ci" || true
 
 before_deploy:
   - go get github.com/mitchellh/gox
