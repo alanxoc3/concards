@@ -18,6 +18,9 @@ func TestNewDeck(t *testing.T) {
 	assert.Len(t, d.CardList(), 0)
 	assert.Len(t, d.OutcomeList(), 0)
 	assert.Len(t, d.PredictList(), 0)
+   assert.Nil(t, d.TopCard())
+   assert.Nil(t, d.TopPredict())
+   assert.Nil(t, d.TopHash())
 }
 
 func TestAddCardsLen(t *testing.T) {
