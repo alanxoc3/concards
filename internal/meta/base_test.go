@@ -80,13 +80,13 @@ var metaTestFuncs = map[string]metaTestFunc{
 	},
 
 	"StreakNoOnly": func(t *testing.T, cf metaCreate) {
-		m := cf("", "", "", "1", "", "-33")
+		m := cf("", "", "", "", "1", "-33")
 		assert.Equal(t, -1, m.Streak())
 		assert.Equal(t, 0, m.YesCount())
 		assert.Equal(t, 1, m.NoCount())
 	},
 
-	"StreakNeutralBoth": func(t *testing.T, cf metaCreate) {
+	"StreakNeutralOneOne": func(t *testing.T, cf metaCreate) {
 		m := cf("", "", "", "1", "1", "33")
 		assert.Equal(t, 0, m.Streak())
 		assert.Equal(t, 1, m.YesCount())
@@ -94,10 +94,10 @@ var metaTestFuncs = map[string]metaTestFunc{
 	},
 
 	"StreakYesBoth": func(t *testing.T, cf metaCreate) {
-		m := cf("", "", "", "5", "1", "5")
+		m := cf("", "", "", "5", "5", "5")
 		assert.Equal(t, 4, m.Streak())
 		assert.Equal(t, 5, m.YesCount())
-		assert.Equal(t, 1, m.NoCount())
+		assert.Equal(t, 5, m.NoCount())
 	},
 
 	"StreakNoBoth": func(t *testing.T, cf metaCreate) {

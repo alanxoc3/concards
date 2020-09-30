@@ -88,7 +88,18 @@ func newBase(hash internal.Hash, next time.Time, curr time.Time, yesCount int, n
 
 	yesCount = boundInt(yesCount, 0, internal.MaxYesNoStreak)
 	noCount = boundInt(noCount, 0, internal.MaxYesNoStreak)
-	streak = boundInt(streak, -internal.MaxYesNoStreak, internal.MaxYesNoStreak)
+
+   if yesCount == 0 && noCount == 0 || yesCount == 1 && noCount == 1 || yesCount == 0 && streak > 0 || noCount == 0 && streak < 0 {
+      streak = 0
+   } else if noCount == 0 && yesCount > 0 {
+      streak = yesCount
+   } else if yesCount == 0 && noCount > 0 {
+      streak = -noCount
+   } else if streak >= yesCount {
+      streak = yesCount - 1
+   } else if -streak >= noCount {
+      streak = -(noCount - 1)
+   }
 
 	// Streak can't be larger than yes or no count.
 	if streak > yesCount {

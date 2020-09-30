@@ -20,13 +20,13 @@ func TestPredictBasics(t *testing.T) {
 }
 
 func TestPredictString(t *testing.T) {
-	p := meta.NewPredictFromStrings("ff", "2020-01-01T00:00:00Z", "2020-01-01T00:00:00Z", "12", "12", "12", "alg")
-	assert.Equal(t, "ff000000000000000000000000000000 2020-01-01T00:00:00Z 2020-01-01T00:00:00Z 12 12 12 alg", p.String())
+	p := meta.NewPredictFromStrings("ff", "2020-01-01T00:00:00Z", "2020-01-01T00:00:00Z", "1", "1", "0", "alg")
+	assert.Equal(t, "ff000000000000000000000000000000 2020-01-01T00:00:00Z 2020-01-01T00:00:00Z 1 1 0 alg", p.String())
 }
 
 func TestPredictStringEmpty(t *testing.T) {
-	p := meta.NewPredictFromStrings("ff", "2020-01-01T00:00:00Z", "2020-01-01T00:00:00Z", "12", "12", "12")
-	assert.Equal(t, "ff000000000000000000000000000000 2020-01-01T00:00:00Z 2020-01-01T00:00:00Z 12 12 12 ", p.String())
+	p := meta.NewPredictFromStrings("ff", "2020-01-01T00:00:00Z", "2020-01-01T00:00:00Z", "1", "1", "0")
+	assert.Equal(t, "ff000000000000000000000000000000 2020-01-01T00:00:00Z 2020-01-01T00:00:00Z 1 1 0 ", p.String())
 }
 
 func TestPredictDefault(t *testing.T) {
