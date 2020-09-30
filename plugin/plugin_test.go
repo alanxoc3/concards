@@ -8,8 +8,8 @@ import (
 )
 
 func TestApi(t *testing.T) {
-   assert.Equal(t, plugin.YesWasYes, plugin.MockOutcome("", "", "", "", "", "1", "1").AnswerClassification())
-   assert.Equal(t, plugin.YesWasNo, plugin.MockOutcome("", "", "", "", "", "-1", "1").AnswerClassification())
-   assert.Equal(t, plugin.NoWasYes, plugin.MockOutcome("", "", "", "", "", "1", "0").AnswerClassification())
-   assert.Equal(t, plugin.NoWasNo, plugin.MockOutcome("", "", "", "", "", "-1", "0").AnswerClassification())
+   assert.Equal(t, plugin.YesWasYes, plugin.MockOutcome("", "", "", "2", "2", "1", "1").AnswerClassification())
+   assert.Equal(t, plugin.YesWasNo, plugin.MockOutcome("", "", "", "2", "2", "-1", "1").AnswerClassification())
+   assert.Equal(t, plugin.NoWasYes, plugin.MockOutcome("", "", "", "2", "2", "1", "0").AnswerClassification())
+   assert.Equal(t, plugin.NoWasNo, plugin.MockOutcome("", "", "", "2", "2", "-1", "0").AnswerClassification())
 }
