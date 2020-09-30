@@ -4,6 +4,7 @@ import (
 	"github.com/alanxoc3/concards/internal/card"
 	"github.com/alanxoc3/concards/internal/deck"
 	"github.com/alanxoc3/concards/internal/file"
+	"github.com/alanxoc3/concards/internal/history"
 	termbox "github.com/nsf/termbox-go"
 )
 
@@ -22,12 +23,13 @@ func TermBoxRun(d *deck.Deck, cfg *file.Config) error {
 	data = make([]byte, 0, 64)
 	const coldef = termbox.ColorDefault
 
+	man := history.NewManager()
 	cardShown := 1
 	helpMode := false
 	quitMode := false
 	finishedEditing := false
 
-	save(d) // Save at beginning, and end of each editing command.
+	man.Save(d) // Save at beginning, and end of each editing command.
 	for d.ReviewLen() > 0 {
 		drawScreen(d, helpMode, cardShown, finishedEditing)
 		finishedEditing = false
@@ -54,16 +56,16 @@ func TermBoxRun(d *deck.Deck, cfg *file.Config) error {
 				if inp == "1" {
 					updateStatMsgAndCard(d, false)
 					cardShown = 1
-					save(d)
+					man.Save(d)
 				} else if inp == "2" {
 					updateStatMsgAndCard(d, true)
 					cardShown = 1
-					save(d)
+					man.Save(d)
 				} else if inp == "d" {
 					updateStatMsg("Deleted.", termbox.ColorYellow)
 					cardShown = 1
 					d.DropTop()
-					save(d)
+					man.Save(d)
 				} else if inp == "e" {
 					err := d.Edit(file.ReadCardsFromFile, func(filename string) ([]*card.Card, error) {
 						return file.EditCards(filename, cfg)
@@ -76,9 +78,9 @@ func TermBoxRun(d *deck.Deck, cfg *file.Config) error {
 					}
 					finishedEditing = true
 					cardShown = 1
-					save(d)
+					man.Save(d)
 				} else if inp == "u" {
-					td, terr := undo()
+					td, terr := man.Undo()
 					if terr != nil {
 						updateStatMsg(terr.Error(), termbox.ColorRed)
 					} else {
@@ -87,7 +89,7 @@ func TermBoxRun(d *deck.Deck, cfg *file.Config) error {
 						cardShown = 1
 					}
 				} else if inp == "r" {
-					td, terr := redo()
+					td, terr := man.Redo()
 					if terr != nil {
 						updateStatMsg(terr.Error(), termbox.ColorRed)
 					} else {
