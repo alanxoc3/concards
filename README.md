@@ -9,12 +9,11 @@ Turning notes into flashcards, or should I say concards! Concards is my ongoing
 attempt to make flashcards simple and easily embeddable into text document
 based notes. Concards is much lighter than other flashcard applications such as
 such as [Anki](https://apps.ankiweb.net/) or
-[Memrise](https://www.memrise.com/), but is also very powerful by following the
-[Unix Philosophy](https://en.wikipedia.org/wiki/Unix_philosophy) of "Do one
-thing and do it well".
+[Memrise](https://www.memrise.com/), but it is also very powerful striving to
+do one thing and do it well.
 
 ## Features
-- Implements the [SM2](https://www.supermemo.com/english/ol/sm2.htm) Repetition Algorithm.
+- Implements a repetition algorithm similar to [SM2](https://www.supermemo.com/english/ol/sm2.htm).
 - Reading from multiple files & directories.
 - Conveniently edit cards while reviewing them!
 - Helpful syntax for adding reversible cards.
@@ -27,7 +26,7 @@ page](https://github.com/alanxoc3/concards/releases). At the moment, only Linux
 and Mac are supported.
 
 ### Building From Source
-It should be super simple. Just use the `go install` command:
+It should be super simple:
 ``` bash
 go install github.com/alanxoc3/concards
 ```
@@ -42,11 +41,11 @@ This project currently depends on:
   Asian characters.
 
 Concards wouldn't be where it is today without those open source projects &
-their contributors, so please check them out too :).
+their contributors, so please check them out too!
 
 ## Usage
 The complete syntax of embedding your flashcards into text documents consists
-of these keywords:
+of these symbols:
 ```
 '@>' = Starts a concards block and also starts a question.
 '|'  = Separates sides.
@@ -98,20 +97,44 @@ $ concards README.md
 ```
 
 ## Advanced Usage
-### The Meta Data File
-Here is an example meta-data file:
+### The Predict File
+The predict file contains information needed to make a prediction when you
+should review a card next.
+
+Here is an example predict file:
 ```
-3dda75cb44ed447186834541475f32e2 2019-01-01T00:00:00Z 0 sm2 2.5
-8525b45f883c05eec46b4f7a88e7f7ef 2020-01-01T00:00:00Z 0 sm2 2.5
+002141b9b9448a257b05da1f2eb78972 2020-08-08T18:00:17Z 2020-08-02T18:00:17Z 2 1 1 sm2
+3dda75cb44ed447186834541475f32e2 2020-08-08T18:00:17Z 2020-08-02T18:00:17Z 1 3 -2 sm2
 ```
 
-Here is the same file, but annotated:
+Here is that same file, but annotated:
 ```
-sha256sum cut in half            | review timestamp      | streak | alg | data
----------------------------------+-----------------------+--------+-----+-----
-3dda75cb44ed447186834541475f32e2 | 2019-01-01T00:00:00Z  | 0      | sm2 | 2.5
-8525b45f883c05eec46b4f7a88e7f7ef | 2020-01-01T00:00:00Z  | 0      | sm2 | 2.5
+sha256sum cut in half            | next timestamp       | previous timestamp   | total yes count | total no count | current streak | spaced repetition algorithm used
+---------------------------------+----------------------+----------------------+---+---+----+----
+002141b9b9448a257b05da1f2eb78972 | 2020-08-08T18:00:17Z | 2020-08-02T18:00:17Z | 2 | 1 |  1 | sm2
+3dda75cb44ed447186834541475f32e2 | 2020-08-08T18:00:17Z | 2020-08-02T18:00:17Z | 1 | 3 | -2 | sm2
 ```
 
-This file is saved to `$CONCARDS_META`. If that environment variable doesn't
-exist, then it is saved to `$HOME/.concards-meta`.
+This file is read from `$CONCARDS_PREDICT`, or `$HOME/.config/concards/predict`
+if that environment variable doesn't exist.
+
+### The Outcome File
+The outcome file contains the historical outcomes of every time a card has been
+passed off or failed. It differs only slightly from the predict file. Here is
+the corresponding outcome file for the predict file example above:
+```
+002141b9b9448a257b05da1f2eb78972 2020-08-08T18:00:17Z 2020-08-02T18:00:17Z 0 0 0 0
+002141b9b9448a257b05da1f2eb78972 2020-08-08T18:00:17Z 2020-08-02T18:00:17Z 0 1 -1 1
+002141b9b9448a257b05da1f2eb78972 2020-08-08T18:00:17Z 2020-08-02T18:00:17Z 1 1 0 1
+3dda75cb44ed447186834541475f32e2 2020-08-08T18:00:17Z 2020-08-02T18:00:17Z 0 0 0 1
+3dda75cb44ed447186834541475f32e2 2020-08-08T18:00:17Z 2020-08-02T18:00:17Z 1 0 1 0
+3dda75cb44ed447186834541475f32e2 2020-08-08T18:00:17Z 2020-08-02T18:00:17Z 1 1 0 0
+3dda75cb44ed447186834541475f32e2 2020-08-08T18:00:17Z 2020-08-02T18:00:17Z 1 2 -1 0
+```
+
+You can notice that there are two main differences from the predict file:
+- There are usually multiple lines with the same hash.
+- The last column is a boolean "pass or fail" instead of an algorithm name.
+
+This file is read from `$CONCARDS_OUTCOME`, or `$HOME/.config/concards/outcome`
+if that environment variable doesn't exist.
