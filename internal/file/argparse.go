@@ -21,19 +21,6 @@ type Config struct {
 	Files    []string
 }
 
-// For debugging
-func (c *Config) String() string {
-	return fmt.Sprintf(`IsReview   %t
-IsMemorize %t
-IsDone     %t
-IsPrint    %t
-IsStream   %t
-Editor     "%s"
-Number     %d
-MetaFile   "%s"
-Files      %s`, c.IsReview, c.IsMemorize, c.IsDone, c.IsPrint, c.IsStream, c.Editor, c.Number, c.MetaFile, c.Files)
-}
-
 func getDefaultEditor() string {
 	if val, present := os.LookupEnv("EDITOR"); present {
 		return val
