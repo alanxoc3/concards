@@ -137,6 +137,7 @@ func TestExecFuture(t *testing.T) {
    assert.Equal(t, h2, *d.TopHash())
    d.ExecTop(false, time.Date(2020,1,3,0,0,0,0,time.UTC))
 
+   assert.Len(t, d.OutcomeList(), 1)
    assert.Equal(t, h1, *d.TopHash())
    assert.Equal(t, 1, d.FutureLen())
 }

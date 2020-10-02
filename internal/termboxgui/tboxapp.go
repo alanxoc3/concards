@@ -50,8 +50,14 @@ func TermBoxRun(d *deck.Deck, cfg *file.Config) error {
 				if err != nil {
 					updateStatMsg(err.Error(), termbox.ColorRed)
 				} else {
-					updateStatMsg("Cards were written.", termbox.ColorYellow)
+               err = file.WriteOutcomesToFile(d.OutcomeList(), cfg.OutcomeFile)
+               if err != nil {
+                  updateStatMsg(err.Error(), termbox.ColorRed)
+               } else {
+                  updateStatMsg("Cards were written.", termbox.ColorYellow)
+               }
 				}
+
 			} else if !helpMode {
 				if inp == "1" {
 					updateStatMsgAndCard(d, false)

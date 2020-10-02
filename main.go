@@ -64,4 +64,5 @@ func main() {
 	rand.Seed(time.Now().UTC().UnixNano()) // Used for algorithms.
 	termboxgui.TermBoxRun(d, c)
 	_ = file.WritePredictsToFile(d.PredictList(), c.PredictFile)
+	_ = file.WriteOutcomesToFile(d.OutcomeList(), c.OutcomeFile)
 }
