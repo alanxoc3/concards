@@ -2,9 +2,7 @@ package file
 
 import (
 	"bufio"
-	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"sort"
 	"strings"
@@ -12,14 +10,17 @@ import (
 	"github.com/alanxoc3/concards/internal/meta"
 )
 
+// TODO: Clean up duplicate code here.
+
 // Open filename and loads cards into new deck
-func ReadPredictsFromFile(filename string) ([]*meta.Predict, error) {
-	if f, err := os.Open(filename); err != nil {
-		return nil, fmt.Errorf("Error: Unable to open meta file \"%s\".", filename)
-	} else {
-		defer f.Close()
-		return ReadPredictsFromReader(f), nil
+func ReadPredictsFromFile(filename string) []*meta.Predict {
+	f, err := os.Open(filename)
+	if err != nil {
+		return []*meta.Predict{}
 	}
+
+	defer f.Close()
+	return ReadPredictsFromReader(f)
 }
 
 func ReadPredictsFromReader(r io.Reader) []*meta.Predict {
@@ -40,24 +41,55 @@ func ReadPredictsFromReader(r io.Reader) []*meta.Predict {
 	return list
 }
 
-func WritePredictsToFile(l []*meta.Predict, filename string) error {
-	str := []byte(WritePredictsToString(l))
-	err := ioutil.WriteFile(filename, str, 0644)
-	if err != nil {
-		return fmt.Errorf("Error: Writing to \"%s\" failed.", filename)
-	}
-
-	return nil
-}
-
 func WritePredictsToString(l []*meta.Predict) string {
 	predictStrings := []string{}
 	for _, v := range l {
-      if !v.IsZero() {
-         predictStrings = append(predictStrings, v.String())
-      }
+		if !v.IsZero() {
+			predictStrings = append(predictStrings, v.String())
+		}
 	}
 
 	sort.Strings(predictStrings)
 	return strings.Join(predictStrings, "\n")
+}
+
+// Open filename and loads cards into new deck
+func ReadOutcomesFromFile(filename string) []*meta.Outcome {
+	f, err := os.Open(filename)
+	if err != nil {
+		return []*meta.Outcome{}
+	}
+
+	defer f.Close()
+	return ReadOutcomesFromReader(f)
+}
+
+func ReadOutcomesFromReader(r io.Reader) []*meta.Outcome {
+	// Scan by words.
+	lineScanner := bufio.NewScanner(r)
+	lineScanner.Split(bufio.ScanLines)
+	list := []*meta.Outcome{}
+
+	for lineScanner.Scan() {
+		strs := strings.Fields(lineScanner.Text())
+
+		// Only add if there is something on the line.
+		if len(strs) > 0 {
+			list = append(list, meta.NewOutcomeFromStrings(strs...))
+		}
+	}
+
+	return list
+}
+
+func WriteOutcomesToString(l []*meta.Outcome) string {
+	outcomeStrings := []string{}
+	for _, v := range l {
+		if !v.IsZero() {
+			outcomeStrings = append(outcomeStrings, v.String())
+		}
+	}
+
+	sort.Strings(outcomeStrings)
+	return strings.Join(outcomeStrings, "\n")
 }

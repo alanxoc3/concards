@@ -18,11 +18,11 @@ func NewOutcomeFromPredict(p *Predict, now time.Time, target bool) *Outcome {
 		target: target,
 	}
 
-	r.next = now
+	r.next = now.UTC()
 
 	// For new cards, the outcome makes more sense to be instant.
 	if r.curr.IsZero() {
-		r.curr = now
+		r.curr = now.UTC()
 	}
 
 	return r
@@ -35,50 +35,30 @@ func NewOutcomeFromStrings(strs ...string) *Outcome {
 	}
 }
 
-func (r *Outcome) AnswerClassification() AnswerClassification {
-	if r.target {
-		if r.streak < 0 {
-			return YesWasNo
-		} else {
-			return YesWasYes
-		}
-	} else {
-		if r.streak > 0 {
-			return NoWasYes
-		} else {
-			return NoWasNo
-		}
-	}
-}
-
+func (r *Outcome) PredYesCount() int { return r.newCount(true, r.yesCount) }
+func (r *Outcome) PredNoCount() int  { return r.newCount(false, r.noCount) }
 func (r *Outcome) PredStreak() int {
-	// Streak Logic
-	streak := r.streak
-	switch r.AnswerClassification() {
-	case YesWasYes:
-		streak++
-	case NoWasNo:
-		streak--
-	default:
-		streak = 0
-	}
-	return streak
+   if r.target && r.streak >= 0 {
+      return r.streak + 1
+   } else if !r.target && r.streak <= 0 {
+      return r.streak - 1
+   } else {
+      return 0
+   }
 }
 
 func (r *Outcome) Target() bool { return r.target }
 
-func (r *Outcome) PredYesCount() int { return r.newCount(true, r.yesCount) }
-func (r *Outcome) PredNoCount() int  { return r.newCount(false, r.noCount) }
+func (r *Outcome) String() string {
+	return fmt.Sprintf("%s %s", r.base.String(), r.targetStr())
+}
+
 func (r *Outcome) targetStr() string {
 	if r.target {
 		return "1"
 	} else {
 		return "0"
 	}
-}
-
-func (r *Outcome) String() string {
-	return fmt.Sprintf("%s %s", r.base.String(), r.targetStr())
 }
 
 func (r *Outcome) newCount(expecting bool, count int) int {

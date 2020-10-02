@@ -118,14 +118,18 @@ func (d *Deck) ExecTop(input bool, now time.Time) (meta.Predict, error) {
 
 	// Step 2: Exec the predict value.
 	np := d.TopPredict().Exec(input, now)
+   no := meta.NewOutcomeFromPredict(&np, now, input)
 
 	// Step 3: Save the new prediction.
 	d.predictMap[np.Hash()] = &np
 
-   // Step 4: Set the current time.
+	// Step 4: Save the outcome too.
+   d.outcomeMap[no.Key()] = no
+
+   // Step 5: Set the current time.
    d.stack.SetTime(now)
 
-   // Step 5: Update the stack.
+   // Step 6: Update the stack.
    updateStatus := d.stack.Update(np.Hash(), np.Next())
    internal.AssertLogic(updateStatus, "stack didn't contain hash")
 
