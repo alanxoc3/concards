@@ -26,3 +26,28 @@ func WritePredictsToFile(l []*meta.Predict, filename string) error {
 
 	return nil
 }
+
+// TODO: clean me up please.
+func WriteOutcomesToFile(l []*meta.Outcome, filename string) error {
+   outcomes := ReadOutcomesFromFile(filename)
+   outcomes = append(outcomes, l...)
+
+   outcomeMap := map[meta.Key]*meta.Outcome{}
+   for _, o := range outcomes {
+      outcomeMap[o.Key()] = o
+   }
+
+	outcomes = []*meta.Outcome{}
+	for _, v := range outcomeMap {
+		outcomes = append(outcomes, v)
+	}
+
+	createDir(filepath.Dir(filename))
+
+	err := ioutil.WriteFile(filename, []byte(WriteOutcomesToString(outcomes)), 0644)
+	if err != nil {
+		return fmt.Errorf("Error: Writing to \"%s\" failed.", filename)
+	}
+
+	return nil
+}

@@ -18,11 +18,11 @@ func NewOutcomeFromPredict(p *Predict, now time.Time, target bool) *Outcome {
 		target: target,
 	}
 
-	r.next = now
+	r.next = now.UTC()
 
 	// For new cards, the outcome makes more sense to be instant.
 	if r.curr.IsZero() {
-		r.curr = now
+		r.curr = now.UTC()
 	}
 
 	return r
