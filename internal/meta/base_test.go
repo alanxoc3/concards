@@ -54,71 +54,84 @@ var metaTestFuncs = map[string]metaTestFunc{
 
 	"Next": func(t *testing.T, cf metaCreate) {
 		m := cf("", "2020-01-01T00:00:00Z")
-		assert.NotZero(t, m)
 		assert.Equal(t, time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC), m.Next())
 	},
 
 	"NoCount": func(t *testing.T, cf metaCreate) {
 		m := cf("", "", "", "", "33")
-		assert.NotZero(t, m)
 		assert.Equal(t, 33, m.NoCount())
 	},
 
-	"StreakYes": func(t *testing.T, cf metaCreate) {
+	"StreakYesZero": func(t *testing.T, cf metaCreate) {
 		m := cf("", "", "", "", "", "33")
-		assert.NotZero(t, m)
-		assert.Equal(t, 33, m.Streak())
-		assert.Equal(t, 33, m.YesCount())
+      assertZero(t, m)
+	},
+
+	"StreakNoZero": func(t *testing.T, cf metaCreate) {
+		m := cf("", "", "", "", "", "-33")
+      assertZero(t, m)
+	},
+
+	"StreakYesOnly": func(t *testing.T, cf metaCreate) {
+		m := cf("", "", "", "1", "", "33")
+		assert.Equal(t, 1, m.Streak())
+		assert.Equal(t, 1, m.YesCount())
 		assert.Equal(t, 0, m.NoCount())
 	},
 
-	"StreakNo": func(t *testing.T, cf metaCreate) {
-		m := cf("", "", "", "", "", "-33")
-		assert.NotZero(t, m)
-		assert.Equal(t, -33, m.Streak())
+	"StreakNoOnly": func(t *testing.T, cf metaCreate) {
+		m := cf("", "", "", "", "1", "-33")
+		assert.Equal(t, -1, m.Streak())
 		assert.Equal(t, 0, m.YesCount())
-		assert.Equal(t, 33, m.NoCount())
+		assert.Equal(t, 1, m.NoCount())
 	},
 
-	"NoCountMax": func(t *testing.T, cf metaCreate) {
-		m := cf("", "", "", "", "2000000001")
-		assert.NotZero(t, m)
-		assert.Equal(t, 536870912, m.NoCount())
+	"StreakNeutralOneOne": func(t *testing.T, cf metaCreate) {
+		m := cf("", "", "", "1", "1", "33")
+		assert.Equal(t, 0, m.Streak())
+		assert.Equal(t, 1, m.YesCount())
+		assert.Equal(t, 1, m.NoCount())
+	},
+
+	"StreakYesBoth": func(t *testing.T, cf metaCreate) {
+		m := cf("", "", "", "5", "5", "5")
+		assert.Equal(t, 4, m.Streak())
+		assert.Equal(t, 5, m.YesCount())
+		assert.Equal(t, 5, m.NoCount())
+	},
+
+	"StreakNoBoth": func(t *testing.T, cf metaCreate) {
+		m := cf("", "", "", "1", "6", "-33")
+		assert.Equal(t, -5, m.Streak())
+		assert.Equal(t, 1, m.YesCount())
+		assert.Equal(t, 6, m.NoCount())
 	},
 
 	"YesCountMax": func(t *testing.T, cf metaCreate) {
 		m := cf("", "", "", "2000000001")
-		assert.NotZero(t, m)
 		assert.Equal(t, 536870912, m.YesCount())
-	},
-
-	"StreakMin": func(t *testing.T, cf metaCreate) {
-		m := cf("", "", "", "", "", "-2000000001")
-		assert.NotZero(t, m)
-		assert.Equal(t, -536870912, m.Streak())
-	},
-
-	"StreakMax": func(t *testing.T, cf metaCreate) {
-		m := cf("", "", "", "", "", "2000000001")
-		assert.NotZero(t, m)
 		assert.Equal(t, 536870912, m.Streak())
-		assert.Equal(t, 536870912, m.Total())
+	},
+
+	"NoCountMax": func(t *testing.T, cf metaCreate) {
+		m := cf("", "", "", "", "2000000001")
+		assert.Equal(t, 536870912, m.NoCount())
+		assert.Equal(t, -536870912, m.Streak())
 	},
 
 	"TotalMax": func(t *testing.T, cf metaCreate) {
 		m := cf("", "", "", "2000000031", "2002000001", "2000040001")
 		assert.Equal(t, 1073741824, m.Total())
+		assert.Equal(t, 536870911, m.Streak())
 	},
 
 	"NextUTC": func(t *testing.T, cf metaCreate) {
 		m := cf("", "2020-01-01T00:00:00-06:00")
-		assert.NotZero(t, m)
 		assert.Equal(t, time.Date(2020, 1, 1, 6, 0, 0, 0, time.UTC), m.Next())
 	},
 
 	"CurrUTC": func(t *testing.T, cf metaCreate) {
 		m := cf("", "", "2020-01-01T00:00:00-06:00")
-		assert.NotZero(t, m)
 		assert.Equal(t, time.Date(2020, 1, 1, 6, 0, 0, 0, time.UTC), m.Curr())
 	},
 
