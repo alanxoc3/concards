@@ -2,9 +2,11 @@ package file
 
 import (
 	"fmt"
-	"github.com/alanxoc3/argparse"
 	"os"
 	"os/user"
+
+	"github.com/alanxoc3/argparse"
+	"github.com/alanxoc3/concards/internal"
 )
 
 type Config struct {
@@ -15,13 +17,14 @@ type Config struct {
 	IsPrint    bool
 	IsStream   bool
 
-	Editor   string
-	Number   int
-	MetaFile string
-	Files    []string
+	Editor      string
+	Number      int
+	PredictFile string
+	OutcomeFile string
+	Files       []string
 }
 
-func getDefaultEditor() string {
+func defaultEditor() string {
 	if val, present := os.LookupEnv("EDITOR"); present {
 		return val
 	} else {
@@ -29,13 +32,13 @@ func getDefaultEditor() string {
 	}
 }
 
-func getDefaultMeta() string {
-	if val, present := os.LookupEnv("CONCARDS_META"); present {
+func defaultEnv(env string, file string) string {
+	if val, present := os.LookupEnv(env); present {
 		return val
 	} else if usr, err := user.Current(); err == nil {
-		return usr.HomeDir + "/.concards-meta"
+		return usr.HomeDir + "/.config/concards/" + file
 	} else {
-		return ".concards-meta"
+		return ""
 	}
 }
 
@@ -50,8 +53,13 @@ func GenConfig(version string) *Config {
 	fDone := parser.Flag("d", "done", &argparse.Options{Help: "Show cards not available to be reviewed or memorized"})
 	fPrint := parser.Flag("p", "print", &argparse.Options{Help: "Prints all cards, one line per card"})
 	fNumber := parser.Int("n", "number", &argparse.Options{Default: 0, Help: "How many cards to review"})
-	fEditor := parser.String("E", "editor", &argparse.Options{Default: getDefaultEditor(), Help: "Which editor to use. Defaults to \"$EDITOR\""})
-	fMeta := parser.String("M", "meta", &argparse.Options{Default: getDefaultMeta(), Help: "Path to meta file. Defaults to \"$CONCARDS_META\" or \"~/.concards-meta\""})
+	fEditor := parser.String("E", "editor", &argparse.Options{Default: defaultEditor(), Help: "Defaults to \"$EDITOR\" or \"vi\""})
+	fPredictFile := parser.String("P", "predict", &argparse.Options{
+      Default: defaultEnv("CONCARDS_PREDICT", "predict"),
+      Help: "Defaults to \"$CONCARDS_PREDICT\" or \"~/.config/concards/predict\"" })
+	fOutcomeFile := parser.String("O", "outcome", &argparse.Options{
+      Default: defaultEnv("CONCARDS_OUTCOME", "outcome"),
+      Help: "Defaults to \"$CONCARDS_OUTCOME\" or \"~/.config/concards/outcome\"" })
 
 	parser.HelpFunc = func(c *argparse.Command, msg interface{}) string {
 		var help string
@@ -80,6 +88,9 @@ func GenConfig(version string) *Config {
 		os.Exit(0)
 	}
 
+   if *fPredictFile == "" { internal.AssertError("No predict file available.") }
+   if *fOutcomeFile == "" { internal.AssertError("No outcome file available.") }
+
 	c := &Config{}
 
 	c.IsReview = *fReview
@@ -90,7 +101,8 @@ func GenConfig(version string) *Config {
 
 	c.Editor = *fEditor
 	c.Number = *fNumber
-	c.MetaFile = *fMeta
+	c.PredictFile = *fPredictFile
+	c.OutcomeFile = *fOutcomeFile
 	c.Files = files
 
 	if !c.IsReview && !c.IsMemorize && !c.IsDone {

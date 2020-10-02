@@ -46,7 +46,7 @@ func TermBoxRun(d *deck.Deck, cfg *file.Config) error {
 			} else if inp == "h" {
 				helpMode = !helpMode
 			} else if inp == "w" {
-				err = file.WritePredictsToFile(d.PredictList(), cfg.MetaFile)
+				err = file.WritePredictsToFile(d.PredictList(), cfg.PredictFile)
 				if err != nil {
 					updateStatMsg(err.Error(), termbox.ColorRed)
 				} else {

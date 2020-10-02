@@ -4,22 +4,28 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"sort"
 	"strings"
 
+	"github.com/alanxoc3/concards/internal"
 	"github.com/alanxoc3/concards/internal/meta"
 )
 
 // Open filename and loads cards into new deck
-func ReadPredictsFromFile(filename string) ([]*meta.Predict, error) {
-	if f, err := os.Open(filename); err != nil {
-		return nil, fmt.Errorf("Error: Unable to open meta file \"%s\".", filename)
-	} else {
-		defer f.Close()
-		return ReadPredictsFromReader(f), nil
+func ReadPredictsFromFile(filename string) []*meta.Predict {
+	f, err := os.Open(filename)
+	if err != nil {
+		WritePredictsToFile([]*meta.Predict{}, filename)
+		f, err = os.Open(filename)
+		if err != nil {
+         fmt.Println(err)
+			internal.AssertError(fmt.Sprintf("Couldn't access file \"%s\".", filename))
+		}
 	}
+
+	defer f.Close()
+	return ReadPredictsFromReader(f)
 }
 
 func ReadPredictsFromReader(r io.Reader) []*meta.Predict {
@@ -40,22 +46,12 @@ func ReadPredictsFromReader(r io.Reader) []*meta.Predict {
 	return list
 }
 
-func WritePredictsToFile(l []*meta.Predict, filename string) error {
-	str := []byte(WritePredictsToString(l))
-	err := ioutil.WriteFile(filename, str, 0644)
-	if err != nil {
-		return fmt.Errorf("Error: Writing to \"%s\" failed.", filename)
-	}
-
-	return nil
-}
-
 func WritePredictsToString(l []*meta.Predict) string {
 	predictStrings := []string{}
 	for _, v := range l {
-      if !v.IsZero() {
-         predictStrings = append(predictStrings, v.String())
-      }
+		if !v.IsZero() {
+			predictStrings = append(predictStrings, v.String())
+		}
 	}
 
 	sort.Strings(predictStrings)

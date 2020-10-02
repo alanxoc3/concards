@@ -37,19 +37,19 @@ func TestWritePredicts(t *testing.T) {
 b0000000000000000000000000000000 2020-02-01T00:00:00Z 2020-01-01T00:00:00Z 0 0 0 sm2
 c0000000000000000000000000000000 2020-02-01T00:00:00Z 2020-01-01T00:00:00Z 3 3 2 sm2`
 
-   predicts := []*meta.Predict{
-      meta.NewPredictFromStrings("a", "2020-02-01T00:00:00Z", "2020-01-01T00:00:00Z", "1", "2", "0", "sm2"),
-      meta.NewPredictFromStrings("b", "2020-02-01T00:00:00Z", "2020-01-01T00:00:00Z", "0", "0", "0", "sm2"),
-      meta.NewPredictFromStrings("c", "2020-02-01T00:00:00Z", "2020-01-01T00:00:00Z", "3", "3", "3", "sm2"),
-   }
+	predicts := []*meta.Predict{
+		meta.NewPredictFromStrings("a", "2020-02-01T00:00:00Z", "2020-01-01T00:00:00Z", "1", "2", "0", "sm2"),
+		meta.NewPredictFromStrings("b", "2020-02-01T00:00:00Z", "2020-01-01T00:00:00Z", "0", "0", "0", "sm2"),
+		meta.NewPredictFromStrings("c", "2020-02-01T00:00:00Z", "2020-01-01T00:00:00Z", "3", "3", "3", "sm2"),
+	}
 
-   assert.Equal(t, fstr, file.WritePredictsToString(predicts))
+	assert.Equal(t, fstr, file.WritePredictsToString(predicts))
 }
 
 func TestWritePredictsNotZero(t *testing.T) {
-   predicts := []*meta.Predict{
-      meta.NewPredictFromStrings("a", "0001-01-01T00:00:00Z", "0001-01-01T00:00:00Z", "0", "0", "0", "sm2"),
-   }
+	predicts := []*meta.Predict{
+		meta.NewPredictFromStrings("a", "0001-01-01T00:00:00Z", "0001-01-01T00:00:00Z", "0", "0", "0", "sm2"),
+	}
 
-   assert.Empty(t, file.WritePredictsToString(predicts))
+	assert.Empty(t, file.WritePredictsToString(predicts))
 }

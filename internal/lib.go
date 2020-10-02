@@ -3,6 +3,7 @@ package internal
 import (
 	"encoding/hex"
 	"fmt"
+	"os"
 	"time"
 )
 
@@ -43,4 +44,9 @@ func AssertLogic(condition bool, message string) {
 	if !condition {
 		panic(fmt.Sprintf("Logic Error: %s\nPlease report this at: https://github.com/alanxoc3/concards/issues", message))
 	}
+}
+
+func AssertError(s string) {
+	fmt.Fprintf(os.Stderr, "Error: %s\n", s)
+	os.Exit(1)
 }
