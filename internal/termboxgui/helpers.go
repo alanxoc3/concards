@@ -168,11 +168,14 @@ func updateStatMsgAndCard(d *deck.Deck, input bool) {
 	m, err := d.ExecTop(input, time.Now())
 	if err != nil {
 		updateStatMsg("Problem reading the card :(.", termbox.ColorRed)
-	} else if input {
-		time := m.Next().Format("Mon 2 Jan 2006 @ 15:04")
-		updateStatMsg(fmt.Sprintf("Yes! Next review is %s.", time), termbox.ColorCyan)
 	} else {
-		updateStatMsg(fmt.Sprintf("No! Next review is %s.", time), termbox.ColorRed)
+		time := m.Next().Local().Format("Mon 2 Jan 2006 @ 15:04")
+
+      if input {
+         updateStatMsg(fmt.Sprintf("Yes! Next review is %s.", time), termbox.ColorCyan)
+      } else {
+         updateStatMsg(fmt.Sprintf("No! Next review is %s.", time), termbox.ColorRed)
+      }
 	}
 }
 
