@@ -44,3 +44,75 @@ func TestTwoNewCards(t *testing.T) {
 	assert.Equal(t, h[0], c[0].Hash().String())
 	assert.Equal(t, h[1], c[1].Hash().String())
 }
+
+func TestColonNoSpace(t *testing.T) {
+	c, _ := card.NewCards(".", "question:answer")
+	h := []string{"2abf30e888b3db27732dff3777687b74", "2fe8516253866fc0768f9ae6683d4bb5"}
+	require.Len(t, c, len(h))
+	assert.Equal(t, h[0], c[0].Hash().String())
+	assert.Equal(t, h[1], c[1].Hash().String())
+}
+
+func TestPipeNoSpace(t *testing.T) {
+	c, _ := card.NewCards(".", "question|answer")
+	h := "2abf30e888b3db27732dff3777687b74"
+	assert.Equal(t, h, c[0].Hash().String())
+}
+
+func TestPipeBackslashNoSpace(t *testing.T) {
+	c, _ := card.NewCards(".", "question \\|answer")
+	h := "1a7d0274be552d6af1f0a998b988823f"
+	assert.Equal(t, h, c[0].Hash().String())
+	assert.Equal(t, "question \\|answer", c[0].String())
+}
+
+func TestBackslashSpace(t *testing.T) {
+	c, _ := card.NewCards(".", "question \\  answer")
+	require.Len(t, c, 1)
+	assert.Equal(t, "question   answer", c[0].GetFactEsc(0))
+}
+
+func TestPipeThenColon(t *testing.T) {
+   c, _ := card.NewCards(".", "question|:answer")
+	require.Len(t, c, 2)
+	assert.Equal(t, "question | answer", c[0].String())
+	assert.Equal(t, "answer | question", c[1].String())
+}
+
+func TestColonThenPipe(t *testing.T) {
+   c, _ := card.NewCards(".", "question:|answer")
+	require.Len(t, c, 1)
+	assert.Equal(t, "question | answer", c[0].String())
+}
+
+func TestDoubleBackslash(t *testing.T) {
+   c, _ := card.NewCards(".", "question\\\\answer")
+	require.Len(t, c, 1)
+	assert.Equal(t, "question\\answer", c[0].GetFactEsc(0))
+}
+
+func TestBackslashSpaceNearEnd(t *testing.T) {
+   c, _ := card.NewCards(".", "question answer\\ ")
+	require.Len(t, c, 1)
+	assert.Equal(t, "question answer ", c[0].GetFactEsc(0))
+}
+
+func TestBackslashSpaceVeryEnd(t *testing.T) {
+   c, _ := card.NewCards(".", "question answer\\")
+	require.Len(t, c, 1)
+	assert.Equal(t, "question answer ", c[0].GetFactEsc(0))
+}
+
+func TestBackslashRandomLetter(t *testing.T) {
+   c, _ := card.NewCards(".", "que\\stion answer")
+	require.Len(t, c, 1)
+	assert.Equal(t, "question answer", c[0].GetFactEsc(0))
+	assert.Equal(t, "question answer", c[0].String())
+}
+
+func TestSpaceBetween(t *testing.T) {
+   c, _ := card.NewCards(".", "question\\ answer")
+	require.Len(t, c, 1)
+	assert.Equal(t, "question answer", c[0].GetFactEsc(0))
+	assert.Equal(t, "question answer", c[0].String())
+}

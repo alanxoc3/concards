@@ -8,6 +8,7 @@ import (
 	"github.com/alanxoc3/concards/internal/file"
 	"github.com/alanxoc3/concards/internal/meta"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestReadCards(t *testing.T) {
@@ -33,8 +34,19 @@ func TestReadCardsBackslash(t *testing.T) {
 	cards := file.ReadCardsFromReader(strings.NewReader(fstr), "file")
 	c, _ := card.NewCards("file", "bye")
 
+	require.Len(t, cards, 1)
 	assert.Equal(t, c[0], cards[0])
-	assert.Len(t, cards, 1)
+}
+
+func TestReadTwoCards(t *testing.T) {
+	fstr := ".@>hi@>bye<@."
+	cards := file.ReadCardsFromReader(strings.NewReader(fstr), "file")
+	c1, _ := card.NewCards("file", "hi")
+	c2, _ := card.NewCards("file", "bye")
+
+	require.Len(t, cards, 2)
+	assert.Equal(t, c1[0], cards[0])
+	assert.Equal(t, c2[0], cards[1])
 }
 
 func TestReadCardsBeginningAndEnd(t *testing.T) {
