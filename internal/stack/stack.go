@@ -91,9 +91,9 @@ func (s *Stack) List() []internal.Hash {
 	hashes = append(hashes, s.review...)
 	hashes = append(hashes, s.future...)
 
-	sort.Slice(hashes, func(i, j int) bool {
-		return s.mapper[hashes[i]].index < s.mapper[hashes[j]].index
-	})
+	// sort.Slice(hashes, func(i, j int) bool {
+		// return s.mapper[hashes[i]].index < s.mapper[hashes[j]].index
+	// })
 
 	return hashes
 }
