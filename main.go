@@ -26,7 +26,7 @@ func main() {
 
 	for _, f := range c.Files {
 		if cm, err := file.ReadCardsFromFile(f); err != nil {
-			internal.AssertError("File \"%s\" does not exist!")
+			internal.AssertError(fmt.Sprintf("File \"%s\" does not exist!", f))
 		} else {
 			for _, c := range cm {
 				d.AddCards(c)
