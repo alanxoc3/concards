@@ -6,9 +6,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"strings"
 
-	"github.com/alanxoc3/concards/internal"
 	"github.com/alanxoc3/concards/internal/card"
 )
 
@@ -47,36 +45,44 @@ func ReadCardsFromFile(filename string) ([]*card.Card, error) {
 func ReadCardsFromReader(r io.Reader, f string) []*card.Card {
 	// Initialization.
 	cl := []*card.Card{}
-	facts := []string{}
+	facts := ""
 	state := false
+	prev := ""
 	var td []*card.Card
 
 	// Scan by words.
 	scanner := bufio.NewScanner(r)
-	scanner.Split(bufio.ScanWords)
+	scanner.Split(bufio.ScanRunes)
 
 	for scanner.Scan() {
 		t := scanner.Text()
 
-		if state {
-			if t == internal.CBeg {
-				cards, _ := card.NewCards(f, strings.Join(facts, " "))
+		if prev == "\\" {
+			prev = "\\" + t
+		} else if state {
+			if prev == "@" && t == ">" {
+				cards, _ := card.NewCards(f, facts)
 				td = append(td, cards...)
 
-				facts = []string{}
-			} else if t == internal.CEnd {
-				cards, _ := card.NewCards(f, strings.Join(facts, " "))
+				facts = ""
+			} else if prev == "<" && t == "@" {
+				cards, _ := card.NewCards(f, facts)
 				td = append(td, cards...)
 				cl = append(cl, td...)
 				state = false
+            prev = ""
 			} else {
-				facts = append(facts, t)
+				facts = facts + prev
+            prev = t
 			}
-		} else if t == internal.CBeg {
+		} else if prev == "@" && t == ">" {
 			// create td
 			td = []*card.Card{}
 			state = true
-			facts = []string{}
+			facts = ""
+			prev = ""
+		} else {
+			prev = t
 		}
 	}
 
