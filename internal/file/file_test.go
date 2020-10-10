@@ -8,16 +8,53 @@ import (
 	"github.com/alanxoc3/concards/internal/file"
 	"github.com/alanxoc3/concards/internal/meta"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestReadCards(t *testing.T) {
 	fstr := " hello ye as \n @> hi | hello <@ asoe @> yoyo man go <@"
 	cards := file.ReadCardsFromReader(strings.NewReader(fstr), "file")
-	hi, _ := card.NewCards("file", "hi | hello")
-	yo, _ := card.NewCards("file", "yoyo man go")
+	c1, _ := card.NewCards("file", "hi | hello")
+	c2, _ := card.NewCards("file", "yoyo man go")
 
-	assert.Equal(t, hi[0], cards[0])
-	assert.Equal(t, yo[0], cards[1])
+	assert.Equal(t, c1[0], cards[0])
+	assert.Equal(t, c2[0], cards[1])
+}
+
+func TestReadCardsNoSpaceBetweenSections(t *testing.T) {
+	fstr := " hello ye as@>hi | hello<@h"
+	cards := file.ReadCardsFromReader(strings.NewReader(fstr), "file")
+	c, _ := card.NewCards("file", "hi | hello")
+
+	assert.Equal(t, c[0], cards[0])
+}
+
+func TestReadCardsBackslash(t *testing.T) {
+	fstr := ".\\@>hi@>bye<@."
+	cards := file.ReadCardsFromReader(strings.NewReader(fstr), "file")
+	c, _ := card.NewCards("file", "bye")
+
+	require.Len(t, cards, 1)
+	assert.Equal(t, c[0], cards[0])
+}
+
+func TestReadTwoCards(t *testing.T) {
+	fstr := ".@>hi@>bye<@."
+	cards := file.ReadCardsFromReader(strings.NewReader(fstr), "file")
+	c1, _ := card.NewCards("file", "hi")
+	c2, _ := card.NewCards("file", "bye")
+
+	require.Len(t, cards, 2)
+	assert.Equal(t, c1[0], cards[0])
+	assert.Equal(t, c2[0], cards[1])
+}
+
+func TestReadCardsBeginningAndEnd(t *testing.T) {
+	fstr := "@> yo <@"
+	cards := file.ReadCardsFromReader(strings.NewReader(fstr), "file")
+	c, _ := card.NewCards("file", "yo")
+
+	assert.Equal(t, c[0], cards[0])
 }
 
 func TestReadPredicts(t *testing.T) {

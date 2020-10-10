@@ -3,8 +3,9 @@ package card
 import (
 	"bufio"
 	"fmt"
-	"regexp"
 	"strings"
+	"unicode"
+	"unicode/utf8"
 
 	"crypto/sha256"
 
@@ -29,26 +30,56 @@ func NewCards(file string, sides string) ([]*Card, error) {
 	facts := [][]string{}
 	cards := []*Card{}
 	waitForReverse := false
+	prev := ""
+	word := ""
 
 	// Add a separator to the end to not repeat logic.
-	sides = sides + " " + internal.CSep
+	sides = sides + " |"
+	scanner := bufio.NewScanner(strings.NewReader(sides))
+	scanner.Split(bufio.ScanRunes)
+	for scanner.Scan() {
+		t := scanner.Text()
 
-	parseByWords(sides, func(word string) {
-		if word == internal.CSep || word == internal.CRev {
-			if len(fact) > 0 {
-				facts = append(facts, fact)
-				fact = []string{}
+		if prev == "\\" {
+			// Only escape special characters.
+			if t == ":" || t == "\\" || t == "|" || t == "@" || t == ">" || t == "<" {
+				prev = "\\" + t
+			} else {
+				prev = t
+			}
+		} else {
+			word += prev
 
-				if waitForReverse {
-					cards = append(cards, createReverseCard(file, facts))
+			if r, _ := utf8.DecodeRuneInString(t); unicode.IsSpace(r) {
+				prev = ""
+				if len(word) > 0 {
+					fact = append(fact, word)
+					word = ""
+				}
+			} else {
+				if t == "|" || t == ":" {
+					if len(word) > 0 {
+						fact = append(fact, word)
+						word = ""
+					}
+
+					if len(fact) > 0 {
+						facts = append(facts, fact)
+						fact = []string{}
+
+						if waitForReverse {
+							cards = append(cards, createReverseCard(file, facts))
+						}
+					}
+
+					waitForReverse = t == ":"
+					prev = ""
+				} else {
+					prev = t
 				}
 			}
-
-			waitForReverse = word == internal.CRev
-		} else if len(word) > 0 {
-			fact = append(fact, word)
 		}
-	})
+	}
 
 	if len(facts) > 0 {
 		return append([]*Card{&Card{file, facts}}, cards...), nil
@@ -69,19 +100,23 @@ func (c *Card) Hash() (dest internal.Hash) {
 }
 
 func (c *Card) GetFactEsc(i int) string {
-	// This banks on the fact that the backslash is an ASCII character at the beginning.
-	// If the escape character wasn't ASCII, the logic here would have to change.
-	return c.getFactHelper(i, func(words []string) []string {
-		re := regexp.MustCompile(`^\\+`)
-		newWords := []string{}
-		for _, word := range words {
-			if escStr := re.ReplaceAllString(word, ""); len(escStr) < len(word) && internal.KeyWords[escStr] {
-				word = word[1:]
-			}
-			newWords = append(newWords, word)
+	factStr := c.getFactRaw(i)
+
+	scanner := bufio.NewScanner(strings.NewReader(factStr))
+	scanner.Split(bufio.ScanRunes)
+	prev := ""
+	str := ""
+	for scanner.Scan() {
+		t := scanner.Text()
+
+		if prev == "\\" {
+			str += t
+		} else if t != "\\" {
+			str += t
 		}
-		return newWords
-	})
+		prev = t
+	}
+	return str
 }
 
 // -------------------- Private stuff below --------------------
@@ -110,14 +145,6 @@ func (c *Card) getFactHelper(i int, factLogic func([]string) []string) string {
 		words = factLogic(c.facts[i])
 	}
 	return strings.Join(words, " ")
-}
-
-func parseByWords(s string, wordFunc func(string)) {
-	scanner := bufio.NewScanner(strings.NewReader(s))
-	scanner.Split(bufio.ScanWords)
-	for scanner.Scan() {
-		wordFunc(scanner.Text())
-	}
 }
 
 func createReverseCard(file string, facts [][]string) *Card {
