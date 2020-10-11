@@ -46,7 +46,7 @@ func TestTwoNewCards(t *testing.T) {
 }
 
 func TestColonNoSpace(t *testing.T) {
-	c, _ := card.NewCards(".", "question:answer")
+   c, _ := card.NewCards(".", "question::answer")
 	h := []string{"2abf30e888b3db27732dff3777687b74", "2fe8516253866fc0768f9ae6683d4bb5"}
 	require.Len(t, c, len(h))
 	assert.Equal(t, h[0], c[0].Hash().String())
@@ -73,16 +73,17 @@ func TestBackslashSpace(t *testing.T) {
 }
 
 func TestPipeThenColon(t *testing.T) {
-   c, _ := card.NewCards(".", "question|:answer")
+   c, _ := card.NewCards(".", "question|::answer")
 	require.Len(t, c, 2)
 	assert.Equal(t, "question | answer", c[0].String())
 	assert.Equal(t, "answer | question", c[1].String())
 }
 
 func TestColonThenPipe(t *testing.T) {
-   c, _ := card.NewCards(".", "question:|answer")
-	require.Len(t, c, 1)
+   c, _ := card.NewCards(".", "question::|answer")
+	require.Len(t, c, 2)
 	assert.Equal(t, "question | answer", c[0].String())
+	assert.Equal(t, "answer | question", c[1].String())
 }
 
 func TestDoubleBackslash(t *testing.T) {
