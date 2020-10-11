@@ -44,7 +44,7 @@ func ReadCardsFromFile(filename string) ([]*card.Card, error) {
 }
 
 func scanCardSections(data []byte, atEOF bool) (advance int, token []byte, err error) {
-	if len(data) >= 2 && data[0] == byte('<') && data[1] == byte('@') {
+	if len(data) >= 2 && data[0] == byte('<') && data[1] == byte(':') {
 		return 2, data[:2], nil
 	}
 
@@ -63,7 +63,7 @@ func scanCardSections(data []byte, atEOF bool) (advance int, token []byte, err e
 				isAt = false
 				break
 			} else {
-				isAt = r == '@'
+				isAt = r == ':'
 			}
 		} else {
 			isAt = false
@@ -81,9 +81,9 @@ func scanCardSections(data []byte, atEOF bool) (advance int, token []byte, err e
 		if !isBackslash && r == '<' {
 			isLt = true
 			isAt = false
-		} else if isLt && r == '@' {
+		} else if isLt && r == ':' {
 			return i - 1, data[start : i-1], nil
-		} else if !isBackslash && r == '@' {
+		} else if !isBackslash && r == ':' {
 			isAt = true
 		} else if isAt && r == '>' {
 			return i - 1, data[start : i-1], nil
