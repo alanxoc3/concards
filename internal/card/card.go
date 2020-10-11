@@ -37,7 +37,7 @@ func scanCardSides(data []byte, atEOF bool) (advance int, token []byte, err erro
 
 	// Check for pipe.
 	if len(data) >= start+1 {
-		if data[start] == byte('|') || data[start] == byte('{') || data[start] == byte('}') {
+		if data[start] == byte('|') {
 			return start + 1, data[start : start+1], nil
 		}
 	}
@@ -59,7 +59,7 @@ func scanCardSides(data []byte, atEOF bool) (advance int, token []byte, err erro
 		if !isBackslash {
 			if unicode.IsSpace(r) {
 				return i, data[start:i], nil
-			} else if r == '{' || r == '}' || r == '|' || unicode.IsSpace(r) {
+			} else if r == '|' || unicode.IsSpace(r) {
 				return i, data[start:i], nil
 			} else if isColon && r == ':' {
 				return i - 1, data[start : i-1], nil
@@ -117,6 +117,7 @@ func NewCards(file string, cardStr string) ([]*Card, error) {
 	sides := [][]string{}
    revSides := [][][]string{}
 	cards := []*Card{}
+   // clozeDepth := 0
 
    // Step 1: Scan through string by card words and special tokens.
 	scanner := bufio.NewScanner(strings.NewReader(cardStr + " |"))
@@ -125,6 +126,7 @@ func NewCards(file string, cardStr string) ([]*Card, error) {
 		t := scanner.Text()
       if t == "::" || t == "|" {
          if len(side) > 0 {
+            // Check for cloze here.
             sides = append(sides, side)
             side = []string{}
          }
