@@ -20,7 +20,7 @@ func TestNewCardErrNoFile(t *testing.T) {
 }
 
 func TestOneNewCard(t *testing.T) {
-	expectedHash := [16]byte{0x78, 0x14, 0xe1, 0xc8, 0xae, 0xa8, 0xa0, 0xc4, 0xca, 0x97, 0x0e, 0xdd, 0x85, 0x0b, 0x12, 0xf0}
+	expectedHash := [16]byte{0xef, 0x88, 0xa5, 0x74, 0xb8, 0x35, 0xe4, 0xd8, 0x52, 0xd7, 0x36, 0x44, 0x52, 0x01, 0x38, 0x8f}
 	hashStr := fmt.Sprintf("%x", expectedHash)
 
 	c, err := card.NewCards("hi", " hello  there  | \\: \\| \\:> \\<:  i'm  a  beard")
@@ -30,7 +30,7 @@ func TestOneNewCard(t *testing.T) {
 	require.Equal(t, 2, c[0].Len())
 	assert.Equal(t, expectedHash, [16]byte(c[0].Hash()))
 	assert.Equal(t, hashStr, c[0].Hash().String())
-	assert.Equal(t, "hello there | \\: \\| \\:> \\<: i'm a beard", c[0].String())
+	assert.Equal(t, "hello there | \\: \\| \\:\\> \\<\\: i'm a beard", c[0].String())
 	assert.Equal(t, "hi", c[0].File())
 	assert.Equal(t, "hello there", c[0].GetFactEsc(0))
 	assert.Equal(t, ": | :> <: i'm a beard", c[0].GetFactEsc(1))
@@ -38,7 +38,7 @@ func TestOneNewCard(t *testing.T) {
 }
 
 func TestTwoNewCards(t *testing.T) {
-   c, _ := card.NewCards(".", "question :: answer")
+   c, _ := card.NewCards(".", "  |question :: answer")
 	h := []string{"2abf30e888b3db27732dff3777687b74", "2fe8516253866fc0768f9ae6683d4bb5"}
 	require.Len(t, c, len(h))
 	assert.Equal(t, h[0], c[0].Hash().String())
@@ -67,7 +67,7 @@ func TestPipeBackslashNoSpace(t *testing.T) {
 }
 
 func TestBackslashSpace(t *testing.T) {
-	c, _ := card.NewCards(".", "question \\  answer")
+	c, _ := card.NewCards(".", "question \\ \nanswer")
 	require.Len(t, c, 1)
 	assert.Equal(t, "question   answer", c[0].GetFactEsc(0))
 }
@@ -81,9 +81,8 @@ func TestPipeThenColon(t *testing.T) {
 
 func TestColonThenPipe(t *testing.T) {
    c, _ := card.NewCards(".", "question::|answer")
-	require.Len(t, c, 2)
+	require.Len(t, c, 1)
 	assert.Equal(t, "question | answer", c[0].String())
-	assert.Equal(t, "answer | question", c[1].String())
 }
 
 func TestDoubleBackslash(t *testing.T) {
@@ -112,8 +111,15 @@ func TestBackslashRandomLetter(t *testing.T) {
 }
 
 func TestSpaceBetween(t *testing.T) {
-   c, _ := card.NewCards(".", "question\\ answer")
+   c, _ := card.NewCards(".", "question\\  answer")
 	require.Len(t, c, 1)
-	assert.Equal(t, "question answer", c[0].GetFactEsc(0))
-	assert.Equal(t, "question answer", c[0].String())
+	assert.Equal(t, "question  answer", c[0].GetFactEsc(0))
+	assert.Equal(t, "question  answer", c[0].String())
+}
+
+func TestColonEscaped(t *testing.T) {
+   c, _ := card.NewCards(".", "q:a")
+	require.Len(t, c, 1)
+   assert.Equal(t, "q:a", c[0].GetFactEsc(0))
+   assert.Equal(t, "q\\:a", c[0].String())
 }
