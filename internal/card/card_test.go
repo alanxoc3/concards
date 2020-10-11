@@ -11,7 +11,7 @@ import (
 
 func TestNewCardErrNoQuestion(t *testing.T) {
 	_, err := card.NewCards(".", "")
-	assert.NotNil(t, err)
+	assert.Nil(t, err)
 }
 
 func TestNewCardErrNoFile(t *testing.T) {
@@ -81,8 +81,9 @@ func TestPipeThenColon(t *testing.T) {
 
 func TestColonThenPipe(t *testing.T) {
    c, _ := card.NewCards(".", "question::|answer")
-	require.Len(t, c, 1)
+	require.Len(t, c, 2)
 	assert.Equal(t, "question | answer", c[0].String())
+	assert.Equal(t, "answer | question", c[1].String())
 }
 
 func TestDoubleBackslash(t *testing.T) {
@@ -122,4 +123,20 @@ func TestColonEscaped(t *testing.T) {
 	require.Len(t, c, 1)
    assert.Equal(t, "q:a", c[0].GetFactEsc(0))
    assert.Equal(t, "q\\:a", c[0].String())
+}
+
+func TestThreeReversibleSides(t *testing.T) {
+   c, _ := card.NewCards(".", "z | y :: a | b :: p")
+	require.Len(t, c, 5)
+	assert.Equal(t, "z | a | b | p", c[0].String())
+	assert.Equal(t, "y | a | b | p", c[1].String())
+	assert.Equal(t, "a | z | y | p", c[2].String())
+	assert.Equal(t, "b | z | y | p", c[3].String())
+	assert.Equal(t, "p | z | y | a | b", c[4].String())
+}
+
+func TestColonAtBeginning(t *testing.T) {
+   c, _ := card.NewCards(".", ":: a | b")
+	require.Len(t, c, 1)
+	assert.Equal(t, "a | b", c[0].String())
 }

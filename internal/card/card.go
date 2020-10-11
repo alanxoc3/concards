@@ -21,7 +21,7 @@ type Card struct {
 type CardMap map[internal.Hash]*Card
 
 func isSpecialChar(r rune) bool {
-	return r == ':' || r == '\\' || r == '|' || r == '>' || r == '<' || unicode.IsSpace(r)
+	return r == ':' || r == '\\' || r == '|' || r == '>' || r == '<' || r == '{' || r == '}' || unicode.IsSpace(r)
 }
 
 func scanCardSides(data []byte, atEOF bool) (advance int, token []byte, err error) {
@@ -37,7 +37,7 @@ func scanCardSides(data []byte, atEOF bool) (advance int, token []byte, err erro
 
 	// Check for pipe.
 	if len(data) >= start+1 {
-		if data[start] == byte('|') {
+		if data[start] == byte('|') || data[start] == byte('{') || data[start] == byte('}') {
 			return start + 1, data[start : start+1], nil
 		}
 	}
@@ -59,7 +59,7 @@ func scanCardSides(data []byte, atEOF bool) (advance int, token []byte, err erro
 		if !isBackslash {
 			if unicode.IsSpace(r) {
 				return i, data[start:i], nil
-			} else if r == '|' || unicode.IsSpace(r) {
+			} else if r == '{' || r == '}' || r == '|' || unicode.IsSpace(r) {
 				return i, data[start:i], nil
 			} else if isColon && r == ':' {
 				return i - 1, data[start : i-1], nil
@@ -108,43 +108,63 @@ func escapeSymbols(s string) string {
 }
 
 // Returns a list of cards, or an empty list if there is an error.
-func NewCards(file string, sides string) ([]*Card, error) {
+func NewCards(file string, cardStr string) ([]*Card, error) {
 	if file == "" {
 		return []*Card{}, fmt.Errorf("File not provided.")
 	}
 
-	fact := []string{}
-	facts := [][]string{}
+	side := []string{}
+	sides := [][]string{}
+   revSides := [][][]string{}
 	cards := []*Card{}
-	waitForReverse := false
 
-	// Add a separator to the end to not repeat logic.
-	sides = sides + " |"
-	scanner := bufio.NewScanner(strings.NewReader(sides))
+   // Step 1: Scan through string by card words and special tokens.
+	scanner := bufio.NewScanner(strings.NewReader(cardStr + " |"))
 	scanner.Split(scanCardSides)
 	for scanner.Scan() {
 		t := scanner.Text()
-		if t == "|" || t == "::" {
-			if len(fact) > 0 {
-				facts = append(facts, fact)
-				fact = []string{}
+      if t == "::" || t == "|" {
+         if len(side) > 0 {
+            sides = append(sides, side)
+            side = []string{}
+         }
 
-				if waitForReverse {
-					cards = append(cards, createReverseCard(file, facts))
-				}
-			}
-
-			waitForReverse = t == "::"
-		} else if len(t) > 0 {
-			fact = append(fact, escapeSymbols(t))
+         if t == "::" && len(sides) > 0 {
+            revSides = append(revSides, sides)
+            sides = [][]string{}
+         }
+      } else if len(t) > 0 {
+			side = append(side, escapeSymbols(t))
 		}
 	}
 
-	if len(facts) > 0 {
-		return append([]*Card{&Card{file, facts}}, cards...), nil
-	} else {
-		return []*Card{}, fmt.Errorf("Question not provided.")
-	}
+   // Step 2: Put any remaining sides to the reverse card structure.
+   if len(sides) > 0 {
+      revSides = append(revSides, sides)
+   }
+
+   // Step 3: Add all the cards/reverse cards.
+   if len(revSides) > 1 {
+      for ri, rs := range revSides {
+         for _, s := range rs {
+            facts := [][]string{}
+            facts = append(facts, s)
+            for rri, rrs := range revSides {
+               if rri != ri {
+                  for _, ss := range rrs {
+                     facts = append(facts, ss)
+                  }
+               }
+            }
+
+            cards = append(cards, &Card{file, facts})
+         }
+      }
+   } else if len(revSides) == 1 {
+      cards = append(cards, &Card{file, revSides[0]})
+   }
+
+   return cards, nil
 }
 
 func (c *Card) HasAnswer() bool { return len(c.facts) > 1 }

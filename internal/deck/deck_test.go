@@ -123,7 +123,7 @@ func TestExecFuture(t *testing.T) {
 	h1 := internal.NewHash("55746153a816f94836725a939a5cac37")
 	h2 := internal.NewHash("abad2c2e5be5c33bc319ce038e3f2108")
    h3 := internal.NewHash("a64332565db9aebe4f2edc4f1c125610")
-   cards, _ := card.NewCards(".", "hi :: yo :: me")
+   cards, _ := card.NewCards(".", "hi :: yo | me")
 
    d := deck.NewDeck(time.Date(2020,1,1,0,0,0,0,time.UTC))
    d.AddCards(cards...)
