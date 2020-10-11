@@ -1,4 +1,4 @@
-<!-- @> Who is the coolest person in the world? | You are :D. | Have a great day! <@ -->
+<!-- @> Who is the coolest person in the world? | You are :D. | Have a great day! <: -->
 # <img src="logo.svg" />
 
 [![Build Status](https://travis-ci.org/alanxoc3/concards.svg?branch=master)](https://travis-ci.org/alanxoc3/concards)
@@ -50,7 +50,7 @@ of these symbols:
 '@>' = Starts a concards block and also starts a question.
 '|'  = Separates sides.
 ':'  = Separates sides, and adds a reversed card.
-'<@' = Ends the concards block.
+'<:' = Ends the concards block.
 '\'  = Escapes the special tokens above.
 ```
 
@@ -72,8 +72,8 @@ Here are a few example concards:
  | Yes
 
 @> What does a concard look like?
- | \@> It could look like this \| What does a concard look like? \<@
- | \@> It could also look like this \| with multiple \| answers! \<@
+ | \@> It could look like this \| What does a concard look like? \<:
+ | \@> It could also look like this \| with multiple \| answers! \<:
 
 @> How do you escape a concard keyword?
  | Put a backslash before it. Your text file would show "\@>", but the app shows "@>".
@@ -87,7 +87,7 @@ Here are a few example concards:
 
 @> The human who created concards.
  : Alan Morgan
-<@
+<:
 ```
 
 The easiest way to understand that syntax is by trying it out! Just run

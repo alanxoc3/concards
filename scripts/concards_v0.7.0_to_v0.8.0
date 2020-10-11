@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+# Concards transition from v0.7.0 to v0.8.0 script.
+# By Alan Morgan
+#
+# In this release, the curly braces were added as symbols "{}". The colon ":"
+# was changed to a double colon "::". The "<@" and "@>" were both changed to
+# "<:" and ":>". Special symbols contained in a card now have have hashes with
+# backslashes. And finally, whitespace is not needed to be before and after
+# symbols anymore when parsing through files.
+#
+# This isn't really a full fledged script, instead there are just a few ideas
+# for how you can make the transition.
+
+exit
+
+# Convert "@>" and "<@"
+find . -type f -exec sed -i "s/@>/:>/g" {} \;
+find . -type f -exec sed -i "s/<@/<:/g" {} \;
+
+# An idea to convert the single colon. This isn't guaranteed to work for
+# everything.
+find . -type f -exec sed -i "s/ : /:: /g" {} \;
+
+# You might need/want to make changes if you have a card that has both a ":"
+# and a "|", since the way those two play together were changed a bit in this
+# release.
+
+# And it's not worth it to change the metadata file for any cards that are
+# affected by the escaping symbol change.

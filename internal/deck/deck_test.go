@@ -25,21 +25,21 @@ func TestNewDeck(t *testing.T) {
 
 func TestAddCardsLen(t *testing.T) {
 	d := deck.NewDeck(ONE_DATE)
-	c1, _ := card.NewCards(".", "hi : yo")
+   c1, _ := card.NewCards(".", "hi :: yo")
 	d.AddCards(c1...)
 	assert.Len(t, d.CardList(), 2)
 }
 
 func TestAddCardsTop(t *testing.T) {
 	d := deck.NewDeck(ONE_DATE)
-	c1, _ := card.NewCards(".", "hi : yo")
+   c1, _ := card.NewCards(".", "hi :: yo")
 	d.AddCards(c1...)
 	assert.Equal(t, c1[0], d.TopCard())
 }
 
 func TestDropTop(t *testing.T) {
 	d := deck.NewDeck(ONE_DATE)
-	c1, _ := card.NewCards(".", "hi : yo")
+   c1, _ := card.NewCards(".", "hi :: yo")
 	d.AddCards(c1...)
    d.DropTop()
 	assert.Equal(t, c1[1], d.TopCard())
@@ -48,7 +48,7 @@ func TestDropTop(t *testing.T) {
 
 func TestTruncate(t *testing.T) {
 	d := deck.NewDeck(ONE_DATE)
-	c1, _ := card.NewCards(".", "hi : yo")
+   c1, _ := card.NewCards(".", "hi :: yo")
 	d.AddCards(c1...)
    d.Truncate(1)
 	assert.Equal(t, c1[0], d.TopCard())
@@ -57,7 +57,7 @@ func TestTruncate(t *testing.T) {
 
 func TestAddCardsPredictSameNext(t *testing.T) {
 	d := deck.NewDeck(ONE_DATE)
-	c1, _ := card.NewCards(".", "hi : yo")
+   c1, _ := card.NewCards(".", "hi :: yo")
 	d.AddCards(c1...)
 	p := meta.NewPredictFromStrings(c1[0].Hash().String(), "0001-01-01T00:00:00Z")
 	d.AddPredicts(p)
@@ -69,7 +69,7 @@ func TestAddCardsPredictSameNext(t *testing.T) {
 
 func TestCardList(t *testing.T) {
 	d := deck.NewDeck(ONE_DATE)
-	c, _ := card.NewCards(".", "hi : yo")
+   c, _ := card.NewCards(".", "hi :: yo")
 	d.AddCards(c...)
 
 	assert.Equal(t, c, d.CardList())
@@ -86,7 +86,7 @@ func TestPredictList(t *testing.T) {
 func TestRemove(t *testing.T) {
 	h1 := internal.NewHash("73a6a403534bcc11b662e3a1d90d31e1")
 	h2 := internal.NewHash("abad2c2e5be5c33bc319ce038e3f2108")
-	cards, _ := card.NewCards(".", "hi : yo")
+   cards, _ := card.NewCards(".", "hi :: yo")
 
 	t.Run("Memorize", func(t *testing.T) {
       d := deck.NewDeck(ONE_DATE)
@@ -123,7 +123,7 @@ func TestExecFuture(t *testing.T) {
 	h1 := internal.NewHash("55746153a816f94836725a939a5cac37")
 	h2 := internal.NewHash("abad2c2e5be5c33bc319ce038e3f2108")
    h3 := internal.NewHash("a64332565db9aebe4f2edc4f1c125610")
-   cards, _ := card.NewCards(".", "hi : yo : me")
+   cards, _ := card.NewCards(".", "hi :: yo :: me")
 
    d := deck.NewDeck(time.Date(2020,1,1,0,0,0,0,time.UTC))
    d.AddCards(cards...)
@@ -152,7 +152,7 @@ func TestEdit(t *testing.T) {
       d.Edit(func(s string) ([]*card.Card, error) {
          return cards, nil
       }, func(s string) ([]*card.Card, error) {
-         return card.NewCards(".", "hi : yo")
+         return card.NewCards(".", "hi :: yo")
       })
 
       assert.Equal(t, 2, d.ReviewLen())

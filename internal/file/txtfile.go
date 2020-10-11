@@ -113,7 +113,7 @@ func ReadCardsFromReader(r io.Reader, f string) []*card.Card {
 	for scanner.Scan() {
 		t := scanner.Text()
 
-		if t == "<@" {
+		if t == "<:" {
 			cl = append(cl, td...)
 			td = []*card.Card{}
 		} else if len(t) > 0 {

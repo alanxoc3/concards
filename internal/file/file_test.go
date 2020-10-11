@@ -12,7 +12,7 @@ import (
 )
 
 func TestReadCards(t *testing.T) {
-	fstr := " hello ye as \n @> hi | hello <@ asoe @> yoyo man go <@"
+	fstr := " hello ye as \n :> hi | hello <: asoe :> yoyo man go <:"
 	cards := file.ReadCardsFromReader(strings.NewReader(fstr), "file")
 	c1, _ := card.NewCards("file", "hi | hello")
 	c2, _ := card.NewCards("file", "yoyo man go")
@@ -22,7 +22,7 @@ func TestReadCards(t *testing.T) {
 }
 
 func TestReadCardsNoSpaceBetweenSections(t *testing.T) {
-	fstr := " hello ye as@>hi | hello<@h"
+	fstr := " hello ye as:>hi | hello<:h"
 	cards := file.ReadCardsFromReader(strings.NewReader(fstr), "file")
 	c, _ := card.NewCards("file", "hi | hello")
 
@@ -30,7 +30,7 @@ func TestReadCardsNoSpaceBetweenSections(t *testing.T) {
 }
 
 func TestReadCardsBackslash(t *testing.T) {
-	fstr := ".\\@>hi@>bye<@."
+	fstr := ".\\:>hi:>bye<:."
 	cards := file.ReadCardsFromReader(strings.NewReader(fstr), "file")
 	c, _ := card.NewCards("file", "bye")
 
@@ -39,7 +39,7 @@ func TestReadCardsBackslash(t *testing.T) {
 }
 
 func TestReadTwoCards(t *testing.T) {
-	fstr := ".@>hi@>bye<@."
+	fstr := ".:>hi:>bye<:."
 	cards := file.ReadCardsFromReader(strings.NewReader(fstr), "file")
 	c1, _ := card.NewCards("file", "hi")
 	c2, _ := card.NewCards("file", "bye")
@@ -50,7 +50,7 @@ func TestReadTwoCards(t *testing.T) {
 }
 
 func TestReadCardsBeginningAndEnd(t *testing.T) {
-	fstr := "@> yo <@"
+	fstr := ":> yo <:"
 	cards := file.ReadCardsFromReader(strings.NewReader(fstr), "file")
 	c, _ := card.NewCards("file", "yo")
 

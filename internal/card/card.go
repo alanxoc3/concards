@@ -89,7 +89,7 @@ func NewCards(file string, sides string) ([]*Card, error) {
 }
 
 func (c *Card) HasAnswer() bool { return len(c.facts) > 1 }
-func (c *Card) String() string  { return strings.Join(c.getFactsRaw(), " "+internal.CSep+" ") }
+func (c *Card) String() string  { return strings.Join(c.getFactsRaw(), " | ") }
 func (c *Card) File() string    { return c.file }
 func (c *Card) Len() int        { return len(c.facts) }
 
