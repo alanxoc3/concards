@@ -20,6 +20,93 @@ type Card struct {
 
 type CardMap map[internal.Hash]*Card
 
+func isSpecialChar(r rune) bool {
+	return r == ':' || r == '\\' || r == '|' || r == '>' || r == '<' || unicode.IsSpace(r)
+}
+
+func scanCardSides(data []byte, atEOF bool) (advance int, token []byte, err error) {
+	// Skip leading spaces.
+	start := 0
+	for width := 0; start < len(data); start += width {
+		var r rune
+		r, width = utf8.DecodeRune(data[start:])
+		if !unicode.IsSpace(r) {
+			break
+		}
+	}
+
+	// Check for pipe.
+	if len(data) >= start+1 {
+		if data[start] == byte('|') {
+			return start + 1, data[start : start+1], nil
+		}
+	}
+
+	// Check for colons.
+	if len(data) >= start+2 {
+		if data[start] == byte(':') && data[start+1] == byte(':') {
+			return start + 2, data[start : start+2], nil
+		}
+	}
+
+	// Parse until next token
+	isBackslash := false
+	isColon := false
+	for width, i := 0, start; i < len(data); i += width {
+		var r rune
+		r, width = utf8.DecodeRune(data[i:])
+
+		if !isBackslash {
+			if unicode.IsSpace(r) {
+				return i, data[start:i], nil
+			} else if r == '|' || unicode.IsSpace(r) {
+				return i, data[start:i], nil
+			} else if isColon && r == ':' {
+				return i - 1, data[start : i-1], nil
+			} else if r == ':' {
+				isColon = true
+			} else {
+				isColon = false
+			}
+		} else {
+			isColon = false
+		}
+
+		isBackslash = r == '\\' && !isBackslash
+	}
+
+	// Return the non empty word.
+	if atEOF && len(data) > start {
+		return len(data), data[start:], nil
+	}
+
+	// Request more data.
+	return start, nil, nil
+}
+
+func escapeSymbols(s string) string {
+	isBackslash := false
+	retStr := ""
+	for _, c := range s {
+		if isBackslash {
+			if isSpecialChar(c) {
+				retStr += "\\" + string(c)
+			} else {
+				retStr += string(c)
+			}
+		} else if c != '\\' {
+			if isSpecialChar(c) {
+				retStr += "\\" + string(c)
+			} else {
+            retStr += string(c)
+			}
+		}
+
+		isBackslash = c == '\\' && !isBackslash
+	}
+	return retStr
+}
+
 // Returns a list of cards, or an empty list if there is an error.
 func NewCards(file string, sides string) ([]*Card, error) {
 	if file == "" {
@@ -30,54 +117,26 @@ func NewCards(file string, sides string) ([]*Card, error) {
 	facts := [][]string{}
 	cards := []*Card{}
 	waitForReverse := false
-	prev := ""
-	word := ""
 
 	// Add a separator to the end to not repeat logic.
 	sides = sides + " |"
 	scanner := bufio.NewScanner(strings.NewReader(sides))
-	scanner.Split(bufio.ScanRunes)
+	scanner.Split(scanCardSides)
 	for scanner.Scan() {
 		t := scanner.Text()
+		if t == "|" || t == "::" {
+			if len(fact) > 0 {
+				facts = append(facts, fact)
+				fact = []string{}
 
-		if prev == "\\" {
-			// Only escape special characters.
-			if t == ":" || t == "\\" || t == "|" || t == "@" || t == ">" || t == "<" {
-				prev = "\\" + t
-			} else {
-				prev = t
-			}
-		} else {
-			word += prev
-
-			if r, _ := utf8.DecodeRuneInString(t); unicode.IsSpace(r) {
-				prev = ""
-				if len(word) > 0 {
-					fact = append(fact, word)
-					word = ""
-				}
-			} else {
-				if t == "|" || t == ":" {
-					if len(word) > 0 {
-						fact = append(fact, word)
-						word = ""
-					}
-
-					if len(fact) > 0 {
-						facts = append(facts, fact)
-						fact = []string{}
-
-						if waitForReverse {
-							cards = append(cards, createReverseCard(file, facts))
-						}
-					}
-
-					waitForReverse = t == ":"
-					prev = ""
-				} else {
-					prev = t
+				if waitForReverse {
+					cards = append(cards, createReverseCard(file, facts))
 				}
 			}
+
+			waitForReverse = t == "::"
+		} else if len(t) > 0 {
+			fact = append(fact, escapeSymbols(t))
 		}
 	}
 
@@ -89,7 +148,7 @@ func NewCards(file string, sides string) ([]*Card, error) {
 }
 
 func (c *Card) HasAnswer() bool { return len(c.facts) > 1 }
-func (c *Card) String() string  { return strings.Join(c.getFactsRaw(), " "+internal.CSep+" ") }
+func (c *Card) String() string  { return strings.Join(c.getFactsRaw(), " | ") }
 func (c *Card) File() string    { return c.file }
 func (c *Card) Len() int        { return len(c.facts) }
 
