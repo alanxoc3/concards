@@ -114,7 +114,7 @@ func TestSpaceBetween(t *testing.T) {
    c, _ := card.NewCards(".", "question\\  answer")
 	require.Len(t, c, 1)
 	assert.Equal(t, "question  answer", c[0].GetFactEsc(0))
-	assert.Equal(t, "question  answer", c[0].String())
+	assert.Equal(t, "question\\  answer", c[0].String())
 }
 
 func TestColonEscaped(t *testing.T) {

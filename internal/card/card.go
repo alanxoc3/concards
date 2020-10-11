@@ -21,7 +21,7 @@ type Card struct {
 type CardMap map[internal.Hash]*Card
 
 func isSpecialChar(r rune) bool {
-	return r == ':' || r == '\\' || r == '|' || r == '>' || r == '<'
+	return r == ':' || r == '\\' || r == '|' || r == '>' || r == '<' || unicode.IsSpace(r)
 }
 
 func scanCardSides(data []byte, atEOF bool) (advance int, token []byte, err error) {
