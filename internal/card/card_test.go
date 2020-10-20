@@ -141,17 +141,38 @@ func TestColonAtBeginning(t *testing.T) {
 	assert.Equal(t, "a | b", c[0].String())
 }
 
-/*
+func TestSpaceInCurly(t *testing.T) {
+   c, _ := card.NewCards(".", "a{ ha}b")
+	require.Len(t, c, 1)
+	assert.Equal(t, "a {}b | ha", c[0].String())
+}
+
 func TestExtraEndCurly(t *testing.T) {
    c, _ := card.NewCards(".", "a {}}")
 	require.Len(t, c, 1)
 	assert.Equal(t, "a {}\\}", c[0].String())
 }
 
-func TestClozeOneSide(t *testing.T) {
-   c, _ := card.NewCards(".", "a {b}")
+func TestBackslashHash(t *testing.T) {
+   c, _ := card.NewCards(".", "heh #3")
 	require.Len(t, c, 1)
-	assert.Equal(t, "a {} | b", c[0].String())
+	assert.Equal(t, "heh \\#3", c[0].String())
+}
+
+func TestClozeOnlySpaces(t *testing.T) {
+   c, _ := card.NewCards(".", "hi {   } yo")
+	require.Len(t, c, 1)
+	assert.Equal(t, "hi {} yo", c[0].String())
+}
+
+func TestClozeCrazySpaceExample(t *testing.T) {
+   c, _ := card.NewCards(".", "hi{ hey{ you }{me{ inner }}yo")
+	require.Len(t, c, 4)
+	assert.Equal(t, "hi {} yo | hey you me inner", c[0].String())
+	assert.Equal(t, "hi hey {} me inner yo | you", c[0].String())
+	assert.Equal(t, "hi hey you {} yo | me inner", c[0].String())
+	assert.Equal(t, "hi hey you me {} yo | inner", c[0].String())
+	assert.Equal(t, "hi {} yo", c[0].String())
 }
 
 func TestClozeDoubleCurly(t *testing.T) {
@@ -159,4 +180,23 @@ func TestClozeDoubleCurly(t *testing.T) {
 	require.Len(t, c, 1)
 	assert.Equal(t, "a {} c | b", c[0].String())
 }
-*/
+
+func TestClozeTwoOfThem(t *testing.T) {
+   c, _ := card.NewCards(".", "{he}lp {him}")
+	require.Len(t, c, 2)
+	assert.Equal(t, "{}lp him | he", c[0].String())
+	assert.Equal(t, "help {} | him", c[0].String())
+}
+
+func TestClozeDoubleCurlyMoreText(t *testing.T) {
+   c, _ := card.NewCards(".", "a {hap{p}y} c")
+	require.Len(t, c, 2)
+	assert.Equal(t, "a {} c | happy", c[0].String())
+	assert.Equal(t, "a hap{}y c | p", c[1].String())
+}
+
+func TestClozeGroupOne(t *testing.T) {
+   c, _ := card.NewCards(".", "aaah #{he}lp #{me}")
+	require.Len(t, c, 1)
+	assert.Equal(t, "aaah {}lp {}", c[0].String())
+}
