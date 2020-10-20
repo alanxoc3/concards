@@ -15,54 +15,38 @@ import (
 // A card is a list of facts. Usually, but not limited to, Q&A format.
 type Card struct {
 	file  string
-	facts [][]string
+	facts []string
 }
 
 type CardMap map[internal.Hash]*Card
 
-func isSpecialChar(r rune) bool {
-	return r == ':' || r == '\\' || r == '|' || r == '>' || r == '<' || r == '{' || r == '}' || unicode.IsSpace(r)
-}
-
-func scanCardSides(data []byte, atEOF bool) (advance int, token []byte, err error) {
-	// Skip leading spaces.
-	start := 0
-	for width := 0; start < len(data); start += width {
-		var r rune
-		r, width = utf8.DecodeRune(data[start:])
-		if !unicode.IsSpace(r) {
-			break
+func splitBySide(data []byte, atEOF bool) (advance int, token []byte, err error) {
+	// Check for "::".
+	if len(data) >= 2 {
+		if data[0] == byte(':') && data[1] == byte(':') {
+			return 2, data[:2], nil
 		}
 	}
 
-	// Check for pipe.
-	if len(data) >= start+1 {
-		if data[start] == byte('|') {
-			return start + 1, data[start : start+1], nil
-		}
-	}
-
-	// Check for colons.
-	if len(data) >= start+2 {
-		if data[start] == byte(':') && data[start+1] == byte(':') {
-			return start + 2, data[start : start+2], nil
+	// Check for "|".
+	if len(data) >= 1 {
+		if data[0] == byte('|') {
+			return 1, data[:1], nil
 		}
 	}
 
 	// Parse until next token
 	isBackslash := false
 	isColon := false
-	for width, i := 0, start; i < len(data); i += width {
+	for width, i := 0, 0; i < len(data); i += width {
 		var r rune
 		r, width = utf8.DecodeRune(data[i:])
 
 		if !isBackslash {
-			if unicode.IsSpace(r) {
-				return i, data[start:i], nil
-			} else if r == '|' || unicode.IsSpace(r) {
-				return i, data[start:i], nil
+			if r == '|' {
+				return i, data[:i], nil
 			} else if isColon && r == ':' {
-				return i - 1, data[start : i-1], nil
+				return i - 1, data[:i-1], nil
 			} else if r == ':' {
 				isColon = true
 			} else {
@@ -75,7 +59,41 @@ func scanCardSides(data []byte, atEOF bool) (advance int, token []byte, err erro
 		isBackslash = r == '\\' && !isBackslash
 	}
 
-	// Return the non empty word.
+	// Return the non empty remainder.
+	if atEOF && len(data) > 0 {
+		return len(data), data[:], nil
+	}
+
+	// Request more data.
+	return 0, nil, nil
+}
+
+func splitByWordBackslash(data []byte, atEOF bool) (advance int, token []byte, err error) {
+	start := 0
+	for width := 0; start < len(data); start += width {
+		var r rune
+		r, width = utf8.DecodeRune(data[start:])
+		if !unicode.IsSpace(r) {
+			break
+		}
+	}
+
+	// Parse until next token
+	isBackslash := false
+	for width, i := 0, start; i < len(data); i += width {
+		var r rune
+		r, width = utf8.DecodeRune(data[i:])
+
+		if !isBackslash {
+			if unicode.IsSpace(r) {
+				return i, data[start:i], nil
+			}
+		}
+
+		isBackslash = r == '\\' && !isBackslash
+	}
+
+	// Return the non empty remainder.
 	if atEOF && len(data) > start {
 		return len(data), data[start:], nil
 	}
@@ -84,27 +102,224 @@ func scanCardSides(data []byte, atEOF bool) (advance int, token []byte, err erro
 	return start, nil, nil
 }
 
-func escapeSymbols(s string) string {
+
+func splitByToken(data []byte, atEOF bool) (advance int, token []byte, err error) {
+	// Check for "::" or "{}".
+	if len(data) >= 2 {
+		if data[0] == byte('{') && data[1] == byte('}') {
+			return 2, data[:2], nil
+		}
+	}
+
+	// Check for "|" or "{" or "}" or ":" or "#".
+	if len(data) >= 1 {
+		if data[0] == byte('#') || data[0] == byte(':') || data[0] == byte('{') || data[0] == byte('}') {
+			return 1, data[:1], nil
+		}
+	}
+
+	// Parse until next token
 	isBackslash := false
-	retStr := ""
-	for _, c := range s {
-		if isBackslash {
-			if isSpecialChar(c) {
-				retStr += "\\" + string(c)
-			} else {
-				retStr += string(c)
-			}
-		} else if c != '\\' {
-			if isSpecialChar(c) {
-				retStr += "\\" + string(c)
-			} else {
-            retStr += string(c)
+	for width, i := 0, 0; i < len(data); i += width {
+		var r rune
+		r, width = utf8.DecodeRune(data[i:])
+
+		if !isBackslash {
+			if r == '{' || r == '}' || r == '#' || r == ':' {
+				return i, data[0:i], nil
 			}
 		}
 
-		isBackslash = c == '\\' && !isBackslash
+		isBackslash = r == '\\' && !isBackslash
 	}
-	return retStr
+
+	// Return the non empty remainder.
+	if atEOF && len(data) > 0 {
+		return len(data), data[:], nil
+	}
+
+	// Request more data.
+	return 0, nil, nil
+}
+
+// Unbackslashes things that don't need to be backslashed.
+func normalizeBackslash(side string) string {
+	s := []rune{}
+   isBackslash := false
+
+   for _, r := range side {
+      if isBackslash {
+         if r == '\\' || r == '#' || r == '{' || r == '}' || r == ':' || r == '|' || unicode.IsSpace(r) {
+            s = append(s, '\\', r)
+         } else {
+            s = append(s, r)
+         }
+      } else if r != '\\' {
+         s = append(s, r)
+      }
+
+		isBackslash = r == '\\' && !isBackslash
+	}
+
+	return string(s)
+}
+
+// Backslashes any invalid cloze or colon.
+func normalizeCloze(side string) string {
+	s := ""
+	clozeString := ""
+	clozeDepth := 0
+
+	scanner := bufio.NewScanner(strings.NewReader(side))
+	scanner.Split(splitByToken)
+	for scanner.Scan() {
+		t := scanner.Text()
+
+		if clozeDepth > 0 {
+			if t == "{" || t == "}" || t == ":" || t == "#" {
+				clozeString += t
+				s += "\\" + t
+			} else {
+				clozeString += t
+				s += t
+			}
+
+			if t == "{" {
+				clozeDepth++
+			} else if t == "}" {
+				clozeDepth--
+			}
+
+			if clozeDepth == 0 {
+				s = clozeString
+			}
+		} else {
+			if t == "{" {
+				clozeDepth++
+				clozeString = s + "{"
+				s += "\\{"
+			} else if t == "}" || t == ":" {
+				s += "\\" + t
+			} else {
+				s += t
+			}
+		}
+	}
+
+	return s
+}
+
+// Backslashes any hashes not associated with a cloze.
+func normalizeHash(side string) string {
+	s := ""
+	hashCount := 0
+
+	scanner := bufio.NewScanner(strings.NewReader(side))
+	scanner.Split(splitByToken)
+	for scanner.Scan() {
+		t := scanner.Text()
+		if t == "#" {
+			hashCount++
+		} else {
+			if hashCount > 0 && t == "{" {
+				s += strings.Repeat("#", hashCount)
+			} else if hashCount > 0 {
+				s += strings.Repeat("\\#", hashCount)
+			}
+			s += t
+			hashCount = 0
+		}
+	}
+
+	if hashCount > 0 {
+		s += strings.Repeat("\\#", hashCount)
+	}
+
+	return s
+}
+
+// Turns colons into curly braces.
+func normalizeColon(side string) string {
+	s := ""
+	hashCount := 0
+	groupStack := []int{}
+
+	scanner := bufio.NewScanner(strings.NewReader(side))
+	scanner.Split(splitByToken)
+	for scanner.Scan() {
+		t := scanner.Text()
+
+		if t == ":" {
+			if groupStack[len(groupStack)-1] == 0 {
+				s += "}{"
+			}
+		} else {
+			s += t
+		}
+
+		if t == "#" {
+			hashCount++
+		} else if t == "{" {
+			groupStack = append(groupStack, hashCount)
+			hashCount = 0
+		} else if t == "}" {
+			groupStack = groupStack[:len(groupStack)-1]
+		}
+	}
+
+	return s
+}
+
+type clozeNode struct {
+	loc   int
+	group int
+	text  string
+	nodes []*clozeNode
+}
+
+func trimSpacesWithBackslash(side string) string {
+	words := []string{}
+
+	scanner := bufio.NewScanner(strings.NewReader(side))
+	scanner.Split(splitByWordBackslash)
+	for scanner.Scan() {
+      words = append(words, scanner.Text())
+	}
+
+	return strings.Join(words, " ")
+}
+
+// Turns colons into curly braces.
+func calcClozeNode(scanner *bufio.Scanner) *clozeNode {
+	nodeText := ""
+	nodes := []*clozeNode{}
+	hashCount := 0
+
+	for scanner.Scan() {
+		t := scanner.Text()
+		if t == "{" {
+			node := calcClozeNode(scanner)
+			node.loc = len(nodeText)
+			node.group = hashCount
+			nodes = append(nodes, node)
+
+			hashCount = 0
+		} else if t == "#" {
+			hashCount++
+		} else if t == "}" {
+			break
+		} else {
+			hashCount = 0
+			nodeText += t
+		}
+	}
+
+	return &clozeNode{
+		loc:   0,
+		group: 0,
+		text:  nodeText,
+		nodes: nodes,
+	}
 }
 
 // Returns a list of cards, or an empty list if there is an error.
@@ -113,64 +328,71 @@ func NewCards(file string, cardStr string) ([]*Card, error) {
 		return []*Card{}, fmt.Errorf("File not provided.")
 	}
 
-	side := []string{}
-	sides := [][]string{}
-   revSides := [][][]string{}
 	cards := []*Card{}
-   // clozeDepth := 0
+	sides := []string{}
+	revSides := [][]string{}
 
-   // Step 1: Scan through string by card words and special tokens.
-	scanner := bufio.NewScanner(strings.NewReader(cardStr + " |"))
-	scanner.Split(scanCardSides)
+	// Step 1: Scan through curly braces.
+
+	// Step 1: Scan through string by card words and special tokens.
+	scanner := bufio.NewScanner(strings.NewReader(cardStr))
+	scanner.Split(splitBySide)
 	for scanner.Scan() {
-		t := scanner.Text()
-      if t == "::" || t == "|" {
-         if len(side) > 0 {
-            // Check for cloze here.
-            sides = append(sides, side)
-            side = []string{}
-         }
+		side := scanner.Text()
+		if side == "::" {
+			if len(sides) > 0 {
+				revSides = append(revSides, sides)
+				sides = []string{}
+			}
+		} else if side != "|" {
+			side = normalizeBackslash(side)
+			side = normalizeCloze(side)
+			side = normalizeHash(side)
+			side = normalizeColon(side)
+			side = trimSpacesWithBackslash(side)
 
-         if t == "::" && len(sides) > 0 {
-            revSides = append(revSides, sides)
-            sides = [][]string{}
+			tokenScanner := bufio.NewScanner(strings.NewReader(side))
+			tokenScanner.Split(splitByToken)
+			n := calcClozeNode(tokenScanner)
+
+         if len(n.text) > 0 {
+            sides = append(sides, n.text)
          }
-      } else if len(t) > 0 {
-			side = append(side, escapeSymbols(t))
 		}
 	}
 
-   // Step 2: Put any remaining sides to the reverse card structure.
-   if len(sides) > 0 {
-      revSides = append(revSides, sides)
-   }
+	// Step 2: Put any remaining sides to the reverse card structure.
+	if len(sides) > 0 {
+		revSides = append(revSides, sides)
+	}
 
-   // Step 3: Add all the cards/reverse cards.
-   if len(revSides) > 1 {
-      for ri, rs := range revSides {
-         for _, s := range rs {
-            facts := [][]string{}
-            facts = append(facts, s)
-            for rri, rrs := range revSides {
-               if rri != ri {
-                  for _, ss := range rrs {
-                     facts = append(facts, ss)
-                  }
-               }
-            }
 
-            cards = append(cards, &Card{file, facts})
-         }
-      }
-   } else if len(revSides) == 1 {
-      cards = append(cards, &Card{file, revSides[0]})
-   }
+	// Step 3: Add all the cards/reverse cards.
+	if len(revSides) > 1 {
+		for ri, rs := range revSides {
+			for _, s := range rs {
+				facts := []string{}
+				facts = append(facts, s)
+				for rri, rrs := range revSides {
+					if rri != ri {
+						for _, ss := range rrs {
+							facts = append(facts, ss)
+						}
+					}
+				}
 
-   return cards, nil
+				cards = append(cards, &Card{file, facts})
+			}
+		}
+	} else if len(revSides) == 1 {
+		cards = append(cards, &Card{file, revSides[0]})
+	}
+
+	return cards, nil
 }
 
 func (c *Card) HasAnswer() bool { return len(c.facts) > 1 }
-func (c *Card) String() string  { return strings.Join(c.getFactsRaw(), " | ") }
+func (c *Card) String() string  { return strings.Join(c.facts, " | ") }
 func (c *Card) File() string    { return c.file }
 func (c *Card) Len() int        { return len(c.facts) }
 
@@ -203,31 +425,8 @@ func (c *Card) GetFactEsc(i int) string {
 // -------------------- Private stuff below --------------------
 
 func (c *Card) getFactRaw(i int) string {
-	return c.getFactHelper(i, func(words []string) []string {
-		return words
-	})
-}
-
-func (c *Card) getFactsRaw() []string {
-	return c.getFactsHelper((*Card).getFactRaw)
-}
-
-func (c *Card) getFactsHelper(factFunc func(*Card, int) string) []string {
-	facts := []string{}
-	for i := range c.facts {
-		facts = append(facts, factFunc(c, i))
-	}
-	return facts
-}
-
-func (c *Card) getFactHelper(i int, factLogic func([]string) []string) string {
-	words := []string{}
 	if len(c.facts) > i && 0 <= i {
-		words = factLogic(c.facts[i])
+		return c.facts[i]
 	}
-	return strings.Join(words, " ")
-}
-
-func createReverseCard(file string, facts [][]string) *Card {
-	return &Card{file, [][]string{facts[len(facts)-1], facts[0]}}
+	return ""
 }
