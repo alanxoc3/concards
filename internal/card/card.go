@@ -322,6 +322,34 @@ func calcClozeNode(scanner *bufio.Scanner) *clozeNode {
 	}
 }
 
+func flattenNode(n *clozeNode) []*Card {
+   /*
+   nodes := []*clozeNode{}
+   for i=0, i < len(node.nodes), i++
+      curNode = node.nodes[i]
+      nodes = append(nodes, f(curNode, loc+curNode.loc)...)
+
+   ret [{
+      group: node.group,
+      loc: loc,
+      text: calcNodeText(node),
+      nodes: [],
+
+   }, nodes...]
+
+   */
+}
+
+func calcNodeText(n *clozeNode) string {
+   text := n.text
+   for i := len(n.nodes)-1; i >= 0; i-- {
+      curNode := n.nodes[i]
+      text = text[:curNode.loc] + calcNodeText(curNode) + text[curNode.loc:]
+   }
+
+   return text
+}
+
 // Returns a list of cards, or an empty list if there is an error.
 func NewCards(file string, cardStr string) ([]*Card, error) {
 	if file == "" {
@@ -354,9 +382,12 @@ func NewCards(file string, cardStr string) ([]*Card, error) {
 			tokenScanner := bufio.NewScanner(strings.NewReader(side))
 			tokenScanner.Split(splitByToken)
 			n := calcClozeNode(tokenScanner)
+         // nc := flattenNode(n, 0)
+         // cards = append(cards, nc...)
+         sideText := calcNodeText(n)
 
          if len(n.text) > 0 {
-            sides = append(sides, n.text)
+            sides = append(sides, sideText)
          }
 		}
 	}
