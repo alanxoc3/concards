@@ -56,6 +56,7 @@ func TestColonNoSpace(t *testing.T) {
 func TestPipeNoSpace(t *testing.T) {
 	c, _ := card.NewCards(".", "question|answer")
 	h := "2abf30e888b3db27732dff3777687b74"
+	require.Len(t, c, 1)
 	assert.Equal(t, h, c[0].Hash().String())
 }
 
@@ -147,7 +148,6 @@ func TestSpaceInCurly(t *testing.T) {
 	assert.Equal(t, "a {}b | ha", c[0].String())
 }
 
-/*
 func TestExtraEndCurly(t *testing.T) {
    c, _ := card.NewCards(".", "a {}}")
 	require.Len(t, c, 1)
@@ -161,9 +161,9 @@ func TestBackslashHash(t *testing.T) {
 }
 
 func TestClozeOnlySpaces(t *testing.T) {
-   c, _ := card.NewCards(".", "hi {   } yo")
+   c, _ := card.NewCards(".", "hi{   }yo")
 	require.Len(t, c, 1)
-	assert.Equal(t, "hi {} yo", c[0].String())
+	assert.Equal(t, "hi {}yo", c[0].String())
 }
 
 func TestClozeCrazySpaceExample(t *testing.T) {
@@ -178,15 +178,16 @@ func TestClozeCrazySpaceExample(t *testing.T) {
 
 func TestClozeDoubleCurly(t *testing.T) {
    c, _ := card.NewCards(".", "a {{b}} c")
-	require.Len(t, c, 1)
+	require.Len(t, c, 2)
 	assert.Equal(t, "a {} c | b", c[0].String())
+	assert.Equal(t, "a {} c | b", c[1].String())
 }
 
 func TestClozeTwoOfThem(t *testing.T) {
    c, _ := card.NewCards(".", "{he}lp {him}")
 	require.Len(t, c, 2)
 	assert.Equal(t, "{}lp him | he", c[0].String())
-	assert.Equal(t, "help {} | him", c[0].String())
+	assert.Equal(t, "help {} | him", c[1].String())
 }
 
 func TestClozeDoubleCurlyMoreText(t *testing.T) {
@@ -201,4 +202,3 @@ func TestClozeGroupOne(t *testing.T) {
 	require.Len(t, c, 1)
 	assert.Equal(t, "aaah {}lp {} | he | me", c[0].String())
 }
-*/

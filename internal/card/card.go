@@ -102,7 +102,6 @@ func splitByWordBackslash(data []byte, atEOF bool) (advance int, token []byte, e
 	return start, nil, nil
 }
 
-
 func splitByToken(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	// Check for "::" or "{}".
 	if len(data) >= 2 {
@@ -145,18 +144,18 @@ func splitByToken(data []byte, atEOF bool) (advance int, token []byte, err error
 // Unbackslashes things that don't need to be backslashed.
 func normalizeBackslash(side string) string {
 	s := []rune{}
-   isBackslash := false
+	isBackslash := false
 
-   for _, r := range side {
-      if isBackslash {
-         if r == '\\' || r == '#' || r == '{' || r == '}' || r == ':' || r == '|' || unicode.IsSpace(r) {
-            s = append(s, '\\', r)
-         } else {
-            s = append(s, r)
-         }
-      } else if r != '\\' {
-         s = append(s, r)
-      }
+	for _, r := range side {
+		if isBackslash {
+			if r == '\\' || r == '#' || r == '{' || r == '}' || r == ':' || r == '|' || unicode.IsSpace(r) {
+				s = append(s, '\\', r)
+			} else {
+				s = append(s, r)
+			}
+		} else if r != '\\' {
+			s = append(s, r)
+		}
 
 		isBackslash = r == '\\' && !isBackslash
 	}
@@ -283,7 +282,7 @@ func trimSpacesWithBackslash(side string) string {
 	scanner := bufio.NewScanner(strings.NewReader(side))
 	scanner.Split(splitByWordBackslash)
 	for scanner.Scan() {
-      words = append(words, scanner.Text())
+		words = append(words, scanner.Text())
 	}
 
 	return strings.Join(words, " ")
@@ -322,32 +321,41 @@ func calcClozeNode(scanner *bufio.Scanner) *clozeNode {
 	}
 }
 
-func flattenNode(n *clozeNode) []*Card {
-   /*
-   nodes := []*clozeNode{}
-   for i=0, i < len(node.nodes), i++
-      curNode = node.nodes[i]
-      nodes = append(nodes, f(curNode, loc+curNode.loc)...)
+func flattenNode(n *clozeNode, loc int) []*clozeNode {
+	nodes := []*clozeNode{}
+   originalLoc := loc
+   for _, curNode := range n.nodes {
+		nodes = append(nodes, flattenNode(curNode, loc+curNode.loc)...)
+      loc += len(nodes[0].text)
+	}
 
-   ret [{
-      group: node.group,
-      loc: loc,
-      text: calcNodeText(node),
-      nodes: [],
+	retNodes := []*clozeNode{}
+	retNodes = append(retNodes, &clozeNode{
+		loc:   originalLoc,
+		group: n.group,
+		text:  calcNodeText(n),
+		nodes: []*clozeNode{},
+	})
+	retNodes = append(retNodes, nodes...)
+	return retNodes
+}
 
-   }, nodes...]
-
-   */
+func createCardsFromSubNodes(file, baseText string, nodes []*clozeNode) []*Card {
+   cards := []*Card{}
+   for _, n := range nodes {
+      cards = append(cards, &Card{file, []string{baseText[:n.loc] + "{}" + baseText[n.loc+len(n.text):], n.text}})
+	}
+	return cards
 }
 
 func calcNodeText(n *clozeNode) string {
-   text := n.text
-   for i := len(n.nodes)-1; i >= 0; i-- {
-      curNode := n.nodes[i]
-      text = text[:curNode.loc] + calcNodeText(curNode) + text[curNode.loc:]
-   }
+	text := n.text
+	for i := len(n.nodes) - 1; i >= 0; i-- {
+		curNode := n.nodes[i]
+		text = text[:curNode.loc] + calcNodeText(curNode) + text[curNode.loc:]
+	}
 
-   return text
+	return text
 }
 
 // Returns a list of cards, or an empty list if there is an error.
@@ -381,14 +389,19 @@ func NewCards(file string, cardStr string) ([]*Card, error) {
 
 			tokenScanner := bufio.NewScanner(strings.NewReader(side))
 			tokenScanner.Split(splitByToken)
-			n := calcClozeNode(tokenScanner)
-         // nc := flattenNode(n, 0)
-         // cards = append(cards, nc...)
-         sideText := calcNodeText(n)
+			node := calcClozeNode(tokenScanner)
+			nodeText := calcNodeText(node)
 
-         if len(n.text) > 0 {
-            sides = append(sides, sideText)
+         nodes := flattenNode(node, 0)
+         newCards := createCardsFromSubNodes(file, nodes[0].text, nodes[1:])
+         for _, c := range newCards {
+            fmt.Printf("%#v\n", c)
          }
+			cards = append(cards, newCards...)
+
+			if len(nodeText) > 0 {
+				sides = append(sides, nodeText)
+			}
 		}
 	}
 
@@ -396,7 +409,6 @@ func NewCards(file string, cardStr string) ([]*Card, error) {
 	if len(sides) > 0 {
 		revSides = append(revSides, sides)
 	}
-
 
 	// Step 3: Add all the cards/reverse cards.
 	if len(revSides) > 1 {
@@ -416,7 +428,9 @@ func NewCards(file string, cardStr string) ([]*Card, error) {
 			}
 		}
 	} else if len(revSides) == 1 {
-		cards = append(cards, &Card{file, revSides[0]})
+      if len(cards) == 0 || len(cards) > 0 && len(revSides[0]) > 1 {
+         cards = append(cards, &Card{file, revSides[0]})
+      }
 	}
 
 	return cards, nil
