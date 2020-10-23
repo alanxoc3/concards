@@ -249,3 +249,46 @@ func TestHashThenCloze(t *testing.T) {
    require.Len(t, c, 1)
    assert.Equal(t, "\\# {}o | hell", c[0].String())
 }
+
+func TestClozeColonGroup(t *testing.T) {
+   c, _ := card.NewCards(".", "#{he:ll}o")
+   require.Len(t, c, 1)
+   assert.Equal(t, "{}o | hell", c[0].String())
+}
+
+func TestClozeColon(t *testing.T) {
+   c, _ := card.NewCards(".", "{he:ll}o")
+   require.Len(t, c, 2)
+   assert.Equal(t, "{}llo | he", c[0].String())
+   assert.Equal(t, "he{}o | ll", c[1].String())
+}
+
+func TestClozeMultipleColons(t *testing.T) {
+   c, _ := card.NewCards(".", "{h:e:l:l}o")
+   require.Len(t, c, 4)
+   assert.Equal(t, "{}ello | h", c[0].String())
+   assert.Equal(t, "h{}llo | e", c[1].String())
+   assert.Equal(t, "he{}lo | l", c[2].String())
+   assert.Equal(t, "hel{}o | l", c[3].String())
+}
+
+func TestClozeDoubleColon(t *testing.T) {
+   c, _ := card.NewCards(".", "{h:e::l:l}o")
+   require.Len(t, c, 2)
+   assert.Equal(t, "\\{h\\:e | l\\:l\\}o", c[0].String())
+   assert.Equal(t, "l\\:l\\}o | \\{h\\:e", c[1].String())
+}
+
+func TestClozeTripleColon(t *testing.T) {
+   c, _ := card.NewCards(".", "{h:e:::l:l}o")
+   require.Len(t, c, 2)
+   assert.Equal(t, "\\{h\\:e | \\:l\\:l\\}o", c[0].String())
+   assert.Equal(t, "\\:l\\:l\\}o | \\{h\\:e", c[1].String())
+}
+
+func TestClozeQuadrupleColon(t *testing.T) {
+   c, _ := card.NewCards(".", "{h:e::::l:l}o")
+   require.Len(t, c, 2)
+   assert.Equal(t, "\\{h\\:e | l\\:l\\}o", c[0].String())
+   assert.Equal(t, "l\\:l\\}o | \\{h\\:e", c[1].String())
+}
