@@ -269,6 +269,33 @@ func normalizeColon(side string) string {
 	return s
 }
 
+// Turns colons into curly braces.
+func normalizeEmptyCloze(side string) string {
+	s := ""
+   createStr := ""
+
+	scanner := bufio.NewScanner(strings.NewReader(side))
+	scanner.Split(splitByToken)
+	for scanner.Scan() {
+		t := scanner.Text()
+
+      if createStr == "" && t == "{" {
+         createStr = "{"
+      } else if createStr == "{" && t == " " {
+         createStr = "{ "
+      } else {
+         if createStr == "{ " && t == "}" {
+            s += " {}"
+         } else {
+            s += createStr + t
+         }
+         createStr = ""
+      }
+	}
+
+	return s
+}
+
 type clozeNode struct {
 	loc   int
 	group int
@@ -288,7 +315,6 @@ func trimSpacesWithBackslash(side string) string {
 	return strings.Join(words, " ")
 }
 
-// Turns colons into curly braces.
 func calcClozeNode(scanner *bufio.Scanner) *clozeNode {
 	nodeText := ""
 	nodes := []*clozeNode{}
@@ -323,10 +349,10 @@ func calcClozeNode(scanner *bufio.Scanner) *clozeNode {
 
 func flattenNode(n *clozeNode, loc int) []*clozeNode {
 	nodes := []*clozeNode{}
-   originalLoc := loc
-   for _, curNode := range n.nodes {
+	originalLoc := loc
+	for _, curNode := range n.nodes {
 		nodes = append(nodes, flattenNode(curNode, loc+curNode.loc)...)
-      loc += len(nodes[0].text)
+		loc += len(nodes[0].text)
 	}
 
 	retNodes := []*clozeNode{}
@@ -340,10 +366,72 @@ func flattenNode(n *clozeNode, loc int) []*clozeNode {
 	return retNodes
 }
 
+func trim(text string) (string, bool, bool) {
+	isStart := true
+	isBackslash := false
+	leading := 0
+	trailing := len(text)
+	for i, r := range text {
+		isSpace := unicode.IsSpace(r)
+      runeLen := utf8.RuneLen(r)
+		if isSpace && isStart {
+			leading = i + runeLen
+		} else if isStart {
+		   isStart = false
+      }
+
+      if !isSpace || isBackslash {
+			trailing = i + runeLen
+		}
+
+		isBackslash = r == '\\' && !isBackslash
+	}
+
+	return text[leading:trailing], leading > 0, trailing < len(text)
+}
+
+func distributeNodeSpacesHelper(newText string, nodeIndex int, nodes []*clozeNode, i int, prevIsSpace, currIsSpace bool) (string, int) {
+	for len(nodes) > nodeIndex && i == nodes[nodeIndex].loc {
+		nt, l, _ := trim(nodes[nodeIndex].text)
+
+		nodes[nodeIndex].text = nt
+
+		if l && !prevIsSpace {
+         nodes[nodeIndex].loc = len(newText)+1
+		} else {
+         nodes[nodeIndex].loc = len(newText)
+      }
+
+		nodeIndex++
+	}
+
+	return newText, nodeIndex
+}
+
+// Relies on a flattened node list (this is not recursive).
+func distributeNodeSpaces(nodeText string, nodes []*clozeNode) string {
+	nodeIndex := 0
+	newText := ""
+	prevIsSpace := true
+	isBackslash := false
+
+	for i, r := range nodeText {
+		currIsSpace := unicode.IsSpace(r)
+		newText, nodeIndex = distributeNodeSpacesHelper(newText, nodeIndex, nodes, i, prevIsSpace, currIsSpace)
+		newText += string(r)
+
+		prevIsSpace = !isBackslash && currIsSpace
+		isBackslash = r == '\\' && !isBackslash
+	}
+
+	newText, _ = distributeNodeSpacesHelper(newText, nodeIndex, nodes, len(nodeText), prevIsSpace, true)
+	return newText
+}
+
 func createCardsFromSubNodes(file, baseText string, nodes []*clozeNode) []*Card {
-   cards := []*Card{}
-   for _, n := range nodes {
-      cards = append(cards, &Card{file, []string{baseText[:n.loc] + "{}" + baseText[n.loc+len(n.text):], n.text}})
+	cards := []*Card{}
+	for _, n := range nodes {
+		cards = append(cards, &Card{file, []string{baseText[:n.loc] + "{}" + baseText[n.loc+len(n.text):], n.text}})
 	}
 	return cards
 }
@@ -368,8 +456,6 @@ func NewCards(file string, cardStr string) ([]*Card, error) {
 	sides := []string{}
 	revSides := [][]string{}
 
-	// Step 1: Scan through curly braces.
-
 	// Step 1: Scan through string by card words and special tokens.
 	scanner := bufio.NewScanner(strings.NewReader(cardStr))
 	scanner.Split(splitBySide)
@@ -381,10 +467,12 @@ func NewCards(file string, cardStr string) ([]*Card, error) {
 				sides = []string{}
 			}
 		} else if side != "|" {
+			side = trimSpacesWithBackslash(side)
 			side = normalizeBackslash(side)
 			side = normalizeCloze(side)
 			side = normalizeHash(side)
 			side = normalizeColon(side)
+			side = normalizeEmptyCloze(side)
 			side = trimSpacesWithBackslash(side)
 
 			tokenScanner := bufio.NewScanner(strings.NewReader(side))
@@ -392,11 +480,10 @@ func NewCards(file string, cardStr string) ([]*Card, error) {
 			node := calcClozeNode(tokenScanner)
 			nodeText := calcNodeText(node)
 
-         nodes := flattenNode(node, 0)
-         newCards := createCardsFromSubNodes(file, nodes[0].text, nodes[1:])
-         for _, c := range newCards {
-            fmt.Printf("%#v\n", c)
-         }
+			nodes := flattenNode(node, 0)
+			nodeText = distributeNodeSpaces(nodeText, nodes[1:])
+
+			newCards := createCardsFromSubNodes(file, nodes[0].text, nodes[1:])
 			cards = append(cards, newCards...)
 
 			if len(nodeText) > 0 {
@@ -428,9 +515,9 @@ func NewCards(file string, cardStr string) ([]*Card, error) {
 			}
 		}
 	} else if len(revSides) == 1 {
-      if len(cards) == 0 || len(cards) > 0 && len(revSides[0]) > 1 {
-         cards = append(cards, &Card{file, revSides[0]})
-      }
+		if len(cards) == 0 || len(cards) > 0 && len(revSides[0]) > 1 {
+			cards = append(cards, &Card{file, revSides[0]})
+		}
 	}
 
 	return cards, nil

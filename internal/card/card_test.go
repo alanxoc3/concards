@@ -167,13 +167,12 @@ func TestClozeOnlySpaces(t *testing.T) {
 }
 
 func TestClozeCrazySpaceExample(t *testing.T) {
-   c, _ := card.NewCards(".", "hi{ hey{ you }{me{ inner }}yo")
+   c, _ := card.NewCards(".", "hi{ hey{ you }{me{ inner }}}yo")
 	require.Len(t, c, 4)
 	assert.Equal(t, "hi {} yo | hey you me inner", c[0].String())
-	assert.Equal(t, "hi hey {} me inner yo | you", c[0].String())
-	assert.Equal(t, "hi hey you {} yo | me inner", c[0].String())
-	assert.Equal(t, "hi hey you me {} yo | inner", c[0].String())
-	assert.Equal(t, "hi {} yo", c[0].String())
+	assert.Equal(t, "hi hey {} me inner yo | you", c[1].String())
+	assert.Equal(t, "hi hey you {} yo | me inner", c[2].String())
+	assert.Equal(t, "hi hey you me {} yo | inner", c[3].String())
 }
 
 func TestClozeDoubleCurly(t *testing.T) {
