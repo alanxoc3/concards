@@ -430,9 +430,42 @@ func distributeNodeSpaces(nodeText string, nodes []*clozeNode) string {
 
 func createCardsFromSubNodes(file, baseText string, nodes []*clozeNode) []*Card {
 	cards := []*Card{}
+   groupNodes := [64][]*clozeNode{}
 	for _, n := range nodes {
-		cards = append(cards, &Card{file, []string{baseText[:n.loc] + "{}" + baseText[n.loc+len(n.text):], n.text}})
+      if n.group == 0 {
+         cards = append(cards, &Card{file, []string{baseText[:n.loc] + "{}" + baseText[n.loc+len(n.text):], n.text}})
+      } else {
+         group := n.group
+         if group > 63 {
+            group = 63
+         }
+
+         if groupNodes[group] == nil {
+            groupNodes[group] = []*clozeNode{}
+         }
+
+         groupNodes[group] = append(groupNodes[group], n)
+      }
 	}
+
+   for _, nodes := range groupNodes {
+      if nodes != nil && len(nodes) > 0 {
+         offset := 0
+         question := ""
+         answers := []string{}
+         for _, n := range nodes {
+            if offset <= n.loc {
+               question += baseText[offset:n.loc] + "{}"
+               answers = append(answers, n.text)
+               offset = n.loc + len(n.text)
+            }
+         }
+         question += baseText[offset:]
+         sides := append([]string{question}, answers...)
+         cards = append(cards, &Card{file, sides})
+      }
+   }
+
 	return cards
 }
 
