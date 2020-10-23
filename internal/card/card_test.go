@@ -19,15 +19,15 @@ func TestNewCardErrNoFile(t *testing.T) {
 }
 
 func TestOneNewCard(t *testing.T) {
-	c, err := card.NewCards("hi", " hello  there  | \\: \\| \\:> \\<:  i'm  a  beard")
+	c, err := card.NewCards("hi", " hello  there  | \\: \\| \\#: \\:#  i'm  a  beard")
 
 	require.Nil(t, err)
 	require.Len(t, c, 1)
 	require.Equal(t, 2, c[0].Len())
-	assert.Equal(t, "hello there | \\: \\| \\:> <\\: i'm a beard", c[0].String())
+	assert.Equal(t, "hello there | \\: \\| \\#\\: \\:\\# i'm a beard", c[0].String())
 	assert.Equal(t, "hi", c[0].File())
 	assert.Equal(t, "hello there", c[0].GetFactEsc(0))
-	assert.Equal(t, ": | :> <: i'm a beard", c[0].GetFactEsc(1))
+	assert.Equal(t, ": | #: :# i'm a beard", c[0].GetFactEsc(1))
 	assert.True(t, c[0].HasAnswer())
 }
 

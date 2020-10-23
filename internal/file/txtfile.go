@@ -44,52 +44,54 @@ func ReadCardsFromFile(filename string) ([]*card.Card, error) {
 }
 
 func scanCardSections(data []byte, atEOF bool) (advance int, token []byte, err error) {
-	if len(data) >= 2 && data[0] == byte('<') && data[1] == byte(':') {
+   if len(data) >= 2 && data[0] == byte(':') && data[1] == byte('#') {
 		return 2, data[:2], nil
 	}
 
 	// Go to start of first card.
 	isBackslash := false
-	isAt := false
-	isLt := false
+	isHash := false
 	start := 0
 	for width := 0; start < len(data); start += width {
 		var r rune
 		r, width = utf8.DecodeRune(data[start:])
 
 		if !isBackslash {
-			if isAt && r == '>' {
+         if isHash && r == ':' {
 				start += width
-				isAt = false
+				isHash = false
 				break
 			} else {
-				isAt = r == ':'
+				isHash = r == '#'
 			}
 		} else {
-			isAt = false
+			isHash = false
 		}
 
 		isBackslash = r == '\\' && !isBackslash
 	}
 
+	isColon := false
+	isHash = false
 	// Go until start of next card or end of card section.
 	for width, i := 0, start; i < len(data); i += width {
 		var r rune
 		r, width = utf8.DecodeRune(data[i:])
 
 		isBackslash = r == '\\' && !isBackslash
-		if !isBackslash && r == '<' {
-			isLt = true
-			isAt = false
-		} else if isLt && r == ':' {
+      if isHash && r == ':' {
 			return i - 1, data[start : i-1], nil
-		} else if !isBackslash && r == ':' {
-			isAt = true
-		} else if isAt && r == '>' {
+		} else if isColon && r == '#' {
 			return i - 1, data[start : i-1], nil
+      } else if !isBackslash && r == ':' {
+			isColon = true
+			isHash = false
+		} else if !isBackslash && r == '#' {
+			isHash = true
+			isColon = false
 		} else {
-			isAt = false
-			isLt = false
+			isHash = false
+			isColon = false
 		}
 	}
 
@@ -113,7 +115,7 @@ func ReadCardsFromReader(r io.Reader, f string) []*card.Card {
 	for scanner.Scan() {
 		t := scanner.Text()
 
-		if t == "<:" {
+      if t == ":#" {
 			cl = append(cl, td...)
 			td = []*card.Card{}
 		} else if len(t) > 0 {

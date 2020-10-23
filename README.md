@@ -1,4 +1,4 @@
-<!-- @> Who is the coolest person in the world? | You are :D. | Have a great day! <: -->
+<!-- #: Who is the coolest person in the world? | You are :D. | Have a great day! :# -->
 # <img src="logo.svg" />
 
 [![Build Status](https://travis-ci.org/alanxoc3/concards.svg?branch=master)](https://travis-ci.org/alanxoc3/concards)
@@ -47,47 +47,47 @@ their contributors, so please check them out too!
 The complete syntax of embedding your flashcards into text documents consists
 of these symbols:
 ```
-'@>' = Starts a concards block and also starts a question.
+'#:' = Starts a concards block and also starts a question.
 '|'  = Separates sides.
 ':'  = Separates sides, and adds a reversed card.
-'<:' = Ends the concards block.
+':#' = Ends the concards block.
 '\'  = Escapes the special tokens above.
 ```
 
 Here are a few example concards:
 ```
-@> Concards
+#: Concards
  : A lightweight embeddable note-taking flashcard program.
 
-@> What does "concards" stand for?
+#: What does "concards" stand for?
  | Console Cards
 
-@> What does the ":" do in concards?
+#: What does the ":" do in concards?
  | It will add an extra card where the "colon" side is the question and the
    question is the answer.
  | This syntax is especially useful for vocabulary when learning a language and
    can save typing.
 
-@> Can a concard have more than 2 sides?
+#: Can a concard have more than 2 sides?
  | Yes
 
-@> What does a concard look like?
- | \@> It could look like this \| What does a concard look like? \<:
- | \@> It could also look like this \| with multiple \| answers! \<:
+#: What does a concard look like?
+ | \#: It could look like this \| What does a concard look like? \:\#
+ | \#: It could also look like this \| with multiple \| answers! \:\#
 
-@> How do you escape a concard keyword?
- | Put a backslash before it. Your text file would show "\@>", but the app shows "@>".
+#: How do you escape a concard keyword?
+ | Put a backslash before it. Your text file would show "\#:", but the app shows "#:".
 
-@> How do you show a backslash then a keyword in the concards ui?
- | To see \\@> in the ui, your text document must have 2 backslashes: \\\@>
+#: How do you show a backslash then a keyword in the concards ui?
+ | To see \\#: in the ui, your text document must have 2 backslashes: \\\#:
 
-@> 你好世界
+#: 你好世界
  : Hello World
  : Greetings World
 
-@> The human who created concards.
+#: The human who created concards.
  : Alan Morgan
-<:
+:#
 ```
 
 The easiest way to understand that syntax is by trying it out! Just run
