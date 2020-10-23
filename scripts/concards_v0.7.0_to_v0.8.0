@@ -3,8 +3,8 @@
 # By Alan Morgan
 #
 # In this release, the curly braces were added as symbols "{}". The colon ":"
-# was changed to a double colon "::". The "<@" and "@>" were both changed to
-# ":#" and "#:". Special symbols contained in a card now have have hashes with
+# was changed to a double colon "::". The "@>" and "<@" were both changed to
+# "#:" and ":#". Special symbols contained in a card now have have hashes with
 # backslashes. And finally, whitespace is not needed to be before and after
 # symbols anymore when parsing through files.
 #
