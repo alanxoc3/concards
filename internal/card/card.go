@@ -3,6 +3,7 @@ package card
 import (
 	"bufio"
 	"fmt"
+	"sort"
 	"strings"
 	"unicode"
 	"unicode/utf8"
@@ -269,33 +270,6 @@ func normalizeColon(side string) string {
 	return s
 }
 
-// Turns colons into curly braces.
-func normalizeEmptyCloze(side string) string {
-	s := ""
-   createStr := ""
-
-	scanner := bufio.NewScanner(strings.NewReader(side))
-	scanner.Split(splitByToken)
-	for scanner.Scan() {
-		t := scanner.Text()
-
-      if createStr == "" && t == "{" {
-         createStr = "{"
-      } else if createStr == "{" && t == " " {
-         createStr = "{ "
-      } else {
-         if createStr == "{ " && t == "}" {
-            s += " {}"
-         } else {
-            s += createStr + t
-         }
-         createStr = ""
-      }
-	}
-
-	return s
-}
-
 type clozeNode struct {
 	loc   int
 	group int
@@ -373,14 +347,14 @@ func trim(text string) (string, bool, bool) {
 	trailing := len(text)
 	for i, r := range text {
 		isSpace := unicode.IsSpace(r)
-      runeLen := utf8.RuneLen(r)
+		runeLen := utf8.RuneLen(r)
 		if isSpace && isStart {
 			leading = i + runeLen
 		} else if isStart {
-		   isStart = false
-      }
+			isStart = false
+		}
 
-      if !isSpace || isBackslash {
+		if !isSpace || isBackslash {
 			trailing = i + runeLen
 		}
 
@@ -397,10 +371,10 @@ func distributeNodeSpacesHelper(newText string, nodeIndex int, nodes []*clozeNod
 		nodes[nodeIndex].text = nt
 
 		if l && !prevIsSpace {
-         nodes[nodeIndex].loc = len(newText)+1
+			nodes[nodeIndex].loc = len(newText) + 1
 		} else {
-         nodes[nodeIndex].loc = len(newText)
-      }
+			nodes[nodeIndex].loc = len(newText)
+		}
 
 		nodeIndex++
 	}
@@ -430,41 +404,59 @@ func distributeNodeSpaces(nodeText string, nodes []*clozeNode) string {
 
 func createCardsFromSubNodes(file, baseText string, nodes []*clozeNode) []*Card {
 	cards := []*Card{}
-   groupNodes := [64][]*clozeNode{}
+	groupNodes := map[int][]*clozeNode{}
 	for _, n := range nodes {
-      if n.group == 0 {
-         cards = append(cards, &Card{file, []string{baseText[:n.loc] + "{}" + baseText[n.loc+len(n.text):], n.text}})
-      } else {
-         group := n.group
-         if group > 63 {
-            group = 63
-         }
+		if n.group == 0 {
+			if len(trimSpacesWithBackslash(n.text)) == 0 {
+				question := baseText[:n.loc] + " " + baseText[n.loc+len(n.text):]
+				question = trimSpacesWithBackslash(question)
+				cards = append(cards, &Card{file, []string{question}})
+			} else {
+				question := baseText[:n.loc] + "{}" + baseText[n.loc+len(n.text):]
+				question = trimSpacesWithBackslash(question)
+				cards = append(cards, &Card{file, []string{question, n.text}})
+			}
+		} else {
+			if _, exists := groupNodes[n.group]; !exists {
+				groupNodes[n.group] = []*clozeNode{}
+			}
 
-         if groupNodes[group] == nil {
-            groupNodes[group] = []*clozeNode{}
-         }
-
-         groupNodes[group] = append(groupNodes[group], n)
-      }
+			groupNodes[n.group] = append(groupNodes[n.group], n)
+		}
 	}
 
-   for _, nodes := range groupNodes {
-      if nodes != nil && len(nodes) > 0 {
-         offset := 0
-         question := ""
-         answers := []string{}
-         for _, n := range nodes {
-            if offset <= n.loc {
-               question += baseText[offset:n.loc] + "{}"
-               answers = append(answers, n.text)
-               offset = n.loc + len(n.text)
-            }
-         }
-         question += baseText[offset:]
-         sides := append([]string{question}, answers...)
-         cards = append(cards, &Card{file, sides})
-      }
-   }
+   // Sort the keys to ensure this is deterministic.
+	groupKeys := make([]int, len(groupNodes))
+
+	i := 0
+	for k := range groupNodes {
+		groupKeys[i] = k
+		i++
+	}
+
+	sort.Ints(groupKeys)
+
+	for _, k := range groupKeys {
+		nodes := groupNodes[k]
+		if nodes != nil && len(nodes) > 0 {
+			offset := 0
+			question := ""
+			answers := []string{}
+			for _, n := range nodes {
+				if offset <= n.loc {
+					if len(n.text) > 0 {
+						question += baseText[offset:n.loc] + "{}"
+						answers = append(answers, n.text)
+						offset = n.loc + len(n.text)
+					}
+				}
+			}
+			question += baseText[offset:]
+			question = trimSpacesWithBackslash(question)
+			sides := append([]string{question}, answers...)
+			cards = append(cards, &Card{file, sides})
+		}
+	}
 
 	return cards
 }
@@ -500,12 +492,10 @@ func NewCards(file string, cardStr string) ([]*Card, error) {
 				sides = []string{}
 			}
 		} else if side != "|" {
-			side = trimSpacesWithBackslash(side)
 			side = normalizeBackslash(side)
 			side = normalizeCloze(side)
 			side = normalizeHash(side)
 			side = normalizeColon(side)
-			side = normalizeEmptyCloze(side)
 			side = trimSpacesWithBackslash(side)
 
 			tokenScanner := bufio.NewScanner(strings.NewReader(side))

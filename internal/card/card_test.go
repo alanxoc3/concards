@@ -160,12 +160,6 @@ func TestBackslashHash(t *testing.T) {
 	assert.Equal(t, "heh \\#3", c[0].String())
 }
 
-func TestClozeOnlySpaces(t *testing.T) {
-   c, _ := card.NewCards(".", "hi{   }yo")
-	require.Len(t, c, 1)
-	assert.Equal(t, "hi {}yo", c[0].String())
-}
-
 func TestClozeCrazySpaceExample(t *testing.T) {
    c, _ := card.NewCards(".", "hi{ hey{ you }{me{ inner }}}yo")
 	require.Len(t, c, 4)
@@ -200,4 +194,58 @@ func TestClozeGroupOne(t *testing.T) {
    c, _ := card.NewCards(".", "aaah #{he}lp #{me}")
 	require.Len(t, c, 1)
 	assert.Equal(t, "aaah {}lp {} | he | me", c[0].String())
+}
+
+func TestClozeOnlySpaces(t *testing.T) {
+   c, _ := card.NewCards(".", "hi{   }yo")
+	require.Len(t, c, 1)
+	assert.Equal(t, "hi yo", c[0].String())
+}
+
+func TestClozeNestedOnlySpaces(t *testing.T) {
+   c, _ := card.NewCards(".", "hi{ { } {   } }yo")
+	require.Len(t, c, 3)
+	assert.Equal(t, "hi yo", c[0].String())
+	assert.Equal(t, "hi yo", c[1].String())
+	assert.Equal(t, "hi yo", c[2].String())
+}
+
+func TestClozeGroupEmpty(t *testing.T) {
+   c, _ := card.NewCards(".", "#{ }#{me}")
+	require.Len(t, c, 1)
+	assert.Equal(t, "{} | me", c[0].String())
+}
+
+func TestMultipleClozeGroups(t *testing.T) {
+   c, _ := card.NewCards(".", "##{a} #{b} ##{c} #{d} {e}")
+	require.Len(t, c, 3)
+	assert.Equal(t, "a b c d {} | e", c[0].String())
+	assert.Equal(t, "a {} c {} e | b | d", c[1].String())
+	assert.Equal(t, "{} b {} d e | a | c", c[2].String())
+}
+
+func TestMultipleNestedClozeGroups(t *testing.T) {
+   c, _ := card.NewCards(".", "##{a #{b}} ##{c #{d}} {e}")
+	require.Len(t, c, 3)
+	assert.Equal(t, "a b c d {} | e", c[0].String())
+	assert.Equal(t, "a {} c {} e | b | d", c[1].String())
+	assert.Equal(t, "{} {} e | a b | c d", c[2].String())
+}
+
+func TestNestedSameClozeGroup(t *testing.T) {
+   c, _ := card.NewCards(".", "#{a #{b #{c}}} d")
+	require.Len(t, c, 1)
+	assert.Equal(t, "{} d | a b c", c[0].String())
+}
+
+func TestClozeGroup71(t *testing.T) {
+   c, _ := card.NewCards(".", "#######################################################################{hell}o world")
+	require.Len(t, c, 1)
+	assert.Equal(t, "{}o world | hell", c[0].String())
+}
+
+func TestHashThenCloze(t *testing.T) {
+   c, _ := card.NewCards(".", "# {hell}o")
+   require.Len(t, c, 1)
+   assert.Equal(t, "\\# {}o | hell", c[0].String())
 }
