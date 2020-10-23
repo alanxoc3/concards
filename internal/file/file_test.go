@@ -45,7 +45,7 @@ func TestReadTwoCards(t *testing.T) {
 	c1, _ := card.NewCards("file", "hi")
 	c2, _ := card.NewCards("file", "bye")
 
-	// require.Len(t, cards, 2)
+	require.Len(t, cards, 2)
 	assert.Equal(t, c1[0], cards[0])
 	assert.Equal(t, c2[0], cards[1])
 }
