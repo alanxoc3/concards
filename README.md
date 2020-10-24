@@ -78,7 +78,7 @@ same block. This creates 2 cards:
 When learning a language, you might find yourself writing a flashcard that
 transitions a phrase from language #1 to language #2 and writing another
 flashcard that transitions the same phrase from language #2 to language #1.
-Concards makes this easier with the reversible card operator `::`.
+Concards makes this easier with the  `::` operator
 ```
 #: saluton al la mundo :: hello world :#
 
@@ -87,8 +87,7 @@ Generates these cards:
 #: hello world | saluton al la mundo :#
 ```
 
-If you are learning two languages, you can expand this with an extra double
-colon:
+If you are learning two languages, you can expand this with an extra `::`:
 ```
 #: spagetoj :: spaghetti :: 意面 :#
 
@@ -99,8 +98,8 @@ Generates these cards:
 ```
 
 Translating a word from one language to another often results in multiple
-definitions. Concards as able to concisely represents these scenarios when you
-combine the pipe and double colon operators.
+definitions. Concards can represent these scenarios more efficiently when
+combining the `|` and `::`.
 ```
 #: apricot | almond :: 杏仁
 
@@ -110,14 +109,13 @@ Generates these cards:
 #: 杏仁 | apricot | almond :#
 ```
 
-Note that the double colon operator always takes precedence before the pipe
-operator.
+The double colon operator always takes precedence before the pipe operator.
 
 ### Cloze Cards
 Cloze cards are handy when working with phrases or related facts. In concards,
-a cloze is created by putting text within a curly brace. Concards will generate
-cards from this cloze by replacing it with an empty set of curly braces.
-
+a cloze is created by putting text within a set of curly braces. Concards will
+generate cards from the text in the curly braces and replace the text with an
+empty set of curly braces.
 ```
 #: {Hermann Ebbinghaus} published his findings on the forgetting curve in {1885}. :#
 
@@ -126,7 +124,7 @@ Generates these cards:
 #: Hermann Ebbinghaus published his findings on the forgetting curve in {}. | 1885 :#
 ```
 
-Nesting clozes is supported:
+Cloze nesting is supported:
 ```
 #: {Education is the {kindling of a flame}}, {not the {filling of a vessel}}. :#
 
