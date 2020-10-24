@@ -325,8 +325,9 @@ func flattenNode(n *clozeNode, loc int) []*clozeNode {
 	nodes := []*clozeNode{}
 	originalLoc := loc
 	for _, curNode := range n.nodes {
-		nodes = append(nodes, flattenNode(curNode, loc+curNode.loc)...)
-		loc += len(nodes[0].text)
+      newNodes := flattenNode(curNode, loc+curNode.loc)
+		nodes = append(nodes, newNodes...)
+      loc += len(newNodes[0].text)
 	}
 
 	retNodes := []*clozeNode{}
@@ -364,7 +365,8 @@ func trim(text string) (string, bool, bool) {
 	return text[leading:trailing], leading > 0, trailing < len(text)
 }
 
-func distributeNodeSpacesHelper(newText string, nodeIndex int, nodes []*clozeNode, i int, prevIsSpace, currIsSpace bool) (string, int) {
+func distributeNodeSpacesHelper(newText string, nodeIndex int, nodes []*clozeNode, i int, prevIsSpace, currIsSpace bool) (bool, int) {
+   shouldAddRune := true
 	for len(nodes) > nodeIndex && i == nodes[nodeIndex].loc {
 		nt, l, _ := trim(nodes[nodeIndex].text)
 
@@ -376,10 +378,14 @@ func distributeNodeSpacesHelper(newText string, nodeIndex int, nodes []*clozeNod
 			nodes[nodeIndex].loc = len(newText)
 		}
 
+      if l && prevIsSpace && currIsSpace {
+         shouldAddRune = false
+      }
+
 		nodeIndex++
 	}
 
-	return newText, nodeIndex
+	return shouldAddRune, nodeIndex
 }
 
 // Relies on a flattened node list (this is not recursive).
@@ -391,14 +397,17 @@ func distributeNodeSpaces(nodeText string, nodes []*clozeNode) string {
 
 	for i, r := range nodeText {
 		currIsSpace := unicode.IsSpace(r)
-		newText, nodeIndex = distributeNodeSpacesHelper(newText, nodeIndex, nodes, i, prevIsSpace, currIsSpace)
-		newText += string(r)
+      shouldAddRune, ni := distributeNodeSpacesHelper(newText, nodeIndex, nodes, i, prevIsSpace, currIsSpace)
+      nodeIndex = ni
+      if shouldAddRune {
+         newText += string(r)
+      }
 
 		prevIsSpace = !isBackslash && currIsSpace
 		isBackslash = r == '\\' && !isBackslash
 	}
 
-	newText, _ = distributeNodeSpacesHelper(newText, nodeIndex, nodes, len(nodeText), prevIsSpace, true)
+	distributeNodeSpacesHelper(newText, nodeIndex, nodes, len(nodeText), prevIsSpace, true)
 	return newText
 }
 
@@ -506,7 +515,7 @@ func NewCards(file string, cardStr string) ([]*Card, error) {
 			nodes := flattenNode(node, 0)
 			nodeText = distributeNodeSpaces(nodeText, nodes[1:])
 
-			newCards := createCardsFromSubNodes(file, nodes[0].text, nodes[1:])
+			newCards := createCardsFromSubNodes(file, nodeText, nodes[1:])
 			cards = append(cards, newCards...)
 
 			if len(nodeText) > 0 {

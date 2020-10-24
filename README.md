@@ -1,102 +1,246 @@
-<!-- #: Who is the coolest person in the world? | You are :D. | Have a great day! :# -->
 # <img src="logo.svg" />
 
 [![Build Status](https://travis-ci.org/alanxoc3/concards.svg?branch=master)](https://travis-ci.org/alanxoc3/concards)
 [![Go Report Card](https://goreportcard.com/badge/github.com/alanxoc3/concards)](https://goreportcard.com/report/github.com/alanxoc3/concards)
 [![Coverage Status](https://coveralls.io/repos/github/alanxoc3/concards/badge.svg?branch=master)](https://coveralls.io/github/alanxoc3/concards?branch=master)
 
-Turning notes into flashcards, or should I say concards! Concards is my ongoing
-attempt to make flashcards simple and easily embeddable into text document
-based notes. Concards is much lighter than other flashcard applications such as
-such as [Anki](https://apps.ankiweb.net/) or
-[Memrise](https://www.memrise.com/), but it is also very powerful striving to
-do one thing and do it well.
+Turning notes into flashcards, or should I say concards! This is my ongoing
+attempt to make flashcards more simple and convenient. Concards provides much
+of the functionality of other mainstream flashcard applications, but with a
+unique focus on parsing cards embedded within text files.
 
 ## Features
-- Implements a repetition algorithm similar to [SM2](https://www.supermemo.com/english/ol/sm2.htm).
-- Reading from multiple files & directories.
-- Conveniently edit cards while reviewing them!
-- Helpful syntax for adding reversible cards.
-- Built with Unicode in mind!
-- Undoing/Redoing support.
+- Spaced repetition similar to [SM2](https://www.supermemo.com/english/ol/sm2.htm)!
+- [UTF-8](https://en.wikipedia.org/wiki/UTF-8) as a first-class citizen!
+- Configure with your favorite editor!
+- Undo & Redo support!
+- Read from directories or files!
+- Reversible cards!
+- [Cloze](https://en.wikipedia.org/wiki/Cloze_test) cards!
 
 ## Install
-Download the latest binary executable from the [release
+Download the latest release from the [release
 page](https://github.com/alanxoc3/concards/releases). At the moment, only Linux
 and Mac are supported.
 
-### Building From Source
-It should be super simple:
-``` bash
-go install github.com/alanxoc3/concards
+You can also build a snapshot from source with the `go` command.
+```bash
+$ go install github.com/alanxoc3/concards
 ```
 
-### Dependencies
-This project currently depends on:
-- [stretchr/testify](https://github.com/stretchr/testify) for unit tests.
-- [alanxoc3/argparse](https://github.com/alanxoc3/argparse) forked from
-  [akamensky/argparse](https://github.com/akamensky/argparse) for CLI options.
-- [nsf/termbox-go](https://github.com/nsf/termbox-go) for the terminal gui.
-- [mattn/go-runewidth](https://github.com/mattn/go-runewidth) to help with
-  Asian characters.
-
-Concards wouldn't be where it is today without those open source projects &
-their contributors, so please check them out too!
-
-## Usage
-The complete syntax of embedding your flashcards into text documents consists
-of these symbols:
-```
-'#:' = Starts a concards block and also starts a question.
-'|'  = Separates sides.
-':'  = Separates sides, and adds a reversed card.
-':#' = Ends the concards block.
-'\'  = Escapes the special tokens above.
-```
-
-Here are a few example concards:
-```
-#: Concards
- : A lightweight embeddable note-taking flashcard program.
-
-#: What does "concards" stand for?
- | Console Cards
-
-#: What does the ":" do in concards?
- | It will add an extra card where the "colon" side is the question and the
-   question is the answer.
- | This syntax is especially useful for vocabulary when learning a language and
-   can save typing.
-
-#: Can a concard have more than 2 sides?
- | Yes
-
-#: What does a concard look like?
- | \#: It could look like this \| What does a concard look like? \:\#
- | \#: It could also look like this \| with multiple \| answers! \:\#
-
-#: How do you escape a concard keyword?
- | Put a backslash before it. Your text file would show "\#:", but the app shows "#:".
-
-#: How do you show a backslash then a keyword in the concards ui?
- | To see \\#: in the ui, your text document must have 2 backslashes: \\\#:
-
-#: 你好世界
- : Hello World
- : Greetings World
-
-#: The human who created concards.
- : Alan Morgan
-:#
-```
-
-The easiest way to understand that syntax is by trying it out! Just run
-concards on this `README.md` file and see what happens!
-``` bash
+Once installed, you may want to try running concards on this readme!
+```bash
 $ concards README.md
 ```
 
-## Advanced Usage
+You may also want to review the help command's output.
+```bash
+$ concards --help
+```
+
+## Basic Syntax
+You can learn the full flashcard embedding syntax in just a few minutes! Let's
+get started.
+
+### Creating a flashcard
+To make a flashcard, you must put the flashcard text within a concards block. A
+concards block looks like this `#: :#`, where text would be placed between the
+two colons. Ex:
+```
+#: This is a one sided flashcard. :#
+```
+
+The text above will produce a one sided flashcard! But flashcards are normally
+2 sided, so let's create a new flashcard that separates a question and answer
+with the pipe symbol:
+```
+#: What is a great way to decrease the effects of the forgetting curve?
+ | Spending time every day to review previously learned information. :#
+```
+
+Any number of sides are supported, so creating a 3 sided flashcard is a piece
+of cake:
+```
+#: What are Newton's 3 laws of motion?
+ | 1. An object at rest stays at rest unless acted upon.
+ | 2. Force is equal to mass times acceleration.
+ | 3. For every action, there is an equal and opposite reaction. :#
+```
+
+You can either create new blocks for each card, or you can keep them in the
+same block. This creates 2 cards:
+```
+#: Who published the first flashcards? | Favell Lee Mortimer
+#: When were the first flashcards published? | 1834 :#
+```
+
+### Reversible Cards
+When learning a language, you might find yourself writing a flashcard that
+transitions a phrase from language #1 to language #2 and writing another
+flashcard that transitions the same phrase from language #2 to language #1.
+Concards makes this easier with the  `::` operator
+```
+#: saluton al la mundo :: hello world :#
+
+Generates these cards:
+
+#: saluton al la mundo | hello world
+#: hello world | saluton al la mundo :#
+```
+
+If you are learning two languages, you can expand this with an extra `::`:
+```
+#: spagetoj :: spaghetti :: 意面 :#
+
+Generates these cards:
+
+#: spagetoj | spaghetti | 意面
+#: spaghetti | spagetoj | 意面
+#: 意面 | spagetoj | spaghetti :#
+```
+
+Translating a word from one language to another often results in multiple
+definitions. Concards can represent these scenarios more efficiently when
+combining the `|` and `::`.
+```
+#: apricot | almond :: 杏仁 :#
+
+Generates these cards:
+
+#: apricot | 杏仁
+#: almond | 杏仁
+#: 杏仁 | apricot | almond :#
+```
+
+The double colon operator always takes precedence before the pipe operator.
+
+### Cloze Cards
+Cloze cards are handy when working with phrases or related facts. In concards,
+a cloze is created by putting text within a set of curly braces. Concards will
+generate cards from the text in the curly braces and replace the text with an
+empty set of curly braces.
+```
+#: {Hermann Ebbinghaus} published his findings on the forgetting curve in {1885}. :#
+
+Generates these cards:
+
+#: {} published his findings on the forgetting curve in 1885. | Hermann Ebbinghaus
+#: Hermann Ebbinghaus published his findings on the forgetting curve in {}. | 1885 :#
+```
+
+Cloze nesting is supported:
+```
+#: {Education is the {kindling of a flame}}, {not the {filling of a vessel}}. :#
+
+Generates these cards:
+
+#: {}, not the filling of a vessel. | Education is the kindling of a flame
+#: Education is the {}, not the filling of a vessel. | kindling of a flame
+#: Education is the kindling of a flame, {}. | not the filling of a vessel
+#: Education is the kindling of a flame, not the {}. | filling of a vessel :#
+```
+
+You can replace consecutive curly braces with the colon operator. This
+especially makes separation within a single word look nicer.
+```
+#: {Pneumono:ultra:microscopic:silico:volcano:coniosis} :#
+
+Is the same as:
+
+#: {Pneumono}{ultra}{microscopic}{silico}{volcano}{coniosis} :#
+
+And generates these cards:
+
+#: {}ultramicroscopicsilicovolcanoconiosis | Pneumono
+#: Pneumono{}microscopicsilicovolcanoconiosis | ultra
+#: Pneumonoultra{}silicovolcanoconiosis | microscopic
+#: Pneumonoultramicroscopic{}volcanoconiosis | silico
+#: Pneumonoultramicroscopicsilico{}coniosis | volcano
+#: Pneumonoultramicroscopicsilicovolcano{} | coniosis :#
+```
+
+To group multiple clozes together, use the hash symbol before a set of curly
+braces.
+```
+#: #{Sebastian Leitner} published about the Leitner System in #{1972}. :#
+
+Generates this card:
+
+#: {} published about the Leitner System in {}. | Sebastian Leitner | 1972 :#
+```
+
+Cloze groups are different based on the number of hash symbols before the curly
+brace. Here is an example with 3 cloze groups:
+```
+#: ###{Spaced repetition} is an #{evidence-based} learning technique which
+   ##{incorporates} increasing time intervals between each ##{review} of a
+   flashcard in order to exploit the ###{psychological} #{spacing effect}. :#
+
+Generates these cards:
+
+#: Spaced repetition is an {} learning technique which incorporates increasing
+   time intervals between each review of a flashcard in order to exploit the
+   psychological {}.
+ | evidence-based
+ | spacing effect
+
+#: Spaced repetition is an evidence-based learning technique which {}
+   increasing time intervals between each {} of a flashcard in order to exploit
+   the psychological spacing effect.
+ | incorporates
+ | review
+
+#: {} is an evidence-based learning technique which incorporates increasing
+   time intervals between each review of a flashcard in order to exploit the {}
+   spacing effect.
+ | Spaced repetition
+ | psychological :#
+```
+
+Finally, you can combine the cloze syntax with `::` and `|`:
+```
+#: {新型:冠状:病毒} :: Coronavirus | COVID-19 :#
+
+Generates these cards:
+
+#: {}冠状病毒 | 新型
+#: 新型{}病毒 | 冠状
+#: 新型冠状{} | 病毒
+#: 新型冠状病毒 | Coronavirus | COVID-19
+#: Coronavirus | 新型冠状病毒
+#: COVID-19 | 新型冠状病毒 :#
+```
+
+### Whitespace & Escaping
+Concards ignores consecutive whitespace. The following flashcards are
+equivalent:
+```
+#: {Piotr A. Woźniak} created the SM-2 spaced repetition algorithm in {1987}.
+#: { Piotr A. Woźniak } created the SM-2 spaced repetition algorithm in { 1987}.
+#:{Piotr A. Woźniak }created the SM-2 spaced repetition algorithm in{ 1987}. :#
+
+Generates these cards:
+
+#: {} created the SM-2 spaced repetition algorithm in 1987. | Piotr A. Woźniak
+#: Piotr A. Woźniak created the SM-2 spaced repetition algorithm in {}. | 1987 :#
+```
+
+Backslash any reserved character or whitespace to include it in the card text:
+```
+#: Which characters are special in concards?
+ | \# \: \| \{ \}
+
+#: Leave my door open just a crack\
+Cause I feel like such an insomniac\
+Why do I tire of counting sheep?\
+When I'm far too tired to fall asleep
+ | Fireflies, by Owl City :#
+```
+
+## File Structure
+Concards has a very simple file structure. This section explains the content of
+the meta data files concards writes to after a review session.
+
 ### The Predict File
 The predict file contains information needed to make a prediction when you
 should review a card next.
@@ -138,3 +282,22 @@ You can notice that there are two main differences from the predict file:
 
 This file is read from `$CONCARDS_OUTCOME`, or `$HOME/.config/concards/outcome`
 if that environment variable doesn't exist.
+
+## Dependencies
+Concards currently depends on these libraries:
+- [stretchr/testify](https://github.com/stretchr/testify) for unit tests.
+- [alanxoc3/argparse](https://github.com/alanxoc3/argparse) forked from
+  [akamensky/argparse](https://github.com/akamensky/argparse) for CLI options.
+- [nsf/termbox-go](https://github.com/nsf/termbox-go) for the terminal gui.
+- [mattn/go-runewidth](https://github.com/mattn/go-runewidth) to help with
+  Asian characters.
+
+Concards wouldn't be where it is today without those repositories & their
+contributors, so please check them out too!
+
+## Future Work
+The next big things to focus on:
+- Improved CLI UI.
+- Local Web Server UI.
+- Support Unix Piping.
+- Customizable Algorithm Plugin System.

@@ -292,3 +292,21 @@ func TestClozeQuadrupleColon(t *testing.T) {
    assert.Equal(t, "\\{h\\:e | l\\:l\\}o", c[0].String())
    assert.Equal(t, "l\\:l\\}o | \\{h\\:e", c[1].String())
 }
+
+func TestLongColonExample(t *testing.T) {
+   c, _ := card.NewCards(".", " {Pneumono:ultra:microscopic:silico:volcano:coniosis} ")
+   require.Len(t, c, 6)
+   assert.Equal(t, "{}ultramicroscopicsilicovolcanoconiosis | Pneumono", c[0].String())
+   assert.Equal(t, "Pneumono{}microscopicsilicovolcanoconiosis | ultra", c[1].String())
+   assert.Equal(t, "Pneumonoultra{}silicovolcanoconiosis | microscopic", c[2].String())
+   assert.Equal(t, "Pneumonoultramicroscopic{}volcanoconiosis | silico", c[3].String())
+   assert.Equal(t, "Pneumonoultramicroscopicsilico{}coniosis | volcano", c[4].String())
+   assert.Equal(t, "Pneumonoultramicroscopicsilicovolcano{} | coniosis", c[5].String())
+}
+
+func TestWozniak(t *testing.T) {
+   c, _ := card.NewCards(".", "{ Piotr A. Woźniak } created the SM-2 spaced repetition algorithm in { 1987}.")
+   require.Len(t, c, 2)
+   assert.Equal(t, "{} created the SM-2 spaced repetition algorithm in 1987. | Piotr A. Woźniak", c[0].String())
+   assert.Equal(t, "Piotr A. Woźniak created the SM-2 spaced repetition algorithm in {}. | 1987", c[1].String())
+}
