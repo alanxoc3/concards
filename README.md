@@ -83,6 +83,7 @@ Concards makes this easier with the  `::` operator
 #: saluton al la mundo :: hello world :#
 
 Generates these cards:
+
 #: saluton al la mundo | hello world
 #: hello world | saluton al la mundo :#
 ```
@@ -92,6 +93,7 @@ If you are learning two languages, you can expand this with an extra `::`:
 #: spagetoj :: spaghetti :: 意面 :#
 
 Generates these cards:
+
 #: spagetoj | spaghetti | 意面
 #: spaghetti | spagetoj | 意面
 #: 意面 | spagetoj | spaghetti :#
@@ -104,6 +106,7 @@ combining the `|` and `::`.
 #: apricot | almond :: 杏仁 :#
 
 Generates these cards:
+
 #: apricot | 杏仁
 #: almond | 杏仁
 #: 杏仁 | apricot | almond :#
@@ -120,6 +123,7 @@ empty set of curly braces.
 #: {Hermann Ebbinghaus} published his findings on the forgetting curve in {1885}. :#
 
 Generates these cards:
+
 #: {} published his findings on the forgetting curve in 1885. | Hermann Ebbinghaus
 #: Hermann Ebbinghaus published his findings on the forgetting curve in {}. | 1885 :#
 ```
@@ -129,6 +133,7 @@ Cloze nesting is supported:
 #: {Education is the {kindling of a flame}}, {not the {filling of a vessel}}. :#
 
 Generates these cards:
+
 #: {}, not the filling of a vessel. | Education is the kindling of a flame
 #: Education is the {}, not the filling of a vessel. | kindling of a flame
 #: Education is the kindling of a flame, {}. | not the filling of a vessel
@@ -145,6 +150,7 @@ Is the same as:
 #: {Pneumono}{ultra}{microscopic}{silico}{volcano}{coniosis} :#
 
 And generates these cards:
+
 #: {}ultramicroscopicsilicovolcanoconiosis | Pneumono
 #: Pneumono{}microscopicsilicovolcanoconiosis | ultra
 #: Pneumonoultra{}silicovolcanoconiosis | microscopic
@@ -159,6 +165,7 @@ braces.
 #: #{Sebastian Leitner} published about the Leitner System in #{1972}. :#
 
 Generates this card:
+
 #: {} published about the Leitner System in {}. | Sebastian Leitner | 1972 :#
 ```
 
@@ -170,6 +177,7 @@ brace. Here is an example with 3 cloze groups:
    flashcard in order to exploit the ###{psychological} #{spacing effect}. :#
 
 Generates these cards:
+
 #: Spaced repetition is an {} learning technique which incorporates increasing
    time intervals between each review of a flashcard in order to exploit the
    psychological {}.
@@ -194,6 +202,7 @@ Finally, you can combine the cloze syntax with `::` and `|`:
 #: {新型:冠状:病毒} :: Coronavirus | COVID-19 :#
 
 Generates these cards:
+
 #: {}冠状病毒 | 新型
 #: 新型{}病毒 | 冠状
 #: 新型冠状{} | 病毒
@@ -210,7 +219,8 @@ equivalent:
 #: { Piotr A. Woźniak } created the SM-2 spaced repetition algorithm in { 1987}.
 #:{Piotr A. Woźniak }created the SM-2 spaced repetition algorithm in{ 1987}. :#
 
-Would generate these cards:
+Generates these cards:
+
 #: {} created the SM-2 spaced repetition algorithm in 1987. | Piotr A. Woźniak
 #: Piotr A. Woźniak created the SM-2 spaced repetition algorithm in {}. | 1987 :#
 ```
@@ -221,9 +231,9 @@ Backslash any reserved character or whitespace to include it in the card text:
  | \# \: \| \{ \}
 
 #: Leave my door open just a crack\
-   Cause I feel like such an insomniac\
-   Why do I tire of counting sheep?\
-   When I'm far too tired to fall asleep
+Cause I feel like such an insomniac\
+Why do I tire of counting sheep?\
+When I'm far too tired to fall asleep
  | Fireflies, by Owl City :#
 ```
 
