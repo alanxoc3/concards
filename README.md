@@ -4,19 +4,19 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/alanxoc3/concards)](https://goreportcard.com/report/github.com/alanxoc3/concards)
 [![Coverage Status](https://coveralls.io/repos/github/alanxoc3/concards/badge.svg?branch=master)](https://coveralls.io/github/alanxoc3/concards?branch=master)
 
-Turning notes into flashcards, or should I say concards! Concards is my ongoing
+Turning notes into flashcards, or should I say concards! This is my ongoing
 attempt to make flashcards more simple and convenient. Concards provides much
 of the functionality of other mainstream flashcard applications, but with a
-unique focus on parsing cards embedded in text based files.
+unique focus on parsing cards embedded within text files.
 
 ## Features
-- Configure with your favorite editor!
 - Spaced repetition similar to [SM2](https://www.supermemo.com/english/ol/sm2.htm)!
+- [UTF-8](https://en.wikipedia.org/wiki/UTF-8) as a first-class citizen!
+- Configure with your favorite editor!
+- Undo & Redo support!
 - Read from directories or files!
 - Reversible cards!
 - [Cloze](https://en.wikipedia.org/wiki/Cloze_test) cards!
-- Undo & Redo support!
-- [UTF-8](https://en.wikipedia.org/wiki/UTF-8) is a first-class citizen!
 
 ## Install
 Download the latest release from the [release
@@ -101,7 +101,7 @@ Translating a word from one language to another often results in multiple
 definitions. Concards can represent these scenarios more efficiently when
 combining the `|` and `::`.
 ```
-#: apricot | almond :: 杏仁
+#: apricot | almond :: 杏仁 :#
 
 Generates these cards:
 #: apricot | 杏仁
