@@ -1,4 +1,3 @@
-<!-- #: Who is the coolest person in the world? | You are :D. | Have a great day! :# -->
 # <img src="logo.svg" />
 
 [![Build Status](https://travis-ci.org/alanxoc3/concards.svg?branch=master)](https://travis-ci.org/alanxoc3/concards)
@@ -16,8 +15,8 @@ unique focus on parsing cards embedded in text based files.
 - Read from directories or files!
 - Reversible cards!
 - [Cloze](https://en.wikipedia.org/wiki/Cloze_test) cards!
-- Undo & Redo support.
-- [UTF-8](https://en.wikipedia.org/wiki/UTF-8) is a first-class citizen.
+- Undo & Redo support!
+- [UTF-8](https://en.wikipedia.org/wiki/UTF-8) is a first-class citizen!
 
 ## Install
 Download the latest release from the [release
@@ -25,81 +24,67 @@ page](https://github.com/alanxoc3/concards/releases). At the moment, only Linux
 and Mac are supported.
 
 You can also build a snapshot from source with the `go` command.
-```sh
+```bash
 $ go install github.com/alanxoc3/concards
 ```
 
-Once installed, you may try running concards on this readme!
-```sh
+Once installed, you may want to try running concards on this readme!
+```bash
 $ concards README.md
 ```
 
-You may also review the help command's output.
-```sh
+You may also want to review the help command's output.
+```bash
 $ concards --help
 ```
-
-## Running Concards
 
 ## Basic Syntax
 You can learn the full flashcard embedding syntax in just a few minutes! Let's
 get started.
 
 ### Creating a flashcard
-To make a flashcard, you must put the flashcard text within a concards block.
-The concards block starts with a pound sign followed by a colon, and ends with
-a colon followed by a pound sign. Ex:
+To make a flashcard, you must put the flashcard text within a concards block. A
+concards block looks like this `#: :#`, where text would be placed between the
+two colons. Ex:
 ```
-#: This is a one sided flashcard.
-:#
+#: This is a one sided flashcard. :#
 ```
 
-If you run concards on a file that has the text above, you'll see a one sided
-flashcard! Flashcards are normally 2 sided, so let's create a new flashcard
-that separates a question and answer with the pipe symbol:
+The text above will produce a one sided flashcard! But flashcards are normally
+2 sided, so let's create a new flashcard that separates a question and answer
+with the pipe symbol:
 ```
 #: What is a great way to decrease the effects of the forgetting curve?
- | Spending time every day to review previously learned information.
-:#
+ | Spending time every day to review previously learned information. :#
 ```
 
-Concards actually supports flashcards with any number of sides. Creating a 3
-sided flashcard is a piece of cake:
+Any number of sides are supported, so creating a 3 sided flashcard is a piece
+of cake:
 ```
 #: What are Newton's 3 laws of motion?
  | 1. An object at rest stays at rest unless acted upon.
  | 2. Force is equal to mass times acceleration.
- | 3. For every action, there is an equal and opposite reaction.
-:#
+ | 3. For every action, there is an equal and opposite reaction. :#
 ```
 
-For embedding multiple flashcards, you can either create new concards blocks
-for each one, or you can reuse the same block. This example will create 2
-flashcards:
+You can either create new blocks for each card, or you can keep them in the
+same block. This creates 2 cards:
 ```
-#: Who published the first flashcards?
- | Favell Lee Mortimer
-
-#: When were the first flashcards published?
- | 1834
-:#
+#: Who published the first flashcards? | Favell Lee Mortimer
+#: When were the first flashcards published? | 1834 :#
 ```
 
 ### Reversible Cards
 When learning a language, you might find yourself writing a flashcard that
-transitions a phrase from English to Esperanto and writing another flashcard
-that transitions the same phrase from Esperanto to English:
+transitions a phrase from language #1 to language #2 and writing another
+flashcard that transitions the same phrase from language #2 to language #1.
+Concards makes this easier with the reversible card operator `::`.
 ```
-#: saluton al la mundo | hello world
-#: hello world | saluton al la mundo
-:#
-```
+#: saluton al la mundo :: hello world :#
 
-Concards can do the same thing with less typing if you use the double colon
-operator:
-```
-#: saluton al la mundo :: hello world
-:#
+Generates these cards:
+#: saluton al la mundo | hello world
+#: hello world | saluton al la mundo :#
 ```
 
 If you are learning two languages, you can expand this with an extra double
@@ -110,8 +95,7 @@ colon:
 Generates these cards:
 #: spagetoj | spaghetti | 意面
 #: spaghetti | spagetoj | 意面
-#: 意面 | spagetoj | spaghetti
-:#
+#: 意面 | spagetoj | spaghetti :#
 ```
 
 Translating a word from one language to another often results in multiple
@@ -123,8 +107,7 @@ combine the pipe and double colon operators.
 Generates these cards:
 #: apricot | 杏仁
 #: almond | 杏仁
-#: 杏仁 | apricot | almond
-:#
+#: 杏仁 | apricot | almond :#
 ```
 
 Note that the double colon operator always takes precedence before the pipe
@@ -136,26 +119,22 @@ a cloze is created by putting text within a curly brace. Concards will generate
 cards from this cloze by replacing it with an empty set of curly braces.
 
 ```
-#: {Hermann Ebbinghaus} published his findings on the forgetting curve in {1885}.
-:#
+#: {Hermann Ebbinghaus} published his findings on the forgetting curve in {1885}. :#
 
 Generates these cards:
 #: {} published his findings on the forgetting curve in 1885. | Hermann Ebbinghaus
-#: Hermann Ebbinghaus published his findings on the forgetting curve in {}. | 1885
-:#
+#: Hermann Ebbinghaus published his findings on the forgetting curve in {}. | 1885 :#
 ```
 
 Nesting clozes is supported:
 ```
-#: {Education is the {kindling of a flame}}, {not the {filling of a vessel}}.
-:#
+#: {Education is the {kindling of a flame}}, {not the {filling of a vessel}}. :#
 
 Generates these cards:
 #: {}, not the filling of a vessel. | Education is the kindling of a flame
 #: Education is the {}, not the filling of a vessel. | kindling of a flame
 #: Education is the kindling of a flame, {}. | not the filling of a vessel
-#: Education is the kindling of a flame, not the {}. | filling of a vessel
-:#
+#: Education is the kindling of a flame, not the {}. | filling of a vessel :#
 ```
 
 You can replace consecutive curly braces with the colon operator. This
@@ -173,8 +152,7 @@ And generates these cards:
 #: Pneumonoultra{}silicovolcanoconiosis | microscopic
 #: Pneumonoultramicroscopic{}volcanoconiosis | silico
 #: Pneumonoultramicroscopicsilico{}coniosis | volcano
-#: Pneumonoultramicroscopicsilicovolcano{} | coniosis
-:#
+#: Pneumonoultramicroscopicsilicovolcano{} | coniosis :#
 ```
 
 To group multiple clozes together, use the hash symbol before a set of curly
@@ -191,8 +169,7 @@ brace. Here is an example with 3 cloze groups:
 ```
 #: ###{Spaced repetition} is an #{evidence-based} learning technique which
    ##{incorporates} increasing time intervals between each ##{review} of a
-   flashcard in order to exploit the ###{psychological} #{spacing effect}.
-:#
+   flashcard in order to exploit the ###{psychological} #{spacing effect}. :#
 
 Generates these cards:
 #: Spaced repetition is an {} learning technique which incorporates increasing
@@ -211,8 +188,7 @@ Generates these cards:
    time intervals between each review of a flashcard in order to exploit the {}
    spacing effect.
  | Spaced repetition
- | psychological
-:#
+ | psychological :#
 ```
 
 Finally, you can combine the cloze syntax with `::` and `|`:
@@ -225,8 +201,7 @@ Generates these cards:
 #: 新型冠状{} | 病毒
 #: 新型冠状病毒 | Coronavirus | COVID-19
 #: Coronavirus | 新型冠状病毒
-#: COVID-19 | 新型冠状病毒
-:#
+#: COVID-19 | 新型冠状病毒 :#
 ```
 
 ### Whitespace & Escaping
@@ -235,13 +210,11 @@ equivalent:
 ```
 #: {Piotr A. Woźniak} created the SM-2 spaced repetition algorithm in {1987}.
 #: { Piotr A. Woźniak } created the SM-2 spaced repetition algorithm in { 1987}.
-#:{Piotr A. Woźniak }created the SM-2 spaced repetition algorithm in{ 1987}.
-:#
+#:{Piotr A. Woźniak }created the SM-2 spaced repetition algorithm in{ 1987}. :#
 
 Would generate these cards:
 #: {} created the SM-2 spaced repetition algorithm in 1987. | Piotr A. Woźniak
-#: Piotr A. Woźniak created the SM-2 spaced repetition algorithm in {}. | 1987
-:#
+#: Piotr A. Woźniak created the SM-2 spaced repetition algorithm in {}. | 1987 :#
 ```
 
 Backslash any reserved character or whitespace to include it in the card text:
@@ -253,8 +226,7 @@ Backslash any reserved character or whitespace to include it in the card text:
    Cause I feel like such an insomniac\
    Why do I tire of counting sheep?\
    When I'm far too tired to fall asleep
- | Fireflies, by Owl City
-:#
+ | Fireflies, by Owl City :#
 ```
 
 ## File Structure
