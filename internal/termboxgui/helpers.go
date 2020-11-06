@@ -6,6 +6,7 @@ import (
 
 	"github.com/alanxoc3/concards/internal/card"
 	"github.com/alanxoc3/concards/internal/deck"
+	"github.com/alanxoc3/concards/internal/meta"
 	runewidth "github.com/mattn/go-runewidth"
 	termbox "github.com/nsf/termbox-go"
 )
@@ -115,10 +116,10 @@ func tbprintCard(c *card.Card, amount int) {
 func tbprintStatusbar(d *deck.Deck) {
 	_, h := termbox.Size()
 	color := termbox.ColorBlue
-	tbhorizontal(h-2, color)
+	tbhorizontal(h-1, color)
 	msg := fmt.Sprintf("%d/%d cards - %s", d.ReviewLen(), d.FutureLen(), d.TopCard().File())
 
-	tbprint(0, h-2, termbox.ColorWhite|termbox.AttrBold, color, msg)
+	tbprint(0, h-1, termbox.ColorWhite|termbox.AttrBold, color, msg)
 }
 
 func displayHelpMode(color termbox.Attribute) {
@@ -127,6 +128,7 @@ func displayHelpMode(color termbox.Attribute) {
 [h]elp:   Toggle this menu.
 [q]uit:   Exit the program.
 [r]edo:   Redo the undo.
+[s]tat:   Show card statistics.
 [u]ndo:   Undo last action.
 [w]rite:  Write state to meta file.
 
@@ -152,6 +154,37 @@ func displayHelpMode(color termbox.Attribute) {
 	tbprint(x, y, color, coldef, helpStr)
 }
 
+func displayStatMode(color termbox.Attribute, p *meta.Predict) {
+	statStr := fmt.Sprintf(`
+Hash: %s
+Alg:  %s
+
+Total Yes Count: %d
+Total No Count:  %d
+Current Streak:  %d
+
+Date reviewed:  %s
+Date available: %s
+
+Press [s] to leave this screen.
+`, p.Hash().String(), p.Name(), p.YesCount(), p.NoCount(), p.Streak(), p.Curr().Format(time.RFC3339), p.Next().Format(time.RFC3339))
+
+	w, h := termbox.Size()
+	h = h - 2 // Status bar at the bottom.
+
+	// characters wide, lines tall.
+	lw, lh := 37, 17
+
+	x := w/2 - lw/2
+
+	y := h/2 - lh/2
+	if y < 0 {
+		y = 0
+	}
+
+	tbprint(x, y, color, coldef, statStr)
+}
+
 func displayCardMode(c *card.Card, showAnswer int) {
 	tbprintCard(c, showAnswer)
 }
@@ -159,9 +192,9 @@ func displayCardMode(c *card.Card, showAnswer int) {
 func tbprintStatMsg() {
 	_, h := termbox.Size()
 	color := termbox.ColorBlack
-	tbhorizontal(h-1, color)
+	tbhorizontal(h-2, color)
 
-	tbprint(0, h-1, statMsgCol, color, statMsg)
+	tbprint(0, h-2, statMsgCol, color, statMsg)
 }
 
 func updateStatMsgAndCard(d *deck.Deck, input bool) {
@@ -171,11 +204,11 @@ func updateStatMsgAndCard(d *deck.Deck, input bool) {
 	} else {
 		time := m.Next().Local().Format("Mon 2 Jan 2006 @ 15:04")
 
-      if input {
-         updateStatMsg(fmt.Sprintf("Yes! Next review is %s.", time), termbox.ColorCyan)
-      } else {
-         updateStatMsg(fmt.Sprintf("No! Next review is %s.", time), termbox.ColorRed)
-      }
+		if input {
+			updateStatMsg(fmt.Sprintf("Yes! Next review is %s.", time), termbox.ColorCyan)
+		} else {
+			updateStatMsg(fmt.Sprintf("No! Next review is %s.", time), termbox.ColorRed)
+		}
 	}
 }
 
