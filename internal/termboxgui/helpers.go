@@ -163,11 +163,11 @@ Total Yes Count: %d
 Total No Count:  %d
 Current Streak:  %d
 
-Date reviewed:  %s
-Date available: %s
+Last Reviewed:  %s
+Planned Review: %s
 
 Press [s] to leave this screen.
-`, p.Hash().String(), p.Name(), p.YesCount(), p.NoCount(), p.Streak(), p.Curr().Format(time.RFC3339), p.Next().Format(time.RFC3339))
+`, p.Hash().String(), p.Name(), p.YesCount(), p.NoCount(), p.Streak(), p.Curr().Local().Format(time.RFC1123), p.Next().Local().Format(time.RFC1123))
 
 	w, h := termbox.Size()
 	h = h - 2 // Status bar at the bottom.
