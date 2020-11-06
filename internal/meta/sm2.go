@@ -11,8 +11,7 @@ import (
 func sm2Exec(r Outcome) float64 {
 	period := 0.0
 	exponent := 0
-	rank := math.Max(1.3, 2.5+.11*float64(r.YesCount())-.29*float64(r.NoCount())+.06*float64(r.Streak()))
-
+	rank := math.Max(1.3, 2.5 + .11*float64(r.YesCount()) - .20*float64(r.NoCount()) + .08*float64(r.Streak()))
 	// Next Day Logic
 	if r.Target() && r.Streak() < 0 {
 		period = float64(time.Minute * 2)
