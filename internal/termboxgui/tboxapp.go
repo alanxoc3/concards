@@ -26,12 +26,13 @@ func TermBoxRun(d *deck.Deck, cfg *file.Config) error {
 	man := history.NewManager()
 	cardShown := 1
 	helpMode := false
+	statMode := false
 	quitMode := false
 	finishedEditing := false
 
 	man.Save(d) // Save at beginning, and end of each editing command.
 	for d.ReviewLen() > 0 {
-		drawScreen(d, helpMode, cardShown, finishedEditing)
+		drawScreen(d, cardShown, helpMode, statMode, finishedEditing)
 		finishedEditing = false
 
 		inp, err := updateInput()
@@ -45,6 +46,10 @@ func TermBoxRun(d *deck.Deck, cfg *file.Config) error {
 				quitMode = true
 			} else if inp == "h" {
 				helpMode = !helpMode
+            statMode = false
+			} else if inp == "s" {
+				statMode = !statMode
+            helpMode = false
 			} else if inp == "w" {
 				err = file.WritePredictsToFile(d.PredictList(), cfg.PredictFile)
 				if err != nil {
@@ -58,7 +63,7 @@ func TermBoxRun(d *deck.Deck, cfg *file.Config) error {
                }
 				}
 
-			} else if !helpMode {
+			} else if !helpMode && !statMode {
 				if inp == "1" {
 					updateStatMsgAndCard(d, false)
 					cardShown = 1
@@ -124,7 +129,7 @@ func TermBoxRun(d *deck.Deck, cfg *file.Config) error {
 	return nil
 }
 
-func drawScreen(d *deck.Deck, helpMode bool, cardShown int, finishedEditing bool) {
+func drawScreen(d *deck.Deck, cardShown int, helpMode, statMode, finishedEditing bool) {
 	if finishedEditing {
 		termbox.Sync()
 	}
@@ -133,8 +138,10 @@ func drawScreen(d *deck.Deck, helpMode bool, cardShown int, finishedEditing bool
 
 	if helpMode {
 		displayHelpMode(termbox.ColorCyan)
-	} else {
-		displayCardMode(d.TopCard(), cardShown)
+	} else if statMode {
+      displayStatMode(termbox.ColorYellow, d.TopPredict())
+   } else {
+      displayCardMode(d.TopCard(), cardShown)
 	}
 
 	tbprintStatusbar(d)
