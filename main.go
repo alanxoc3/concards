@@ -51,11 +51,11 @@ func main() {
 		lines := d.CardList()
 
 		for _, c := range lines {
-			fmt.Printf("@> %s\n", c)
+         fmt.Printf("#: %s\n", c)
 		}
 
 		if len(lines) > 0 {
-			fmt.Printf("<@\n")
+         fmt.Printf(":#\n")
 		}
 
 		return
