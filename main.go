@@ -18,7 +18,7 @@ func main() {
 	d := deck.NewDeck(time.Now())
 
 	predicts := file.ReadPredictsFromFile(c.PredictFile)
-   d.AddPredicts(predicts...)
+	d.AddPredicts(predicts...)
 
 	if len(c.Files) == 0 {
 		internal.AssertError("You didn't provide any files to parse.")
@@ -47,15 +47,27 @@ func main() {
 		d.Truncate(c.Number)
 	}
 
-	if c.IsPrint {
-		lines := d.CardList()
+	if c.IsFileList {
+		files := map[string]bool{}
 
-		for _, c := range lines {
-         fmt.Printf("#: %s\n", c)
+		for _, c := range d.CardList() {
+			file := c.File()
+			if _, exist := files[file]; !exist {
+				files[file] = true
+				fmt.Printf("%s\n", file)
+			}
 		}
 
-		if len(lines) > 0 {
-         fmt.Printf(":#\n")
+		return
+	} else if c.IsPrint {
+		cards := d.CardList()
+
+		for _, c := range cards {
+			fmt.Printf("#: %s\n", c)
+		}
+
+		if len(cards) > 0 {
+			fmt.Printf(":#\n")
 		}
 
 		return
