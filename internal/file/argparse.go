@@ -15,6 +15,7 @@ type Config struct {
 	IsMemorize bool
 	IsDone     bool
 	IsPrint    bool
+	IsFileList bool
 	IsStream   bool
 
 	Editor      string
@@ -51,7 +52,8 @@ func GenConfig(version string) *Config {
 	fReview := parser.Flag("r", "review", &argparse.Options{Help: "Show cards available to be reviewed"})
 	fMemorize := parser.Flag("m", "memorize", &argparse.Options{Help: "Show cards available to be memorized"})
 	fDone := parser.Flag("d", "done", &argparse.Options{Help: "Show cards not available to be reviewed or memorized"})
-	fPrint := parser.Flag("p", "print", &argparse.Options{Help: "Prints all cards, one line per card"})
+	fPrint := parser.Flag("p", "print", &argparse.Options{Help: "Print all cards, one card per line"})
+	fFileList := parser.Flag("l", "files-with-cards", &argparse.Options{Help: "Print the file paths that have cards"})
 	fNumber := parser.Int("n", "number", &argparse.Options{Default: 0, Help: "How many cards to review"})
 	fEditor := parser.String("E", "editor", &argparse.Options{Default: defaultEditor(), Help: "Defaults to \"$EDITOR\" or \"vi\""})
 	fPredictFile := parser.String("P", "predict", &argparse.Options{
@@ -67,9 +69,9 @@ func GenConfig(version string) *Config {
 
 		for _, arg := range c.GetArgs() {
 			if arg.IsFlag() {
-				help += fmt.Sprintf("  -%s  --%-9s %s.\n", arg.GetSname(), arg.GetLname(), arg.GetOpts().Help)
+				help += fmt.Sprintf("  -%s  --%-17s %s.\n", arg.GetSname(), arg.GetLname(), arg.GetOpts().Help)
 			} else {
-				help += fmt.Sprintf("  -%s  --%-9s %s.\n", arg.GetSname(), arg.GetLname()+" "+arg.GetSname(), arg.GetOpts().Help)
+				help += fmt.Sprintf("  -%s  --%-17s %s.\n", arg.GetSname(), arg.GetLname()+" "+arg.GetSname(), arg.GetOpts().Help)
 			}
 		}
 
@@ -97,6 +99,7 @@ func GenConfig(version string) *Config {
 	c.IsMemorize = *fMemorize
 	c.IsDone = *fDone
 	c.IsPrint = *fPrint
+	c.IsFileList = *fFileList
 	c.IsStream = false
 
 	c.Editor = *fEditor

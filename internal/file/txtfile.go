@@ -29,12 +29,12 @@ func ReadCardsFromFile(filename string) ([]*card.Card, error) {
 			return nil
 		}
 
-		absPath, _ := filepath.Abs(path)
-		if f, fe := os.Open(absPath); fe != nil {
+		cardPath := getPreferredPath(path)
+		if f, fe := os.Open(cardPath); fe != nil {
 			return fmt.Errorf("Error: Unable to open file \"%s\"", filename)
 		} else {
 			defer f.Close()
-			cl = append(cl, ReadCardsFromReader(f, absPath)...)
+			cl = append(cl, ReadCardsFromReader(f, cardPath)...)
 		}
 
 		return nil
@@ -44,7 +44,7 @@ func ReadCardsFromFile(filename string) ([]*card.Card, error) {
 }
 
 func scanCardSections(data []byte, atEOF bool) (advance int, token []byte, err error) {
-   if len(data) >= 2 && data[0] == byte(':') && data[1] == byte('#') {
+	if len(data) >= 2 && data[0] == byte(':') && data[1] == byte('#') {
 		return 2, data[:2], nil
 	}
 
@@ -57,7 +57,7 @@ func scanCardSections(data []byte, atEOF bool) (advance int, token []byte, err e
 		r, width = utf8.DecodeRune(data[start:])
 
 		if !isBackslash {
-         if isHash && r == ':' {
+			if isHash && r == ':' {
 				start += width
 				isHash = false
 				break
@@ -79,11 +79,11 @@ func scanCardSections(data []byte, atEOF bool) (advance int, token []byte, err e
 		r, width = utf8.DecodeRune(data[i:])
 
 		isBackslash = r == '\\' && !isBackslash
-      if isHash && r == ':' {
+		if isHash && r == ':' {
 			return i - 1, data[start : i-1], nil
 		} else if isColon && r == '#' {
 			return i - 1, data[start : i-1], nil
-      } else if !isBackslash && r == ':' {
+		} else if !isBackslash && r == ':' {
 			isColon = true
 			isHash = false
 		} else if !isBackslash && r == '#' {
@@ -115,7 +115,7 @@ func ReadCardsFromReader(r io.Reader, f string) []*card.Card {
 	for scanner.Scan() {
 		t := scanner.Text()
 
-      if t == ":#" {
+		if t == ":#" {
 			cl = append(cl, td...)
 			td = []*card.Card{}
 		} else if len(t) > 0 {
@@ -125,4 +125,24 @@ func ReadCardsFromReader(r io.Reader, f string) []*card.Card {
 	}
 
 	return cl
+}
+
+// relative path OR absolute path OR default path
+func getPreferredPath(defaultPath string) string {
+	absPath, err := filepath.Abs(defaultPath)
+	if err != nil {
+		return defaultPath
+	}
+
+	workDir, err := os.Getwd()
+	if err != nil {
+		return absPath
+	}
+
+	prefPath, err := filepath.Rel(workDir, absPath)
+	if err != nil {
+		return absPath
+	}
+
+	return prefPath
 }
