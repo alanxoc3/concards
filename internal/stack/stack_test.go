@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+var DATE_0 time.Time = time.Time{}
 var DATE_1 time.Time = time.Date(1, 1, 1, 0, 0, 0, 1, time.UTC)
 var DATE_2 time.Time = time.Date(1, 1, 1, 0, 0, 0, 2, time.UTC)
 var DATE_3 time.Time = time.Date(1, 1, 1, 0, 0, 0, 3, time.UTC)
@@ -38,14 +39,14 @@ func TestEmpty(t *testing.T) {
 func TestInsert(t *testing.T) {
 	s := stack.NewStack(DATE_1)
    h := internal.NewHash("")
-   s.Insert(h, DATE_1)
+   s.Insert(h, DATE_1, false)
 	assert.Len(t, s.List(), 1)
 }
 
 func TestInsertSameFuture(t *testing.T) {
 	s := stack.NewStack(DATE_2)
    h := internal.NewHash("")
-   s.Insert(h, DATE_2)
+   s.Insert(h, DATE_2, false)
 	assert.Equal(t, 0, s.ReviewLen())
 	assert.Equal(t, 1, s.FutureLen())
 }
@@ -53,7 +54,7 @@ func TestInsertSameFuture(t *testing.T) {
 func TestInsertDifferentFuture(t *testing.T) {
 	s := stack.NewStack(DATE_1)
    h := internal.NewHash("")
-   s.Insert(h, DATE_2)
+   s.Insert(h, DATE_2, false)
 	assert.Equal(t, 0, s.ReviewLen())
 	assert.Equal(t, 1, s.FutureLen())
 }
@@ -61,7 +62,7 @@ func TestInsertDifferentFuture(t *testing.T) {
 func TestInsertDifferentReview(t *testing.T) {
 	s := stack.NewStack(DATE_2)
    h := internal.NewHash("")
-   s.Insert(h, DATE_1)
+   s.Insert(h, DATE_1, false)
 	assert.Equal(t, h, *s.Top())
 	assert.Equal(t, 1, s.ReviewLen())
 	assert.Equal(t, 0, s.FutureLen())
@@ -69,7 +70,7 @@ func TestInsertDifferentReview(t *testing.T) {
 
 func TestPop(t *testing.T) {
 	s := stack.NewStack(DATE_2)
-   s.Insert(internal.NewHash("ff"), DATE_1)
+   s.Insert(internal.NewHash("ff"), DATE_1, false)
    s.Pop()
 	assert.Len(t, s.List(), 0)
 }
@@ -82,6 +83,32 @@ func TestClone(t *testing.T) {
 	assert.Equal(t, s2, s1)
 }
 
+func TestInsertMemorizePriority(t *testing.T) {
+	s := stack.NewStack(DATE_3)
+
+	a := internal.NewHash("a")
+	b := internal.NewHash("b")
+	c := internal.NewHash("c")
+	d := internal.NewHash("d")
+	e := internal.NewHash("e")
+	f := internal.NewHash("f")
+
+	s.Insert(a, DATE_1, false)
+	s.Insert(b, DATE_1, true)
+	s.Insert(c, DATE_2, true)
+	s.Insert(d, DATE_2, false)
+	s.Insert(e, DATE_1, true)
+	s.Insert(f, DATE_4, true)
+
+	list := []internal.Hash{}
+	for s.Top() != nil {
+		list = append(list, *s.Top())
+		s.Pop()
+	}
+
+	assert.Equal(t, []internal.Hash{c, b, e, a, d}, list)
+}
+
 // Insertion order should be in order of date, then insertion order.
 func TestListInsertionOrder(t *testing.T) {
 	s := stack.NewStack(DATE_3)
@@ -92,12 +119,12 @@ func TestListInsertionOrder(t *testing.T) {
    e := internal.NewHash("e")
    f := internal.NewHash("f")
 
-   s.Insert(a, DATE_4)
-   s.Insert(b, DATE_3)
-   s.Insert(c, DATE_3)
-   s.Insert(d, DATE_1)
-   s.Insert(e, DATE_2)
-   s.Insert(f, DATE_1)
+   s.Insert(a, DATE_4, false)
+   s.Insert(b, DATE_3, false)
+   s.Insert(c, DATE_3, false)
+   s.Insert(d, DATE_1, false)
+   s.Insert(e, DATE_2, false)
+   s.Insert(f, DATE_1, false)
 
    assert.Equal(t, []internal.Hash{d, f, e, b, c, a}, s.List())
 }
@@ -108,9 +135,9 @@ func TestUpdate(t *testing.T) {
    e := internal.NewHash("e")
    d := internal.NewHash("d")
 
-   s.Insert(f, DATE_2)
-   s.Insert(e, DATE_2)
-   s.Insert(d, DATE_2)
+   s.Insert(f, DATE_2, false)
+   s.Insert(e, DATE_2, false)
+   s.Insert(d, DATE_2, false)
 
    s.Update(f, DATE_1)
    s.Update(d, DATE_1)
@@ -126,9 +153,9 @@ func TestUpdateFutureToReview(t *testing.T) {
    e := internal.NewHash("e")
    d := internal.NewHash("d")
 
-   s.Insert(f, time.Date(2020,1,1,0,0,0,1,time.UTC))
-   s.Insert(e, time.Date(2019,1,1,0,0,0,0,time.UTC))
-   s.Insert(d, time.Date(2019,1,1,0,0,0,0,time.UTC))
+   s.Insert(f, time.Date(2020,1,1,0,0,0,1,time.UTC), false)
+   s.Insert(e, time.Date(2019,1,1,0,0,0,0,time.UTC), false)
+   s.Insert(d, time.Date(2019,1,1,0,0,0,0,time.UTC), false)
    assert.Equal(t, 1, s.FutureLen())
 
    s.SetTime(time.Date(2020,1,1,0,0,0,2,time.UTC))

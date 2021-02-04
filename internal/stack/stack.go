@@ -78,7 +78,7 @@ func (s *Stack) insertKey(h internal.Hash, k key) {
 
 // Insert the card into either the review stack or future stack.
 // Order depends on date and order inserted.
-func (s *Stack) Insert(h internal.Hash, t time.Time) {
+func (s *Stack) Insert(h internal.Hash, t time.Time, isMemorize bool) {
 	if _, exist := s.mapper[h]; !exist {
 		internal.AssertLogic(s.nextIndex >= 0, "next index should always be a natural number")
 		s.insertKey(h, key{t, s.nextIndex})
@@ -108,6 +108,7 @@ func removeHashFromSlice(slice []internal.Hash, h internal.Hash) []internal.Hash
 	return slice
 }
 
+// Updates both the current time that the stack holds, and also the card that was reviewed.
 func (s *Stack) Update(h internal.Hash, t time.Time) bool {
 	if k, exist := s.mapper[h]; exist {
 		// Step 1: Delete from slices.

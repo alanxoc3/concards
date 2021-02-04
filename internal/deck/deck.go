@@ -46,7 +46,7 @@ func (d *Deck) AddCards(cards ...*card.Card) {
 			d.cardMap[h] = c
 		}
 
-      d.stack.Insert(h, d.predictMap[h].Next())
+      d.stack.Insert(h, d.predictMap[h].Next(), d.predictMap[h].Total() == 0)
 	}
 }
 
