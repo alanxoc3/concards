@@ -94,11 +94,11 @@ func TestListInsertionOrder(t *testing.T) {
    s.Insert(a, DATE_4)
    s.Insert(b, DATE_3)
    s.Insert(c, DATE_3)
-   s.Insert(f, DATE_1)
-   s.Insert(e, DATE_2)
    s.Insert(d, DATE_1)
+   s.Insert(e, DATE_2)
+   s.Insert(f, DATE_1)
 
-   assert.Equal(t, []internal.Hash{f, d, e, b, c, a}, s.List())
+   assert.Equal(t, []internal.Hash{d, f, e, b, c, a}, s.List())
 }
 
 func TestUpdate(t *testing.T) {
