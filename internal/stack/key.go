@@ -7,10 +7,14 @@ type key struct {
 	index int
 }
 
+// Keys with a higher date go to the top.
+// If 2 keys have the same date, the one with a smaller index will be at the top.
 func (k key) reviewLess(o key) bool {
 	return k.time.Before(o.time) || k.time.Equal(o.time) && k.index > o.index
 }
 
+// Keys with a lower date go to the top.
+// If 2 keys have the same date, the one with a larger index will be at the top.
 func (k key) futureLess(o key) bool {
 	return k.time.After(o.time) || k.time.Equal(o.time) && k.index < o.index
 }
