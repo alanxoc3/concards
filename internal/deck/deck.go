@@ -56,7 +56,7 @@ func (d *Deck) AddPredicts(predicts ...*meta.Predict) {
 		h := p.Hash()
 		if v, predExist := d.predictMap[h]; !predExist || v.IsZero() {
 			d.predictMap[h] = p
-			d.stack.Update(h, p.Next())
+			d.stack.Update(h, p.Next(), p.Total() == 0)
 		}
 	}
 }
@@ -130,7 +130,7 @@ func (d *Deck) ExecTop(input bool, now time.Time) (meta.Predict, error) {
    d.stack.SetTime(now)
 
    // Step 6: Update the stack.
-   updateStatus := d.stack.Update(np.Hash(), np.Next())
+   updateStatus := d.stack.Update(np.Hash(), np.Next(), np.Total() == 0)
    internal.AssertLogic(updateStatus, "stack didn't contain hash")
 
    return np, nil

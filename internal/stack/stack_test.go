@@ -33,7 +33,7 @@ func TestEmpty(t *testing.T) {
 	assert.Empty(t, s.List())
 	assert.Zero(t, s.ReviewLen())
 	assert.Zero(t, s.FutureLen())
-	assert.False(t, s.Update(internal.NewHash(""), DATE_2))
+	assert.False(t, s.Update(internal.NewHash(""), DATE_2, false))
 }
 
 func TestInsert(t *testing.T) {
@@ -106,7 +106,7 @@ func TestInsertMemorizePriority(t *testing.T) {
 		s.Pop()
 	}
 
-	assert.Equal(t, []internal.Hash{c, b, e, a, d}, list)
+	assert.Equal(t, []internal.Hash{c, b, e, d, a}, list)
 }
 
 // Insertion order should be in order of date, then insertion order.
@@ -139,8 +139,8 @@ func TestUpdate(t *testing.T) {
    s.Insert(e, DATE_2, false)
    s.Insert(d, DATE_2, false)
 
-   s.Update(f, DATE_1)
-   s.Update(d, DATE_1)
+   s.Update(f, DATE_1, true)
+   s.Update(d, DATE_1, false)
 
    assert.Equal(t, 2, s.ReviewLen())
    assert.Equal(t, 1, s.FutureLen())
@@ -159,7 +159,7 @@ func TestUpdateFutureToReview(t *testing.T) {
    assert.Equal(t, 1, s.FutureLen())
 
    s.SetTime(time.Date(2020,1,1,0,0,0,2,time.UTC))
-   s.Update(e, DATE_1)
+   s.Update(e, DATE_1, false)
 
    assert.Equal(t, 0, s.FutureLen())
    assert.Equal(t, f, *s.Top())
