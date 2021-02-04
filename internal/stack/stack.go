@@ -86,15 +86,15 @@ func (s *Stack) Insert(h internal.Hash, t time.Time) {
 	}
 }
 
-// Guarantees a list in the insertion order.
+// Guarantees a list sorted by date, then insertion order if there are conflicts.
 func (s *Stack) List() []internal.Hash {
 	hashes := []internal.Hash{}
 	hashes = append(hashes, s.review...)
 	hashes = append(hashes, s.future...)
 
-	// sort.Slice(hashes, func(i, j int) bool {
-	// return s.mapper[hashes[i]].index < s.mapper[hashes[j]].index
-	// })
+	sort.Slice(hashes, func(i, j int) bool {
+            return s.mapper[hashes[j]].futureLess(s.mapper[hashes[i]])
+	})
 
 	return hashes
 }

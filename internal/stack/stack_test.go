@@ -82,14 +82,15 @@ func TestClone(t *testing.T) {
 	assert.Equal(t, s2, s1)
 }
 
+// Insertion order should be in order of date, then insertion order.
 func TestListInsertionOrder(t *testing.T) {
-	s := stack.NewStack(DATE_2)
-   f := internal.NewHash("f")
-   e := internal.NewHash("e")
-   d := internal.NewHash("d")
-   c := internal.NewHash("c")
-   b := internal.NewHash("b")
+	s := stack.NewStack(DATE_3)
    a := internal.NewHash("a")
+   b := internal.NewHash("b")
+   c := internal.NewHash("c")
+   d := internal.NewHash("d")
+   e := internal.NewHash("e")
+   f := internal.NewHash("f")
 
    s.Insert(a, DATE_4)
    s.Insert(b, DATE_3)
