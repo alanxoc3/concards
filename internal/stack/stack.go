@@ -20,11 +20,11 @@ func NewStack(t time.Time) Stack {
 }
 
 func (s *Stack) SetTime(t time.Time) {
-   s.mainKey = newMainKey(t)
+	s.mainKey = newMainKey(t)
 }
 
 func (s *Stack) Time() time.Time {
-   return s.mainKey.time
+	return s.mainKey.time
 }
 
 func (s *Stack) Top() *internal.Hash {
@@ -35,10 +35,10 @@ func (s *Stack) Top() *internal.Hash {
 }
 
 func (s *Stack) Pop() {
-   if h := s.Top(); h != nil {
-      delete(s.mapper, *h)
-      s.review = s.review[1:]
-   }
+	if h := s.Top(); h != nil {
+		delete(s.mapper, *h)
+		s.review = s.review[1:]
+	}
 }
 
 func (s *Stack) Clone(o Stack) {
@@ -76,24 +76,25 @@ func (s *Stack) insertKey(h internal.Hash, k key) {
 	}
 }
 
-// Requires current card to have an entry in the predict map.
-func (s *Stack) Insert(h internal.Hash, t time.Time) {
+// Insert the card into either the review stack or future stack.
+// Order depends on date and order inserted.
+func (s *Stack) Insert(h internal.Hash, t time.Time, memorize bool) {
 	if _, exist := s.mapper[h]; !exist {
-      internal.AssertLogic(s.nextIndex >= 0, "next index should always be a natural number")
-		s.insertKey(h, key{t, s.nextIndex})
+		internal.AssertLogic(s.nextIndex >= 0, "next index should always be a natural number")
+		s.insertKey(h, key{t, s.nextIndex, memorize})
 		s.nextIndex += 1 // TODO: Add max, this could technically overflow.
 	}
 }
 
-// Guarantees a list in the insertion order.
+// Guarantees a list sorted by date, then insertion order if there are conflicts.
 func (s *Stack) List() []internal.Hash {
 	hashes := []internal.Hash{}
 	hashes = append(hashes, s.review...)
 	hashes = append(hashes, s.future...)
 
-	// sort.Slice(hashes, func(i, j int) bool {
-		// return s.mapper[hashes[i]].index < s.mapper[hashes[j]].index
-	// })
+	sort.Slice(hashes, func(i, j int) bool {
+            return s.mapper[hashes[j]].futureLess(s.mapper[hashes[i]])
+	})
 
 	return hashes
 }
@@ -107,24 +108,25 @@ func removeHashFromSlice(slice []internal.Hash, h internal.Hash) []internal.Hash
 	return slice
 }
 
-func (s *Stack) Update(h internal.Hash, t time.Time) bool {
+// Updates both the current time that the stack holds, and also the card that was reviewed.
+func (s *Stack) Update(h internal.Hash, t time.Time, memorize bool) bool {
 	if k, exist := s.mapper[h]; exist {
 		// Step 1: Delete from slices.
 		s.future = removeHashFromSlice(s.future, h)
 		s.review = removeHashFromSlice(s.review, h)
 
-      // Step 2: Future stack to review stack.
-      for len(s.future) > 0 && s.mapper[s.future[0]].beforeTime(s.mainKey) {
-         hashToReview := s.future[0]
-         s.future = s.future[1:]
-         s.insertKey(hashToReview, s.mapper[hashToReview])
-      }
+		// Step 2: Future stack to review stack.
+		for len(s.future) > 0 && s.mapper[s.future[0]].beforeTime(s.mainKey) {
+			hashToReview := s.future[0]
+			s.future = s.future[1:]
+			s.insertKey(hashToReview, s.mapper[hashToReview])
+		}
 
 		// Step 3: Re-insert into key map & lists, preserving insertion index.
-		s.insertKey(h, key{t, k.index})
-      return true
-   }
-   return false
+		s.insertKey(h, key{t, k.index, memorize})
+		return true
+	}
+	return false
 }
 
 func (s *Stack) ReviewLen() int { return len(s.review) }
