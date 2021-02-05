@@ -84,6 +84,40 @@ func TestHardCardsAreFirstWhenAddingCardsThenPredicts(t *testing.T) {
 	assert.Len(t, d.CardList(), 2)
 }
 
+func TestHardCardsAreFirstWhenUsingExecTop(t *testing.T) {
+	d := deck.NewDeck(DATE_1)
+	c1, _ := card.NewCards(".", "hi :: yo | me")
+
+	p1 := meta.NewPredictFromStrings(c1[0].Hash().String(), "0001-01-01T00:00:00Z", "0001-01-01T00:00:00Z", "1", "0", "0", "unit-test")
+	p2 := meta.NewPredictFromStrings(c1[1].Hash().String(), "0001-01-01T00:00:00Z", "0001-01-01T00:00:00Z", "0", "0", "0", "unit-test")
+	p3 := meta.NewPredictFromStrings(c1[2].Hash().String(), "0001-01-01T00:00:00Z", "0001-01-01T00:00:00Z", "0", "0", "0", "unit-test")
+	d.AddPredicts(p1, p2, p3)
+	d.AddCards(c1...)
+
+	require.Equal(t, 3, d.ReviewLen())
+	require.Equal(t, c1[1], d.TopCard())
+	d.ExecTop(false, DATE_1)
+
+	require.Equal(t, 2, d.ReviewLen())
+	require.Equal(t, c1[2], d.TopCard())
+	d.ExecTop(false, DATE_2)
+
+	require.Equal(t, 2, d.ReviewLen())
+	require.Equal(t, c1[1], d.TopCard())
+	d.ExecTop(true, DATE_3)
+
+	require.Equal(t, 2, d.ReviewLen())
+	require.Equal(t, c1[2], d.TopCard())
+	d.ExecTop(true, DATE_4)
+
+	require.Equal(t, 1, d.ReviewLen())
+	require.Equal(t, c1[0], d.TopCard())
+	d.ExecTop(true, DATE_5)
+
+	require.Zero(t, d.ReviewLen())
+	require.Nil(t, d.TopCard())
+}
+
 func TestAddCardsPredictSameNext(t *testing.T) {
 	d := deck.NewDeck(DATE_1)
 	c1, _ := card.NewCards(".", "hi :: yo")
