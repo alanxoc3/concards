@@ -9,12 +9,18 @@ import (
 	"github.com/alanxoc3/concards/internal/deck"
 	"github.com/alanxoc3/concards/internal/meta"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-var ONE_DATE time.Time = time.Date(1, 1, 1, 0, 0, 0, 1, time.UTC)
+var DATE_0 time.Time = time.Time{}
+var DATE_1 time.Time = time.Date(1, 1, 1, 0, 0, 1, 0, time.UTC)
+var DATE_2 time.Time = time.Date(1, 1, 1, 0, 0, 2, 0, time.UTC)
+var DATE_3 time.Time = time.Date(1, 1, 1, 0, 0, 3, 0, time.UTC)
+var DATE_4 time.Time = time.Date(1, 1, 1, 0, 0, 4, 0, time.UTC)
+var DATE_5 time.Time = time.Date(1, 1, 1, 0, 0, 5, 0, time.UTC)
 
 func TestNewDeck(t *testing.T) {
-	d := deck.NewDeck(ONE_DATE)
+	d := deck.NewDeck(DATE_1)
 	assert.Len(t, d.CardList(), 0)
 	assert.Len(t, d.OutcomeList(), 0)
 	assert.Len(t, d.PredictList(), 0)
@@ -24,21 +30,21 @@ func TestNewDeck(t *testing.T) {
 }
 
 func TestAddCardsLen(t *testing.T) {
-	d := deck.NewDeck(ONE_DATE)
+	d := deck.NewDeck(DATE_1)
 	c1, _ := card.NewCards(".", "hi :: yo")
 	d.AddCards(c1...)
 	assert.Len(t, d.CardList(), 2)
 }
 
 func TestAddCardsTop(t *testing.T) {
-	d := deck.NewDeck(ONE_DATE)
+	d := deck.NewDeck(DATE_1)
 	c1, _ := card.NewCards(".", "hi :: yo")
 	d.AddCards(c1...)
 	assert.Equal(t, c1[0], d.TopCard())
 }
 
 func TestDropTop(t *testing.T) {
-	d := deck.NewDeck(ONE_DATE)
+	d := deck.NewDeck(DATE_1)
 	c1, _ := card.NewCards(".", "hi :: yo")
 	d.AddCards(c1...)
 	d.DropTop()
@@ -47,7 +53,7 @@ func TestDropTop(t *testing.T) {
 }
 
 func TestTruncate(t *testing.T) {
-	d := deck.NewDeck(ONE_DATE)
+	d := deck.NewDeck(DATE_1)
 	c1, _ := card.NewCards(".", "hi :: yo")
 	d.AddCards(c1...)
 	d.Truncate(1)
@@ -55,8 +61,65 @@ func TestTruncate(t *testing.T) {
 	assert.Len(t, d.CardList(), 1)
 }
 
+func TestHardCardsAreFirstWhenAddingPredictsThenCards(t *testing.T) {
+	d := deck.NewDeck(DATE_3)
+	c1, _ := card.NewCards(".", "hi :: yo")
+	p := meta.NewPredictFromStrings(c1[0].Hash().String(), "0001-01-01T00:00:02Z", "0001-01-01T00:00:01Z", "1")
+	d.AddPredicts(p)
+	d.AddCards(c1...)
+	assert.Equal(t, c1[1], d.TopCard())
+	assert.Len(t, d.CardList(), 2)
+}
+
+func TestHardCardsAreFirstWhenAddingCardsThenPredicts(t *testing.T) {
+	d := deck.NewDeck(DATE_3)
+	c1, _ := card.NewCards(".", "hi :: yo")
+	d.AddCards(c1...)
+	require.Equal(t, c1[0], d.TopCard())
+	require.Len(t, d.CardList(), 2)
+
+	p := meta.NewPredictFromStrings(c1[0].Hash().String(), "0001-01-01T00:00:02Z", "0001-01-01T00:00:01Z", "1")
+	d.AddPredicts(p)
+	assert.Equal(t, c1[1], d.TopCard())
+	assert.Len(t, d.CardList(), 2)
+}
+
+func TestHardCardsAreFirstWhenUsingExecTop(t *testing.T) {
+	d := deck.NewDeck(DATE_1)
+	c1, _ := card.NewCards(".", "hi :: yo | me")
+
+	p1 := meta.NewPredictFromStrings(c1[0].Hash().String(), "0001-01-01T00:00:00Z", "0001-01-01T00:00:00Z", "1", "0", "0", "unit-test")
+	p2 := meta.NewPredictFromStrings(c1[1].Hash().String(), "0001-01-01T00:00:00Z", "0001-01-01T00:00:00Z", "0", "0", "0", "unit-test")
+	p3 := meta.NewPredictFromStrings(c1[2].Hash().String(), "0001-01-01T00:00:00Z", "0001-01-01T00:00:00Z", "0", "0", "0", "unit-test")
+	d.AddPredicts(p1, p2, p3)
+	d.AddCards(c1...)
+
+	require.Equal(t, 3, d.ReviewLen())
+	require.Equal(t, c1[1], d.TopCard())
+	d.ExecTop(false, DATE_1)
+
+	require.Equal(t, 2, d.ReviewLen())
+	require.Equal(t, c1[2], d.TopCard())
+	d.ExecTop(false, DATE_2)
+
+	require.Equal(t, 2, d.ReviewLen())
+	require.Equal(t, c1[1], d.TopCard())
+	d.ExecTop(true, DATE_3)
+
+	require.Equal(t, 2, d.ReviewLen())
+	require.Equal(t, c1[2], d.TopCard())
+	d.ExecTop(true, DATE_4)
+
+	require.Equal(t, 1, d.ReviewLen())
+	require.Equal(t, c1[0], d.TopCard())
+	d.ExecTop(true, DATE_5)
+
+	require.Zero(t, d.ReviewLen())
+	require.Nil(t, d.TopCard())
+}
+
 func TestAddCardsPredictSameNext(t *testing.T) {
-	d := deck.NewDeck(ONE_DATE)
+	d := deck.NewDeck(DATE_1)
 	c1, _ := card.NewCards(".", "hi :: yo")
 	d.AddCards(c1...)
 	p := meta.NewPredictFromStrings(c1[0].Hash().String(), "0001-01-01T00:00:00Z")
@@ -68,7 +131,7 @@ func TestAddCardsPredictSameNext(t *testing.T) {
 }
 
 func TestCardList(t *testing.T) {
-	d := deck.NewDeck(ONE_DATE)
+	d := deck.NewDeck(DATE_1)
 	c, _ := card.NewCards(".", "hi :: yo")
 	d.AddCards(c...)
 
@@ -76,7 +139,7 @@ func TestCardList(t *testing.T) {
 }
 
 func TestPredictList(t *testing.T) {
-	d := deck.NewDeck(ONE_DATE)
+	d := deck.NewDeck(DATE_1)
 	h := internal.NewHash("fad")
 	p := meta.NewPredictFromStrings(h.String(), "2020-01-01T00:00:00Z")
 	d.AddPredicts(p)
@@ -89,7 +152,7 @@ func TestRemove(t *testing.T) {
 	cards, _ := card.NewCards(".", "hi :: yo")
 
 	t.Run("Memorize", func(t *testing.T) {
-		d := deck.NewDeck(ONE_DATE)
+		d := deck.NewDeck(DATE_1)
 		d.AddCards(cards...)
 		d.AddPredicts(meta.NewPredictFromStrings(h1.String()), meta.NewPredictFromStrings(h2.String(), "", "", "1"))
 		d.RemoveMemorize()
@@ -99,7 +162,7 @@ func TestRemove(t *testing.T) {
 	})
 
 	t.Run("Review", func(t *testing.T) {
-		d := deck.NewDeck(ONE_DATE)
+		d := deck.NewDeck(DATE_1)
 		d.AddCards(cards...)
 		d.AddPredicts(meta.NewPredictFromStrings(h1.String()), meta.NewPredictFromStrings(h2.String(), "", "", "1"))
 		d.RemoveReview()
@@ -109,7 +172,7 @@ func TestRemove(t *testing.T) {
 	})
 
 	t.Run("Done", func(t *testing.T) {
-		d := deck.NewDeck(ONE_DATE)
+		d := deck.NewDeck(DATE_1)
 		d.AddCards(cards...)
 		d.AddPredicts(meta.NewPredictFromStrings(h1.String()), meta.NewPredictFromStrings(h2.String(), "2020-01-01T00:00:00Z", "", "1"))
 		d.RemoveDone()

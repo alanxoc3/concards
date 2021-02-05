@@ -10,11 +10,11 @@ import (
 )
 
 var DATE_0 time.Time = time.Time{}
-var DATE_1 time.Time = time.Date(1, 1, 1, 0, 0, 0, 1, time.UTC)
-var DATE_2 time.Time = time.Date(1, 1, 1, 0, 0, 0, 2, time.UTC)
-var DATE_3 time.Time = time.Date(1, 1, 1, 0, 0, 0, 3, time.UTC)
-var DATE_4 time.Time = time.Date(1, 1, 1, 0, 0, 0, 4, time.UTC)
-var DATE_5 time.Time = time.Date(1, 1, 1, 0, 0, 0, 5, time.UTC)
+var DATE_1 time.Time = time.Date(1, 1, 1, 0, 0, 1, 0, time.UTC)
+var DATE_2 time.Time = time.Date(1, 1, 1, 0, 0, 2, 0, time.UTC)
+var DATE_3 time.Time = time.Date(1, 1, 1, 0, 0, 3, 0, time.UTC)
+var DATE_4 time.Time = time.Date(1, 1, 1, 0, 0, 4, 0, time.UTC)
+var DATE_5 time.Time = time.Date(1, 1, 1, 0, 0, 5, 0, time.UTC)
 
 func TestTime(t *testing.T) {
 	s := stack.NewStack(DATE_1)
