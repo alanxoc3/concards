@@ -28,16 +28,16 @@ func defaultEnv(env string, file string) string {
 
 func genConfig(flags *pflag.FlagSet) *internal.Config {
 	c := &internal.Config{}
-	flags.BoolVarP(&c.IsVersion, "version", "V", false, "Concards build information")
-	flags.BoolVarP(&c.IsReview, "review", "r", false, "Show cards available to be reviewed")
-	flags.BoolVarP(&c.IsMemorize, "memorize", "m", false, "Show cards available to be memorized")
-	flags.BoolVarP(&c.IsDone, "done", "d", false, "Show cards not available to be reviewed or memorized")
-	flags.BoolVarP(&c.IsPrint, "print", "p", false, "Print all cards, one card per line")
-	flags.BoolVarP(&c.IsFileList, "files-with-cards", "l", false, "Print the file paths that have cards")
-	flags.IntVarP(&c.Number, "number", "n", 0, "How many cards to review")
-	flags.StringVarP(&c.Editor, "editor", "E", defaultEditor(), "Defaults to \"$EDITOR\" or \"vi\"")
-	flags.StringVarP(&c.PredictFile, "predict", "P", "", "Defaults to \"$CONCARDS_PREDICT\" or \"~/.config/concards/predict\"")
-	flags.StringVarP(&c.OutcomeFile, "outcome", "O", "", "Defaults to \"$CONCARDS_OUTCOME\" or \"~/.config/concards/outcome\"")
+	flags.BoolVarP(&c.IsVersion, "version", "V", false, "Concards build information.")
+	flags.BoolVarP(&c.IsReview, "review", "r", false, "Show cards available to be reviewed.")
+	flags.BoolVarP(&c.IsMemorize, "memorize", "m", false, "Show cards available to be memorized.")
+	flags.BoolVarP(&c.IsDone, "done", "d", false, "Show cards not available to be reviewed or memorized.")
+	flags.BoolVarP(&c.IsPrint, "print", "p", false, "Print all cards, one card per line.")
+	flags.BoolVarP(&c.IsFileList, "files-with-cards", "l", false, "Print the file paths that have cards.")
+	flags.IntVarP(&c.Number, "number", "n", 0, "How many cards to review.")
+	flags.StringVarP(&c.Editor, "editor", "E", defaultEditor(), "Defaults to \"$EDITOR\" or \"vi\".")
+	flags.StringVarP(&c.PredictFile, "predict", "P", "", "Defaults to \"$CONCARDS_PREDICT\" or \"~/.config/concards/predict\".")
+	flags.StringVarP(&c.OutcomeFile, "outcome", "O", "", "Defaults to \"$CONCARDS_OUTCOME\" or \"~/.config/concards/outcome\".")
 	return c
 }
 
