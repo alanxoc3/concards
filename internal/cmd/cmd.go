@@ -1,12 +1,8 @@
-package file
+package cmd
 
 import (
-	"fmt"
 	"os"
 	"os/user"
-
-	"github.com/alanxoc3/argparse"
-	"github.com/alanxoc3/concards/internal"
 )
 
 type Config struct {
@@ -43,6 +39,7 @@ func defaultEnv(env string, file string) string {
 	}
 }
 
+/*
 func GenConfig(version string) *Config {
 	// Create new parser object
 	parser := argparse.NewParser("concards", "Concards is a simple CLI based SRS flashcard app.")
@@ -116,3 +113,4 @@ func GenConfig(version string) *Config {
 
 	return c
 }
+*/
