@@ -16,7 +16,7 @@ var version string = "snapshot"
 
 func main() {
 	rootCmd := &cobra.Command{
-		Use:   "concards",
+		Use:   "concards [flags] [file | folder]...",
 		Short: "Concards is a simple CLI based SRS flashcard app.",
 	}
 
