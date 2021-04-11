@@ -9,12 +9,34 @@ import (
 	"github.com/alanxoc3/concards/internal/deck"
 	"github.com/alanxoc3/concards/internal/file"
 	"github.com/alanxoc3/concards/internal/termboxgui"
+	"github.com/spf13/cobra"
 )
 
 var version string = "snapshot"
 
 func main() {
-	c := file.GenConfig(version)
+	rootCmd := &cobra.Command{
+		Use:   "concards",
+		Short: "Concards is a simple CLI based SRS flashcard app.",
+	}
+
+	c := genConfig(rootCmd.Flags())
+	rootCmd.PreRun = func(cmd *cobra.Command, args []string) {
+		cleanConfig(c, args)
+	}
+
+	rootCmd.Run = func(cmd *cobra.Command, args []string) {
+		if c.IsVersion {
+			fmt.Println("concards " + version)
+			return
+		}
+		main_logic(c)
+	}
+
+	rootCmd.Execute()
+}
+
+func main_logic(c *internal.Config) {
 	d := deck.NewDeck(time.Now())
 
 	predicts := file.ReadPredictsFromFile(c.PredictFile)
