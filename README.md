@@ -286,8 +286,7 @@ if that environment variable doesn't exist.
 ## Dependencies
 Concards currently depends on these libraries:
 - [stretchr/testify](https://github.com/stretchr/testify) for unit tests.
-- [alanxoc3/argparse](https://github.com/alanxoc3/argparse) forked from
-  [akamensky/argparse](https://github.com/akamensky/argparse) for CLI options.
+- [spf13/cobra](https://github.com/spf13/cobra) for CLI options.
 - [nsf/termbox-go](https://github.com/nsf/termbox-go) for the terminal gui.
 - [mattn/go-runewidth](https://github.com/mattn/go-runewidth) to help with
   Asian characters.
