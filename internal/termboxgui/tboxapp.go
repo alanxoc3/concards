@@ -1,6 +1,7 @@
 package termboxgui
 
 import (
+	"github.com/alanxoc3/concards/internal"
 	"github.com/alanxoc3/concards/internal/card"
 	"github.com/alanxoc3/concards/internal/deck"
 	"github.com/alanxoc3/concards/internal/file"
@@ -8,7 +9,7 @@ import (
 	termbox "github.com/nsf/termbox-go"
 )
 
-func TermBoxRun(d *deck.Deck, cfg *file.Config) error {
+func TermBoxRun(d *deck.Deck, cfg *internal.Config) error {
 	err := termbox.Init()
 	if err != nil {
 		return err
@@ -46,21 +47,21 @@ func TermBoxRun(d *deck.Deck, cfg *file.Config) error {
 				quitMode = true
 			} else if inp == "h" {
 				helpMode = !helpMode
-            statMode = false
+				statMode = false
 			} else if inp == "s" {
 				statMode = !statMode
-            helpMode = false
+				helpMode = false
 			} else if inp == "w" {
 				err = file.WritePredictsToFile(d.PredictList(), cfg.PredictFile)
 				if err != nil {
 					updateStatMsg(err.Error(), termbox.ColorRed)
 				} else {
-               err = file.WriteOutcomesToFile(d.OutcomeList(), cfg.OutcomeFile)
-               if err != nil {
-                  updateStatMsg(err.Error(), termbox.ColorRed)
-               } else {
-                  updateStatMsg("Cards were written.", termbox.ColorYellow)
-               }
+					err = file.WriteOutcomesToFile(d.OutcomeList(), cfg.OutcomeFile)
+					if err != nil {
+						updateStatMsg(err.Error(), termbox.ColorRed)
+					} else {
+						updateStatMsg("Cards were written.", termbox.ColorYellow)
+					}
 				}
 
 			} else if !helpMode && !statMode {
@@ -139,9 +140,9 @@ func drawScreen(d *deck.Deck, cardShown int, helpMode, statMode, finishedEditing
 	if helpMode {
 		displayHelpMode(termbox.ColorCyan)
 	} else if statMode {
-      displayStatMode(termbox.ColorYellow, d.TopPredict())
-   } else {
-      displayCardMode(d.TopCard(), cardShown)
+		displayStatMode(termbox.ColorYellow, d.TopPredict())
+	} else {
+		displayCardMode(d.TopCard(), cardShown)
 	}
 
 	tbprintStatusbar(d)

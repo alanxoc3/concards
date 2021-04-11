@@ -2,92 +2,41 @@ package main
 
 import (
 	"fmt"
-	"os"
-	"os/user"
-	// "math/rand"
-	// "time"
-	"strings"
+	"math/rand"
+	"time"
 
+	"github.com/alanxoc3/concards/internal"
+	"github.com/alanxoc3/concards/internal/deck"
+	"github.com/alanxoc3/concards/internal/file"
+	"github.com/alanxoc3/concards/internal/termboxgui"
 	"github.com/spf13/cobra"
-	// "github.com/alanxoc3/concards/internal"
-	// "github.com/alanxoc3/concards/internal/deck"
-	// "github.com/alanxoc3/concards/internal/file"
-	// "github.com/alanxoc3/concards/internal/termboxgui"
 )
 
 var version string = "snapshot"
 
-type Config struct {
-	// The various true or false options
-	IsReview   bool
-	IsMemorize bool
-	IsDone     bool
-	IsPrint    bool
-	IsFileList bool
-	IsStream   bool
-
-	Editor      string
-	Number      int
-	PredictFile string
-	OutcomeFile string
-	Files       []string
-}
-
-func defaultEditor() string {
-	if val, present := os.LookupEnv("EDITOR"); present {
-		return val
-	} else {
-		return "vi"
-	}
-}
-
-func defaultEnv(env string, file string) string {
-	if val, present := os.LookupEnv(env); present {
-		return val
-	} else if usr, err := user.Current(); err == nil {
-		return usr.HomeDir + "/.config/concards/" + file
-	} else {
-		return ""
-	}
-}
-
 func main() {
-	//    config := Config{}
-	var version bool
-	var review bool
-	var memorize bool
-	var done bool
-	var print bool
-	var filelist bool
-	var number int
-	var editor string
-	var predictfile string
-	var outcomefile string
+	rootCmd := &cobra.Command{
+		Use:   "concards",
+		Short: "Concards is a simple CLI based SRS flashcard app.",
+	}
 
-	var rootCmd = &cobra.Command{Use: "concards"}
-
-	rootCmd.Flags().BoolVarP(&version, "version", "V", false, "Concards build information")
-	rootCmd.Flags().BoolVarP(&review, "review", "r", false, "Show cards available to be reviewed")
-	rootCmd.Flags().BoolVarP(&memorize, "memorize", "m", false, "Show cards available to be memorized")
-	rootCmd.Flags().BoolVarP(&done, "done", "d", false, "Show cards not available to be reviewed or memorized")
-	rootCmd.Flags().BoolVarP(&print, "print", "p", false, "Print all cards, one card per line")
-	rootCmd.Flags().BoolVarP(&filelist, "filelist", "l", false, "Print the file paths that have cards")
-	rootCmd.Flags().IntVarP(&number, "number", "n", 0, "How many cards to review")
-	rootCmd.Flags().StringVarP(&editor, "editor", "E", defaultEditor(), "Defaults to \"$EDITOR\" or \"vi\"")
-	rootCmd.Flags().StringVarP(&predictfile, "predict", "P", defaultEnv("CONCARDS_PREDICT", "predict"), "Defaults to \"$CONCARDS_PREDICT\" or \"~/.config/concards/predict\"")
-	rootCmd.Flags().StringVarP(&outcomefile, "outcome", "O", defaultEnv("CONCARDS_OUTCOME", "outcome"), "Defaults to \"$CONCARDS_OUTCOME\" or \"~/.config/concards/outcome\"")
+	c := genConfig(rootCmd.Flags())
+	rootCmd.PreRun = func(cmd *cobra.Command, args []string) {
+		cleanConfig(c, args)
+	}
 
 	rootCmd.Run = func(cmd *cobra.Command, args []string) {
-		fmt.Println("hello: " + strings.Join(args, " "))
+		if c.IsVersion {
+			fmt.Println("concards " + version)
+			return
+		}
+		main_logic(c)
 	}
-	// rootCmd.AddCommand(cmdPrint, cmdEcho)
-	// cmdEcho.AddCommand(cmdTimes)
+
 	rootCmd.Execute()
 }
 
-/*
-func main() {
-	c := file.GenConfig(version)
+func main_logic(c *internal.Config) {
 	d := deck.NewDeck(time.Now())
 
 	predicts := file.ReadPredictsFromFile(c.PredictFile)
@@ -151,4 +100,3 @@ func main() {
 	_ = file.WritePredictsToFile(d.PredictList(), c.PredictFile)
 	_ = file.WriteOutcomesToFile(d.OutcomeList(), c.OutcomeFile)
 }
-*/

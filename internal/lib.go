@@ -11,6 +11,23 @@ import (
 const MaxNextDuration float64 = float64(time.Hour * 24 * 365 * 100) // 100 years.
 const MaxYesNoStreak = 1 << 29                                      // About 500 million
 
+type Config struct {
+	// The various true or false options
+	IsVersion  bool
+	IsReview   bool
+	IsMemorize bool
+	IsDone     bool
+	IsPrint    bool
+	IsFileList bool
+	IsStream   bool
+
+	Editor      string
+	Number      int
+	PredictFile string
+	OutcomeFile string
+	Files       []string
+}
+
 type Hash [16]byte
 
 func NewHash(str string) (h Hash) {
