@@ -16,11 +16,13 @@ func defaultEditor() string {
 	}
 }
 
-func defaultEnv(env string, file string) string {
-	if val, present := os.LookupEnv(env); present {
-		return val
+func defaultDataEnv(file string) string {
+	if val, present := os.LookupEnv("CONCARDS_DATA_DIR"); present {
+		return val + file
+	} else if val, present := os.LookupEnv("XDG_DATA_HOME"); present {
+		return val + file
 	} else if usr, err := user.Current(); err == nil {
-		return usr.HomeDir + "/.config/concards/" + file
+		return usr.HomeDir + "/.local/share/concards/" + file
 	} else {
 		return ""
 	}
@@ -36,8 +38,8 @@ func genConfig(flags *pflag.FlagSet) *internal.Config {
 	flags.BoolVarP(&c.IsFileList, "files-with-cards", "l", false, "Print the file paths that have cards.")
 	flags.IntVarP(&c.Number, "number", "n", 0, "How many cards to review.")
 	flags.StringVarP(&c.Editor, "editor", "E", defaultEditor(), "Defaults to \"$EDITOR\" or \"vi\".")
-	flags.StringVarP(&c.PredictFile, "predict", "P", "", "Defaults to \"$CONCARDS_PREDICT\" or \"~/.config/concards/predict\".")
-	flags.StringVarP(&c.OutcomeFile, "outcome", "O", "", "Defaults to \"$CONCARDS_OUTCOME\" or \"~/.config/concards/outcome\".")
+	flags.StringVar(&c.PredictFile, "predict-file", "", "Override the predict file location.")
+	flags.StringVar(&c.OutcomeFile, "outcome-file", "", "Override the outcome file location.")
 	return c
 }
 
@@ -51,6 +53,6 @@ func cleanConfig(c *internal.Config, args []string) {
 	c.Files = args
 
 	if c.Editor      == "" { c.Editor      = defaultEditor() }
-	if c.PredictFile == "" { c.PredictFile = defaultEnv("CONCARDS_PREDICT", "predict") }
-	if c.OutcomeFile == "" { c.OutcomeFile = defaultEnv("CONCARDS_OUTCOME", "outcome") }
+	if c.PredictFile == "" { c.PredictFile = defaultDataEnv("predict") }
+	if c.OutcomeFile == "" { c.OutcomeFile = defaultDataEnv("outcome") }
 }
