@@ -35,7 +35,7 @@ func getConfigDir() string {
 	if val, present := os.LookupEnv("CONCARDS_CONFIG_DIR"); present {
 		return val
 	} else if val, present := os.LookupEnv("XDG_CONFIG_HOME"); present {
-		return val
+		return filepath.Join(val, "concards")
 	} else if usr, err := user.Current(); err == nil {
 		return usr.HomeDir + "/.config/concards"
 	} else {
@@ -74,5 +74,5 @@ func cleanConfig(c *internal.Config, args []string) {
 	c.PredictFile = filepath.Join(c.DataDir, "predict")
 	c.OutcomeFile = filepath.Join(c.DataDir, "outcome")
 
-	c.ReviewHookFile = filepath.Join(c.ConfigDir, "hooks", "listen-review")
+	c.ReviewHookFile = filepath.Join(c.ConfigDir, "hooks", "event-review")
 }

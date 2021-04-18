@@ -3,6 +3,7 @@ module github.com/alanxoc3/concards
 go 1.16
 
 require (
+	github.com/go-cmd/cmd v1.3.0
 	github.com/mattn/go-runewidth v0.0.12
 	github.com/nsf/termbox-go v1.1.0
 	github.com/spf13/cobra v1.1.3

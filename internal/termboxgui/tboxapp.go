@@ -66,11 +66,11 @@ func TermBoxRun(d *deck.Deck, cfg *internal.Config) error {
 
 			} else if !helpMode && !statMode {
 				if inp == "1" {
-					updateStatMsgAndCard(d, false)
+					updateStatMsgAndCard(d, false, cfg)
 					cardShown = 1
 					man.Save(d)
 				} else if inp == "2" {
-					updateStatMsgAndCard(d, true)
+					updateStatMsgAndCard(d, true, cfg)
 					cardShown = 1
 					man.Save(d)
 				} else if inp == "d" {
