@@ -257,8 +257,9 @@ parallel with concards and perform tasks that don't affect concards directly.
 Hooks that begin with `hook-` are similar to plugins in that they are meant to
 change program behavior.
 
-- `hooks/event-review`: This is executed right after passing off a card with a pass or fail. Currently, no parameters are passed into this.
-- `hooks/event-startup`: This is executed once if/when concards starts the GUI up successfully.
+Here are all the currently supported hooks:
+- `hooks/event-review`  - executed right after passing off a card with a pass or fail
+- `hooks/event-startup` - executed once if/when concards starts the GUI up successfully
 
 ### Data Directory
 The data directory is calculated by following this order of steps until one
