@@ -250,12 +250,12 @@ succeeds:
 5. `./`
 
 #### Hooks
-Currently hooks is an experimental feature. Hooks in concards works similar to
+Hooks are currently an experimental feature. Concards hooks works similar to
 git hooks. You must place an executable file with a specific name in
 `<config-dir>/hooks/`. Hooks that begin with `event-` are meant to be run in
 parallel with concards and perform tasks that don't affect concards directly.
 Hooks that begin with `hook-` are similar to plugins in that they are meant to
-change concards' behavior.
+change program behavior.
 
 - `hooks/event-review`: This is executed right after passing off a card with a pass or fail. Currently, no parameters are passed into this.
 - `hooks/event-startup`: This is executed once if/when concards starts the GUI up successfully.
