@@ -205,8 +205,8 @@ func updateStatMsgAndCard(d *deck.Deck, input bool, cfg *internal.Config) {
 	if err != nil {
 		updateStatMsg("Problem reading the card :(.", termbox.ColorRed)
 	} else {
-		hook := cmd.NewCmd(cfg.ReviewHookFile)
-		hook.Start()
+    		// Review Hook
+		cmd.NewCmd(cfg.EventReviewFile).Start()
 
 		time := m.Next().Local().Format("Mon 2 Jan 2006 @ 15:04")
 

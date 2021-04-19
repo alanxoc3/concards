@@ -28,7 +28,8 @@ type Config struct {
 
 	PredictFile string
 	OutcomeFile string
-	ReviewHookFile string
+	EventReviewFile string
+	EventStartupFile string
 
 	Files       []string
 }

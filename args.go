@@ -74,5 +74,6 @@ func cleanConfig(c *internal.Config, args []string) {
 	c.PredictFile = filepath.Join(c.DataDir, "predict")
 	c.OutcomeFile = filepath.Join(c.DataDir, "outcome")
 
-	c.ReviewHookFile = filepath.Join(c.ConfigDir, "hooks", "event-review")
+	c.EventReviewFile = filepath.Join(c.ConfigDir, "hooks", "event-review")
+	c.EventStartupFile = filepath.Join(c.ConfigDir, "hooks", "event-startup")
 }
