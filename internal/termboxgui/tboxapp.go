@@ -6,6 +6,7 @@ import (
 	"github.com/alanxoc3/concards/internal/deck"
 	"github.com/alanxoc3/concards/internal/file"
 	"github.com/alanxoc3/concards/internal/history"
+	"github.com/go-cmd/cmd"
 	termbox "github.com/nsf/termbox-go"
 )
 
@@ -30,6 +31,9 @@ func TermBoxRun(d *deck.Deck, cfg *internal.Config) error {
 	statMode := false
 	quitMode := false
 	finishedEditing := false
+
+	// Startup Hook
+	cmd.NewCmd(cfg.EventStartupFile).Start()
 
 	man.Save(d) // Save at beginning, and end of each editing command.
 	for d.ReviewLen() > 0 {
@@ -66,11 +70,11 @@ func TermBoxRun(d *deck.Deck, cfg *internal.Config) error {
 
 			} else if !helpMode && !statMode {
 				if inp == "1" {
-					updateStatMsgAndCard(d, false)
+					updateStatMsgAndCard(d, false, cfg)
 					cardShown = 1
 					man.Save(d)
 				} else if inp == "2" {
-					updateStatMsgAndCard(d, true)
+					updateStatMsgAndCard(d, true, cfg)
 					cardShown = 1
 					man.Save(d)
 				} else if inp == "d" {

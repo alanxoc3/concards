@@ -1,8 +1,8 @@
 # <img src="logo.svg" />
 
-[![Build Status](https://travis-ci.org/alanxoc3/concards.svg?branch=master)](https://travis-ci.org/alanxoc3/concards)
+[![Build Status](https://travis-ci.com/alanxoc3/concards.svg?branch=main)](https://travis-ci.com/alanxoc3/concards)
 [![Go Report Card](https://goreportcard.com/badge/github.com/alanxoc3/concards)](https://goreportcard.com/report/github.com/alanxoc3/concards)
-[![Coverage Status](https://coveralls.io/repos/github/alanxoc3/concards/badge.svg?branch=master)](https://coveralls.io/github/alanxoc3/concards?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/alanxoc3/concards/badge.svg?branch=main)](https://coveralls.io/github/alanxoc3/concards?branch=main)
 
 Turning notes into flashcards, or should I say concards! This is my ongoing
 attempt to make flashcards more simple and convenient. Concards provides much
@@ -238,12 +238,44 @@ When I'm far too tired to fall asleep
 ```
 
 ## File Structure
+Concards follows the XDG standard for config/data file placement.
+
+### Config Directory
+The config directory is calculated by following this order of steps until one
+succeeds:
+1. `concards --config-dir <directory>`
+2. `$CONCARDS_CONFIG_DIR`
+3. `$XDG_CONFIG_HOME/concards`
+4. `$HOME/.config/concards`
+5. `./`
+
+#### Hooks
+Hooks are currently an experimental feature. Concards hooks works similar to
+git hooks. You must place an executable file with a specific name in
+`<config-dir>/hooks/`. Hooks that begin with `event-` are meant to be run in
+parallel with concards and perform tasks that don't affect concards directly.
+Hooks that begin with `hook-` are similar to plugins in that they are meant to
+change program behavior.
+
+Here are all the currently supported hooks:
+- `hooks/event-review`  - executed right after passing off a card with a pass or fail
+- `hooks/event-startup` - executed once if/when concards starts the GUI up successfully
+
+### Data Directory
+The data directory is calculated by following this order of steps until one
+succeeds:
+1. `concards --data-dir <directory>`
+2. `$CONCARDS_DATA_DIR`
+3. `$XDG_DATA_HOME/concards`
+4. `$HOME/.local/share/concards`
+5. `./`
+
 Concards has a very simple file structure. This section explains the content of
 the meta data files concards writes to after a review session.
 
-### The Predict File
-The predict file contains information needed to make a prediction when you
-should review a card next.
+#### The Predict File
+The predict file is located at `<data-dir>/predict`. This file contains
+information needed to make a prediction when you should review a card next.
 
 Here is an example predict file:
 ```
@@ -259,13 +291,11 @@ sha256sum cut in half            | next timestamp       | previous timestamp   |
 3dda75cb44ed447186834541475f32e2 | 2020-08-08T18:00:17Z | 2020-08-02T18:00:17Z | 1 | 3 | -2 | sm2
 ```
 
-This file is read from `$CONCARDS_PREDICT`, or `$HOME/.config/concards/predict`
-if that environment variable doesn't exist.
-
-### The Outcome File
-The outcome file contains the historical outcomes of every time a card has been
-passed off or failed. It differs only slightly from the predict file. Here is
-the corresponding outcome file for the predict file example above:
+#### The Outcome File
+The outcome file is located at `<data-dir>/outcome`. This file contains the
+historical outcomes of every time a card has been passed off or failed. It
+differs only slightly from the predict file. Here is the corresponding outcome
+file for the predict file example above:
 ```
 002141b9b9448a257b05da1f2eb78972 2020-08-08T18:00:17Z 2020-08-02T18:00:17Z 0 0 0 0
 002141b9b9448a257b05da1f2eb78972 2020-08-08T18:00:17Z 2020-08-02T18:00:17Z 0 1 -1 1
@@ -280,14 +310,12 @@ You can notice that there are two main differences from the predict file:
 - There are usually multiple lines with the same hash.
 - The last column is a boolean "pass or fail" instead of an algorithm name.
 
-This file is read from `$CONCARDS_OUTCOME`, or `$HOME/.config/concards/outcome`
-if that environment variable doesn't exist.
-
 ## Dependencies
 Concards currently depends on these libraries:
 - [stretchr/testify](https://github.com/stretchr/testify) for unit tests.
 - [spf13/cobra](https://github.com/spf13/cobra) for CLI options.
 - [nsf/termbox-go](https://github.com/nsf/termbox-go) for the terminal gui.
+- [go-cmd/cmd](https://github.com/go-cmd/cmd) for hook support.
 - [mattn/go-runewidth](https://github.com/mattn/go-runewidth) to help with
   Asian characters.
 

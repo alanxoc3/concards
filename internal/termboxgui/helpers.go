@@ -3,7 +3,9 @@ package termboxgui
 import (
 	"fmt"
 	"time"
+	"github.com/go-cmd/cmd"
 
+	"github.com/alanxoc3/concards/internal"
 	"github.com/alanxoc3/concards/internal/card"
 	"github.com/alanxoc3/concards/internal/deck"
 	"github.com/alanxoc3/concards/internal/meta"
@@ -197,11 +199,15 @@ func tbprintStatMsg() {
 	tbprint(0, h-2, statMsgCol, color, statMsg)
 }
 
-func updateStatMsgAndCard(d *deck.Deck, input bool) {
+func updateStatMsgAndCard(d *deck.Deck, input bool, cfg *internal.Config) {
 	m, err := d.ExecTop(input, time.Now())
+
 	if err != nil {
 		updateStatMsg("Problem reading the card :(.", termbox.ColorRed)
 	} else {
+    		// Review Hook
+		cmd.NewCmd(cfg.EventReviewFile).Start()
+
 		time := m.Next().Local().Format("Mon 2 Jan 2006 @ 15:04")
 
 		if input {

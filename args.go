@@ -1,8 +1,11 @@
+// "pre-xxxx" hooks in git do affect the process.
+// "post-xxxx" hooks in git don't affect the process.
 package main
 
 import (
 	"os"
 	"os/user"
+        "path/filepath"
 
 	"github.com/alanxoc3/concards/internal"
 	"github.com/spf13/pflag"
@@ -16,11 +19,25 @@ func defaultEditor() string {
 	}
 }
 
-func defaultEnv(env string, file string) string {
-	if val, present := os.LookupEnv(env); present {
+func getDataDir() string {
+	if val, present := os.LookupEnv("CONCARDS_DATA_DIR"); present {
+		return val
+	} else if val, present := os.LookupEnv("XDG_DATA_HOME"); present {
 		return val
 	} else if usr, err := user.Current(); err == nil {
-		return usr.HomeDir + "/.config/concards/" + file
+		return usr.HomeDir + "/.local/share/concards"
+	} else {
+		return ""
+	}
+}
+
+func getConfigDir() string {
+	if val, present := os.LookupEnv("CONCARDS_CONFIG_DIR"); present {
+		return val
+	} else if val, present := os.LookupEnv("XDG_CONFIG_HOME"); present {
+		return filepath.Join(val, "concards")
+	} else if usr, err := user.Current(); err == nil {
+		return usr.HomeDir + "/.config/concards"
 	} else {
 		return ""
 	}
@@ -36,8 +53,8 @@ func genConfig(flags *pflag.FlagSet) *internal.Config {
 	flags.BoolVarP(&c.IsFileList, "files-with-cards", "l", false, "Print the file paths that have cards.")
 	flags.IntVarP(&c.Number, "number", "n", 0, "How many cards to review.")
 	flags.StringVarP(&c.Editor, "editor", "E", defaultEditor(), "Defaults to \"$EDITOR\" or \"vi\".")
-	flags.StringVarP(&c.PredictFile, "predict", "P", "", "Defaults to \"$CONCARDS_PREDICT\" or \"~/.config/concards/predict\".")
-	flags.StringVarP(&c.OutcomeFile, "outcome", "O", "", "Defaults to \"$CONCARDS_OUTCOME\" or \"~/.config/concards/outcome\".")
+	flags.StringVar(&c.DataDir, "data-dir", "", "Override the data directory location.")
+	flags.StringVar(&c.ConfigDir, "config-dir", "", "Override the config directory location.")
 	return c
 }
 
@@ -51,6 +68,12 @@ func cleanConfig(c *internal.Config, args []string) {
 	c.Files = args
 
 	if c.Editor      == "" { c.Editor      = defaultEditor() }
-	if c.PredictFile == "" { c.PredictFile = defaultEnv("CONCARDS_PREDICT", "predict") }
-	if c.OutcomeFile == "" { c.OutcomeFile = defaultEnv("CONCARDS_OUTCOME", "outcome") }
+	if c.DataDir     == "" { c.DataDir = getDataDir() }
+	if c.ConfigDir   == "" { c.ConfigDir = getConfigDir() }
+
+	c.PredictFile = filepath.Join(c.DataDir, "predict")
+	c.OutcomeFile = filepath.Join(c.DataDir, "outcome")
+
+	c.EventReviewFile = filepath.Join(c.ConfigDir, "hooks", "event-review")
+	c.EventStartupFile = filepath.Join(c.ConfigDir, "hooks", "event-startup")
 }

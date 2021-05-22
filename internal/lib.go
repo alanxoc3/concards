@@ -23,8 +23,14 @@ type Config struct {
 
 	Editor      string
 	Number      int
+	DataDir     string
+	ConfigDir   string
+
 	PredictFile string
 	OutcomeFile string
+	EventReviewFile string
+	EventStartupFile string
+
 	Files       []string
 }
 
