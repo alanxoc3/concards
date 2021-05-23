@@ -32,7 +32,6 @@ tags
 
 # no executable files!!!
 concards
-.profile.cov
 
 # not my flashcard test file too!
 *.txt
