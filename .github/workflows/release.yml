@@ -1,0 +1,39 @@
+name: release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Install Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.16
+
+    - name: Prepare Release
+      run: |
+        go get github.com/mitchellh/gox
+        echo "APP_VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+        echo "APP_NAME=concards" >> $GITHUB_ENV
+
+    - name: Build Release
+      run: |
+        echo "App name: '$APP_NAME'. Version is: '$APP_VERSION'."
+        gox -osarch="linux/386 linux/arm linux/amd64 darwin/amd64" -ldflags "-X main.version=${APP_VERSION}" -output "${APP_NAME}_${APP_VERSION}_{{.OS}}_{{.Arch}}"
+        sha256sum ${APP_NAME}_* > sha256_sums.txt
+
+    - name: Upload Release
+      uses: softprops/action-gh-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        files: |
+          sha256_sums.txt
+          ${{ env.APP_NAME }}_*

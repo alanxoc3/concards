@@ -66,12 +66,11 @@ func TestPredictExecHash(t *testing.T) {
 
 func TestPredictExecCurr(t *testing.T) {
 	p := newDefPred("", "sm2")
-	tsOne := time.Now()
-	pp := p.Exec(true, time.Now())
-	tsTwo := time.Now()
+	ts := time.Date(2021, 1, 1, 0, 0, 0, 2, time.UTC)
+	pp := p.Exec(true, ts)
 
-	assert.True(t, tsOne.Equal(pp.Next()) || tsOne.Before(pp.Curr()))
-	assert.True(t, tsTwo.Equal(pp.Next()) || tsTwo.After(pp.Curr()))
+	assert.True(t, ts.Equal(pp.Curr()))
+	assert.True(t, ts.Before(pp.Next()))
 }
 
 func TestPredictExecYesCount(t *testing.T) {
@@ -98,5 +97,5 @@ func TestPredictExecName(t *testing.T) {
 
 func TestPredictClone(t *testing.T) {
 	p := newDefPred("ff", "sm2")
-   assert.Equal(t, p, p.Clone(internal.Hash{0xff}))
+	assert.Equal(t, p, p.Clone(internal.Hash{0xff}))
 }
