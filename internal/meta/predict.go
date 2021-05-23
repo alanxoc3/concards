@@ -30,23 +30,23 @@ func NewDefaultPredict(hash internal.Hash, name string) *Predict {
 }
 
 func (p *Predict) Clone(h internal.Hash) *Predict {
-   np := *p
-   np.hash = h
+	np := *p
+	np.hash = h
 	return &np
 }
 
 func (p *Predict) Exec(input bool, now time.Time) Predict {
-   name := p.name
+	name := p.name
 
-   algFunc, exists := algs[p.name]
-   if !exists {
-      algFunc = sm2Exec
-      name = "sm2"
-   }
+	algFunc, exists := algs[p.name]
+	if !exists {
+		algFunc = sm2Exec
+		name = "sm2"
+	}
 
 	// Note that r.Next() has the current time.
 	r := NewOutcomeFromPredict(p, now, input)
-   next := r.Next().Add(time.Duration(math.Min(algFunc(*r), internal.MaxNextDuration)))
+	next := r.Next().Add(time.Duration(math.Min(algFunc(*r), internal.MaxNextDuration)))
 
 	return Predict{
 		*newBase(
