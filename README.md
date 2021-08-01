@@ -54,24 +54,27 @@ The text above will produce a one sided flashcard! But flashcards are normally
 2 sided, so let's create a new flashcard that separates a question and answer
 with the pipe symbol:
 ```
-#: What is a great way to decrease the effects of the forgetting curve?
- | Spending time every day to review previously learned information. :#
+#: {Spending time every day to review previously learned information} is a great way to decrease the effects of the forgetting curve. :#
 ```
 
 Any number of sides are supported, so creating a 3 sided flashcard is a piece
 of cake:
 ```
-#: What are Newton's 3 laws of motion?
- | 1. An object at rest stays at rest unless acted upon.
- | 2. Force is equal to mass times acceleration.
- | 3. For every action, there is an equal and opposite reaction. :#
+#: Newton's 1st law of motion is "{an object at rest stays at rest unless acted upon}".
+#: Newton's 2st law of motion is "{force is equal to mass times acceleration}".
+#: Newton's 3st law of motion is "{for every action, there is an equal and opposite reaction}".
+:#
 ```
 
 You can either create new blocks for each card, or you can keep them in the
 same block. This creates 2 cards:
 ```
-#: Who published the first flashcards? | Favell Lee Mortimer
-#: When were the first flashcards published? | 1834 :#
+#: Who published the first flashcards? : Favell Lee Mortimer
+#: When were the first flashcards published? : 1834
+:#
+
+#: {Favell Lee Mortimer} published the first flashcards in {1834}.
+:#
 ```
 
 ### Reversible Cards
@@ -84,32 +87,35 @@ Concards makes this easier with the  `::` operator
 
 Generates these cards:
 
-#: saluton al la mundo | hello world
-#: hello world | saluton al la mundo :#
+#: saluton al la mundo : hello world
+#: hello world : saluton al la mundo :#
 ```
 
 If you are learning two languages, you can expand this with an extra `::`:
 ```
 #: spagetoj :: spaghetti :: 意面 :#
 
+#: spaghetti :: spagetoj :#
+#: spaghetti :: 意面 :#
+
 Generates these cards:
 
-#: spagetoj | spaghetti | 意面
-#: spaghetti | spagetoj | 意面
-#: 意面 | spagetoj | spaghetti :#
+#: spaghetti : spagetoj : 意面
+#: spagetoj : spaghetti : 意面
+#: 意面 : spaghetti : spagetoj :#
 ```
 
 Translating a word from one language to another often results in multiple
-definitions. Concards can represent these scenarios more efficiently when
-combining the `|` and `::`.
+definitions. Concards can represent these scenarios when combining the `:` and
+`::`.
 ```
-#: apricot | almond :: 杏仁 :#
+#: apricot : almond :: 杏仁 :#
 
 Generates these cards:
 
-#: apricot | 杏仁
-#: almond | 杏仁
-#: 杏仁 | apricot | almond :#
+#: apricot : 杏仁
+#: almond : 杏仁
+#: 杏仁 : apricot : almond :#
 ```
 
 The double colon operator always takes precedence before the pipe operator.
@@ -124,8 +130,8 @@ empty set of curly braces.
 
 Generates these cards:
 
-#: {} published his findings on the forgetting curve in 1885. | Hermann Ebbinghaus
-#: Hermann Ebbinghaus published his findings on the forgetting curve in {}. | 1885 :#
+#: {} published his findings on the forgetting curve in 1885. : Hermann Ebbinghaus
+#: Hermann Ebbinghaus published his findings on the forgetting curve in {}. : 1885 :#
 ```
 
 Cloze nesting is supported:
@@ -134,29 +140,10 @@ Cloze nesting is supported:
 
 Generates these cards:
 
-#: {}, not the filling of a vessel. | Education is the kindling of a flame
-#: Education is the {}, not the filling of a vessel. | kindling of a flame
-#: Education is the kindling of a flame, {}. | not the filling of a vessel
-#: Education is the kindling of a flame, not the {}. | filling of a vessel :#
-```
-
-You can replace consecutive curly braces with the colon operator. This
-especially makes separation within a single word look nicer.
-```
-#: {Pneumono:ultra:microscopic:silico:volcano:coniosis} :#
-
-Is the same as:
-
-#: {Pneumono}{ultra}{microscopic}{silico}{volcano}{coniosis} :#
-
-And generates these cards:
-
-#: {}ultramicroscopicsilicovolcanoconiosis | Pneumono
-#: Pneumono{}microscopicsilicovolcanoconiosis | ultra
-#: Pneumonoultra{}silicovolcanoconiosis | microscopic
-#: Pneumonoultramicroscopic{}volcanoconiosis | silico
-#: Pneumonoultramicroscopicsilico{}coniosis | volcano
-#: Pneumonoultramicroscopicsilicovolcano{} | coniosis :#
+#: {}, not the filling of a vessel.                  : Education is the kindling of a flame
+#: Education is the {}, not the filling of a vessel. : kindling of a flame
+#: Education is the kindling of a flame, {}.         : not the filling of a vessel
+#: Education is the kindling of a flame, not the {}. : filling of a vessel :#
 ```
 
 To group multiple clozes together, use the hash symbol before a set of curly
@@ -166,11 +153,11 @@ braces.
 
 Generates this card:
 
-#: {} published about the Leitner System in {}. | Sebastian Leitner | 1972 :#
+#: {} published about the Leitner System in {}. : Sebastian Leitner : 1972 :#
 ```
 
-Cloze groups are different based on the number of hash symbols before the curly
-brace. Here is an example with 3 cloze groups:
+Cloze groups differ based on the number of hash symbols before the curly brace.
+Here is an example with 3 cloze groups:
 ```
 #: ###{Spaced repetition} is an #{evidence-based} learning technique which
    ##{incorporates} increasing time intervals between each ##{review} of a
@@ -181,34 +168,34 @@ Generates these cards:
 #: Spaced repetition is an {} learning technique which incorporates increasing
    time intervals between each review of a flashcard in order to exploit the
    psychological {}.
- | evidence-based
- | spacing effect
+ : evidence-based
+ : spacing effect
 
 #: Spaced repetition is an evidence-based learning technique which {}
    increasing time intervals between each {} of a flashcard in order to exploit
    the psychological spacing effect.
- | incorporates
- | review
+ : incorporates
+ : review
 
 #: {} is an evidence-based learning technique which incorporates increasing
    time intervals between each review of a flashcard in order to exploit the {}
    spacing effect.
- | Spaced repetition
- | psychological :#
+ : Spaced repetition
+ : psychological :#
 ```
 
-Finally, you can combine the cloze syntax with `::` and `|`:
+Finally, you can combine the cloze syntax with `::` and `:`:
 ```
-#: {新型:冠状:病毒} :: Coronavirus | COVID-19 :#
+#: {新型}{冠状}{病毒} :: Coronavirus : COVID-19 :#
 
 Generates these cards:
 
-#: {}冠状病毒 | 新型
-#: 新型{}病毒 | 冠状
-#: 新型冠状{} | 病毒
-#: 新型冠状病毒 | Coronavirus | COVID-19
-#: Coronavirus | 新型冠状病毒
-#: COVID-19 | 新型冠状病毒 :#
+#: {}冠状病毒 : 新型
+#: 新型{}病毒 : 冠状
+#: 新型冠状{} : 病毒
+#: 新型冠状病毒 : Coronavirus : COVID-19
+#: Coronavirus : 新型冠状病毒
+#: COVID-19 : 新型冠状病毒 :#
 ```
 
 ### Whitespace & Escaping
@@ -221,20 +208,20 @@ equivalent:
 
 Generates these cards:
 
-#: {} created the SM-2 spaced repetition algorithm in 1987. | Piotr A. Woźniak
-#: Piotr A. Woźniak created the SM-2 spaced repetition algorithm in {}. | 1987 :#
+#: {} created the SM-2 spaced repetition algorithm in 1987. : Piotr A. Woźniak
+#: Piotr A. Woźniak created the SM-2 spaced repetition algorithm in {}. : 1987 :#
 ```
 
 Backslash any reserved character or whitespace to include it in the card text:
 ```
 #: Which characters are special in concards?
- | \# \: \| \{ \}
+ : \# \: \{ \}
 
 #: Leave my door open just a crack\
 Cause I feel like such an insomniac\
 Why do I tire of counting sheep?\
 When I'm far too tired to fall asleep
- | Fireflies, by Owl City :#
+ : Fireflies, by Owl City :#
 ```
 
 ## File Structure
@@ -270,9 +257,6 @@ succeeds:
 4. `$HOME/.local/share/concards`
 5. `./`
 
-Concards has a very simple file structure. This section explains the content of
-the meta data files concards writes to after a review session.
-
 #### The Meta File
 The meta file is located at `<data-dir>/meta`. This contains the data concards
 needs to function.
@@ -282,7 +266,7 @@ Here is an example meta file:
 YKB4BOBAU5WkkyLdhaah 2020-11-21T03:47:12Z
 2020-11-21T01:47:11Z n AaA6231boaWTNyndaDZZ
 2020-11-21T03:47:12Z y ynda4BOBUa6231boawtn
-2020-11-21T03:47:12Z y
+2020-11-21T03:47:12Z y ynda4BOBUa6231boawtn
 
 nYNDAdzzaAa6231BOAwt 2020-11-21T03:47:12Z
 2020-11-21T01:47:11Z n obau5wKKYlDHAAHykb4b
@@ -292,18 +276,40 @@ nYNDAdzzaAa6231BOAwt never
 ```
 
 There are 3 different data types in this file:
-* date:
-* bool: represents 
-* hash: the sha256 hash
+* date: either a date in UTC RFC-3339 format without spaces, or the string "never".
+* hash: the sha256 of a string, truncated to the first 120 bits and represented in base64.
+* bool: a y for yes or n for no.
 
+And there are a few more things I will define:
+* block: synonomous with a paragraph.
+* entry: synonomous with a line in a block.
+* token: synonomous with a word in an entry.
 
+Each block is divided into 2 parts:
+* current entry: the first entry in a block.
+* historical entries: all entries in a block, excluding the first one.
 
+The current entry of each block contains 2 tokens. The first token is a hash of
+the card's question. The second token is a date describing when the card should
+be reviewed next. If the current time is after that date, the card will be
+marked as reviewable. Otherwise, the card will not show up in a review session.
 
+The historical entries of each block represents a list of historical
+interactions with the card separated by new lines. Each item in this list has 3
+or more tokens. The first token is a date showing the timestamp of when the
+card was reviewed. The second token is a bool that represents if the user knew
+the answer or not. And the remaining tokens are the different answers that were
+available when reviewing the card.
 
-Each paragraph represents a card. 9kThere are 2 parts to each paragraph. The first line and the rest of the lines, I'll refer to them as the future record and historical record.
+If the date in the first line is "never", then that card is blacklisted and
+will never show up in your review session. This could be useful to filter out
+noise, but also to show you know a card good well enough that you never need to
+review it again.
 
-The first line in the paragraph contains
-current information, while the remaining lines contain historical information.
+Invalid blocks, entries, or tokens may get filtered out when concards saves to a file.
+* A current entry with an invalid/empty date or hash will filter out the entire block.
+* A historical entry that has a "never" date, invalid date, or no hashes will get filtered out individually.
+* Invalid hashes within a historical entry will get filtered out without filtering out the historical entry itself.
 
 ## Dependencies
 Concards currently depends on these libraries:
