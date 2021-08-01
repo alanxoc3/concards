@@ -273,42 +273,37 @@ succeeds:
 Concards has a very simple file structure. This section explains the content of
 the meta data files concards writes to after a review session.
 
-#### The Predict File
-The predict file is located at `<data-dir>/predict`. This file contains
-information needed to make a prediction when you should review a card next.
+#### The Meta File
+The meta file is located at `<data-dir>/meta`. This contains the data concards
+needs to function.
 
-Here is an example predict file:
+Here is an example meta file:
 ```
-002141b9b9448a257b05da1f2eb78972 2020-08-08T18:00:17Z 2020-08-02T18:00:17Z 2 1 1 sm2
-3dda75cb44ed447186834541475f32e2 2020-08-08T18:00:17Z 2020-08-02T18:00:17Z 1 3 -2 sm2
-```
+YKB4BOBAU5WkkyLdhaah 2020-11-21T03:47:12Z
+2020-11-21T01:47:11Z n AaA6231boaWTNyndaDZZ
+2020-11-21T03:47:12Z y ynda4BOBUa6231boawtn
+2020-11-21T03:47:12Z y
 
-Here is that same file, but annotated:
-```
-sha256sum cut in half            | next timestamp       | previous timestamp   | total yes count | total no count | current streak | spaced repetition algorithm used
----------------------------------+----------------------+----------------------+---+---+----+----
-002141b9b9448a257b05da1f2eb78972 | 2020-08-08T18:00:17Z | 2020-08-02T18:00:17Z | 2 | 1 |  1 | sm2
-3dda75cb44ed447186834541475f32e2 | 2020-08-08T18:00:17Z | 2020-08-02T18:00:17Z | 1 | 3 | -2 | sm2
-```
+nYNDAdzzaAa6231BOAwt 2020-11-21T03:47:12Z
+2020-11-21T01:47:11Z n obau5wKKYlDHAAHykb4b
+2020-11-21T03:47:12Z y kkyLdhaahYKB4BOBAU5W obau5wKKYlDHAAHykb4b
 
-#### The Outcome File
-The outcome file is located at `<data-dir>/outcome`. This file contains the
-historical outcomes of every time a card has been passed off or failed. It
-differs only slightly from the predict file. Here is the corresponding outcome
-file for the predict file example above:
-```
-002141b9b9448a257b05da1f2eb78972 2020-08-08T18:00:17Z 2020-08-02T18:00:17Z 0 0 0 0
-002141b9b9448a257b05da1f2eb78972 2020-08-08T18:00:17Z 2020-08-02T18:00:17Z 0 1 -1 1
-002141b9b9448a257b05da1f2eb78972 2020-08-08T18:00:17Z 2020-08-02T18:00:17Z 1 1 0 1
-3dda75cb44ed447186834541475f32e2 2020-08-08T18:00:17Z 2020-08-02T18:00:17Z 0 0 0 1
-3dda75cb44ed447186834541475f32e2 2020-08-08T18:00:17Z 2020-08-02T18:00:17Z 1 0 1 0
-3dda75cb44ed447186834541475f32e2 2020-08-08T18:00:17Z 2020-08-02T18:00:17Z 1 1 0 0
-3dda75cb44ed447186834541475f32e2 2020-08-08T18:00:17Z 2020-08-02T18:00:17Z 1 2 -1 0
+nYNDAdzzaAa6231BOAwt never
 ```
 
-You can notice that there are two main differences from the predict file:
-- There are usually multiple lines with the same hash.
-- The last column is a boolean "pass or fail" instead of an algorithm name.
+There are 3 different data types in this file:
+* date:
+* bool: represents 
+* hash: the sha256 hash
+
+
+
+
+
+Each paragraph represents a card. 9kThere are 2 parts to each paragraph. The first line and the rest of the lines, I'll refer to them as the future record and historical record.
+
+The first line in the paragraph contains
+current information, while the remaining lines contain historical information.
 
 ## Dependencies
 Concards currently depends on these libraries:
@@ -324,7 +319,6 @@ contributors, so please check them out too!
 
 ## Future Work
 The next big things to focus on:
-- Improved CLI UI.
-- Local Web Server UI.
-- Support Unix Piping.
-- Customizable Algorithm Plugin System.
+- Improved UIs.
+- More hook support (algorithm, filters, etc)
+- Server/client architecture.
