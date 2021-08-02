@@ -6,17 +6,15 @@
 
 Turning notes into flashcards, or should I say concards! This is my ongoing
 attempt to make flashcards more simple and convenient. Concards provides much
-of the functionality of other mainstream flashcard applications, but with a
-unique focus on parsing cards embedded within text files.
+of same functionality of other mainstream flashcard applications, but with a
+POSIX inspired twist!
 
 ## Features
-- Spaced repetition similar to [SM2](https://www.supermemo.com/english/ol/sm2.htm)!
+- Configurable [spaced repetition](https://en.wikipedia.org/wiki/Spaced_repetition) algorithms!
+- [Cloze](https://en.wikipedia.org/wiki/Cloze_test) cards, reversible cards, and multi-sided cards all supported!
+- Cards embedded in note files, similar to [literate programming](https://en.wikipedia.org/wiki/Literate_programming)!
 - [UTF-8](https://en.wikipedia.org/wiki/UTF-8) as a first-class citizen!
-- Configure with your favorite editor!
-- Undo & Redo support!
-- Read from directories or files!
-- Reversible cards!
-- [Cloze](https://en.wikipedia.org/wiki/Cloze_test) cards!
+- Full-fledged CLI support!
 
 ## Install
 Download the latest release from the [release
@@ -51,39 +49,36 @@ two colons. Ex:
 ```
 
 The text above will produce a one sided flashcard! But flashcards are normally
-2 sided, so let's create a new flashcard that separates a question and answer
-with the pipe symbol:
+2 sided, so let's create a new flashcard with a question and answer:
 ```
-#: {Spending time every day to review previously learned information} is a great way to decrease the effects of the forgetting curve. :#
-```
-
-Any number of sides are supported, so creating a 3 sided flashcard is a piece
-of cake:
-```
-#: Newton's 1st law of motion is "{an object at rest stays at rest unless acted upon}".
-#: Newton's 2st law of motion is "{force is equal to mass times acceleration}".
-#: Newton's 3st law of motion is "{for every action, there is an equal and opposite reaction}".
-:#
+#: What is a great way to decrease the effects of the forgetting curve?
+ : Spending time every day to review previously learned information. :#
 ```
 
-You can either create new blocks for each card, or you can keep them in the
-same block. This creates 2 cards:
+Cards in concards can only have 1 question, but they can have any number of
+answers:
+```
+#: What are Newton's 3 laws of motion?
+ : 1. an object at rest stays at rest unless acted upon.
+ : 2. force is equal to mass times acceleration.
+ : 3. for every action, there is an equal and opposite reaction. :#
+```
+
+You can use the begin delimiter multiple times before using the end delimiter.
+This will create multiple cards:
 ```
 #: Who published the first flashcards? : Favell Lee Mortimer
-#: When were the first flashcards published? : 1834
-:#
-
-#: {Favell Lee Mortimer} published the first flashcards in {1834}.
-:#
+#: When were the first flashcards published? : 1834 :#
 ```
 
 ### Reversible Cards
 When learning a language, you might find yourself writing a flashcard that
-transitions a phrase from language #1 to language #2 and writing another
-flashcard that transitions the same phrase from language #2 to language #1.
-Concards makes this easier with the  `::` operator
+translates a phrase from esperanto to english and rewriting the same flashcard
+translating the same phrase from english to esperanto. With concards though,
+you just have to use the `::` operator:
 ```
-#: saluton al la mundo :: hello world :#
+#: saluton al la mundo
+:: hello world :#
 
 Generates these cards:
 
@@ -91,12 +86,12 @@ Generates these cards:
 #: hello world : saluton al la mundo :#
 ```
 
-If you are learning two languages, you can expand this with an extra `::`:
+You can use as many `::` operators as you want. It might be useful if you're
+learning mandarin as well:
 ```
-#: spagetoj :: spaghetti :: 意面 :#
-
-#: spaghetti :: spagetoj :#
-#: spaghetti :: 意面 :#
+#: spaghetti
+:: spagetoj
+:: 意面 :#
 
 Generates these cards:
 
@@ -105,11 +100,13 @@ Generates these cards:
 #: 意面 : spaghetti : spagetoj :#
 ```
 
-Translating a word from one language to another often results in multiple
-definitions. Concards can represent these scenarios when combining the `:` and
-`::`.
+Concards allows you to combine the `::` and `:` operators together. This can be
+useful if two different concepts in one language translates to the same word in
+another language:
 ```
-#: apricot : almond :: 杏仁 :#
+#: apricot
+ : almond
+:: 杏仁 :#
 
 Generates these cards:
 
@@ -118,20 +115,46 @@ Generates these cards:
 #: 杏仁 : apricot : almond :#
 ```
 
-The double colon operator always takes precedence before the pipe operator.
-
 ### Cloze Cards
-Cloze cards are handy when working with phrases or related facts. In concards,
-a cloze is created by putting text within a set of curly braces. Concards will
-generate cards from the text in the curly braces and replace the text with an
-empty set of curly braces.
+A lot of cards phrased in question form can be rewritten in cloze form. A cloze
+in concards is expressed with curly braces `{...}`. Concards will generate
+cards from the text in the curly braces and replace the text with an empty set
+of curly braces `{}` which signifies a blank. Here is a card from earlier,
+rewritten to be in cloze form:
 ```
-#: {Hermann Ebbinghaus} published his findings on the forgetting curve in {1885}. :#
+#: {Spending time every day to review previously learned information} is a
+   great way to decrease the effects of the forgetting curve. :#
 
 Generates these cards:
 
-#: {} published his findings on the forgetting curve in 1885. : Hermann Ebbinghaus
-#: Hermann Ebbinghaus published his findings on the forgetting curve in {}. : 1885 :#
+#: {} is a great way to decrease the effects of the forgetting curve.
+ : Spending time every day to review previously learned information :#
+```
+
+Another:
+```
+#: Newton's 1st law of motion is "{an object at rest stays at rest unless acted upon}".
+#: Newton's 2st law of motion is "{force is equal to mass times acceleration}".
+#: Newton's 3st law of motion is "{for every action, there is an equal and opposite reaction}". :#
+
+Generates these cards:
+
+#: Newton's 1st law of motion is "{}".
+ : an object at rest stays at rest unless acted upon
+#: Newton's 2st law of motion is "{}".
+ : force is equal to mass times acceleration
+#: Newton's 3st law of motion is "{}".
+ : for every action, there is an equal and opposite reaction :#
+```
+
+And one more:
+```
+#: {Favell Lee Mortimer} published the first flashcards in {1834}. :#
+
+Generates these cards:
+
+#: {} published the first flashcards in 1834. : Favell Lee Mortimer
+#: Favell Lee Mortimer published the first flashcards in {}. : 1834 :#
 ```
 
 Cloze nesting is supported:
