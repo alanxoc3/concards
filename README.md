@@ -4,7 +4,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/alanxoc3/concards)](https://goreportcard.com/report/github.com/alanxoc3/concards)
 [![Coverage Status](https://coveralls.io/repos/github/alanxoc3/concards/badge.svg?branch=main)](https://coveralls.io/github/alanxoc3/concards?branch=main)
 
-Turning notes into flashcards, or should I say concards! This is my ongoing attempt to make flashcards more simple and convenient. Concards provides much of same functionality of other mainstream flashcard applications, but with a POSIX inspired twist!
+Turning notes into flashcards, or should I say concards! This is my ongoing attempt to make flashcards more simple and convenient. Concards provides much of same functionality of other mainstream flashcard applications, but with a POSIX inspired twist.
 
 ## Features
 
@@ -18,19 +18,19 @@ Turning notes into flashcards, or should I say concards! This is my ongoing atte
 
 Download the latest release from the [release page](https://github.com/alanxoc3/concards/releases). At the moment, only Linux and Mac are supported.
 
-You can also build a snapshot from source with the `go` command.
+You can also build a snapshot from source with the `go` command:
 
 ```bash
 $ go install github.com/alanxoc3/concards
 ```
 
-Once installed, you may want to try running concards on this readme!
+Once installed, you may want to try running concards on this readme:
 
 ```bash
 $ concards README.md
 ```
 
-You may also want to review the help command's output.
+You may also want to review the output of the help command:
 
 ```bash
 $ concards --help
@@ -202,19 +202,40 @@ The data directory is calculated by following this order of steps until one succ
 3. `$HOME/.local/share/concards`
 4. `./`
 
-### Hooks
+### Events & Hooks
 
-Concards hooks works similar to git hooks. You must place an executable file with a specific name in `<config-dir>/`. Hooks that begin with `event-` are meant to be run in parallel with concards and perform tasks that don't affect concards directly. Hooks that begin with `hook-` are meant to change program behavior.
+Concards events and hooks works similar to git hooks. You must place an executable file with a specific name in the "config directory". Files that begin with `event-` are run in parallel with concards and perform tasks that don't affect concards directly. Files that begin with `hook-` are not run in parallel with concards and can change the behaviour of concards.
+
+Here are all the currently supported events:
+
+- `event-review` - executed right after passing off a card with a pass or fail
+- `event-startup` - executed once if/when concards starts the GUI up successfully
 
 Here are all the currently supported hooks:
 
-- `event-review`  - executed right after passing off a card with a pass or fail
-- `event-startup` - executed once if/when concards starts the GUI up successfully
-- `hook-review` - executed 
+#### event-review & hook-review
 
-TODO: Working here.
+Both the review event and hook are executed right after passing off a card with a pass or fail. Stdout for the event is ignored. Stdout for the hook must be a single date following the date format described in "The Meta File" section below. Here are the environment variables available to the event and hook, as well as example values:
 
-`hook-review` - executed right after passing off a card parameters 
+```
+CONCARD_HASH = 'YKB4BOBAU5WkkyLdhaah'
+```
+
+Program arguments are passed into the event and hook as well. Each argument represents a historical meta file entry in descending order according to the timestamp reviewed. This means a few things:
+- there will always be at least 1 argument available
+- the first argument is always the metadata of the time the card was reviewed right before executing the event/hook
+- the last argument is always the metadata of the earliest time the card was reviewed
+
+Here is an example of what the arguments might look like. For a more detailed explanation, see "The Meta File" section:
+
+```
+1 = '2020-12-01T01:47:11Z y AaA6231boaWTNyndaDZZ')
+2 = '2020-10-01T01:47:11Z y AaA6231boaWTNyndaDZZ')
+3 = '2020-09-01T01:47:11Z y AaA6231boaWTNyndaDZZ')
+...
+```
+
+You set the new timestamp. Print a date as specified in "The Meta File" section to standard out. All other output will be ignored.
 
 #### The Meta File
 
@@ -241,7 +262,7 @@ There are 3 different data types in this file:
 - hash: the sha256 of a string, truncated to the first 120 bits and represented in base64.
 - bool: a y for yes or n for no.
 
-And there are a few more things I will define:
+And there are a few more definitions:
 
 - block: synonomous with a paragraph.
 - entry: synonomous with a line in a block.
