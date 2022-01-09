@@ -175,7 +175,7 @@ Backslash any reserved character or whitespace to include it in the card text:
 
 ```
 #: Which characters are special in concards?
- : \# \: \{ \}
+ : \# \: \{ \} \\
 
 #: Leave my door open just a crack\
 Cause I feel like such an insomniac\
@@ -204,18 +204,24 @@ The data directory is calculated by following this order of steps until one succ
 
 ### Events & Hooks
 
-Concards events and hooks works similar to git hooks. You must place an executable file with a specific name in the "config directory". Files that begin with `event-` are run in parallel with concards and perform tasks that don't affect concards directly. Files that begin with `hook-` are not run in parallel with concards and can change the behaviour of concards.
+Concards events and hooks works similar to git hooks. You must place an executable file with a specific name in the config directory. Files that begin with `event-` are run in parallel with concards and perform tasks that don't affect concards directly. Files that begin with `hook-` are not run in parallel with concards and affect the behaviour of concards.
 
-Here are all the currently supported events:
+Stdout from events are ignored. Hooks however use stdout to send information to concards.
 
-- `event-review` - executed right after passing off a card with a pass or fail
-- `event-startup` - executed once if/when concards starts the GUI up successfully
+Here are all the currently supported events and hooks:
 
-Here are all the currently supported hooks:
+```
+event-display -- executed right before displaying a card
+event-review  -- executed right after reviewing a card
+hook-display  -- same as event-display, stdout can filter the card's content
+hook-review   -- executed right after reviewing a card
+```
 
-#### event-review & hook-review
+And below is a brief explanation
 
-Both the review event and hook are executed right after passing off a card with a pass or fail. Stdout for the event is ignored. Stdout for the hook must be a single date following the date format described in "The Meta File" section below. Here are the environment variables available to the event and hook, as well as example values:
+#### event-review
+
+The review event is executed right after reviewing a card. There is one environment variable available to this event:
 
 ```
 CONCARD_HASH = 'YKB4BOBAU5WkkyLdhaah'
@@ -229,13 +235,21 @@ Program arguments are passed into the event and hook as well. Each argument repr
 Here is an example of what the arguments might look like. For a more detailed explanation, see "The Meta File" section:
 
 ```
-1 = '2020-12-01T01:47:11Z y AaA6231boaWTNyndaDZZ')
-2 = '2020-10-01T01:47:11Z y AaA6231boaWTNyndaDZZ')
-3 = '2020-09-01T01:47:11Z y AaA6231boaWTNyndaDZZ')
+1 = '2020-12-01T01:47:11Z y AaA6231boaWTNyndaDZZ'
+2 = '2020-10-01T01:47:11Z y AaA6231boaWTNyndaDZZ'
+3 = '2020-09-01T01:47:11Z y AaA6231boaWTNyndaDZZ'
 ...
 ```
 
+Stdout for the event is ignored. Stdout for the hook must be a single date following the date format described in "The Meta File" section below. 
+
 You set the new timestamp. Print a date as specified in "The Meta File" section to standard out. All other output will be ignored.
+
+#### hook-display
+
+Input: question text, answer text, question hash, answer hash. Wait, is just the text good enough? hmm... yes? I don't think the hash would be needed, because the hash would just change. Could there be a filter on questions? I need to think of some concrete examples.
+
+pinyin is a good example.
 
 #### The Meta File
 
