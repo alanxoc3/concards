@@ -83,32 +83,37 @@ func newMetaFromStrings(strs ...string) *base {
 }
 
 func newBase(hash internal.Hash, next time.Time, curr time.Time, yesCount int, noCount int, streak int) *base {
-	curr = curr.UTC()
-	next = next.UTC()
+    curr = curr.UTC()
+    next = next.UTC()
 
-	yesCount = boundInt(yesCount, 0, internal.MaxYesNoStreak)
-	noCount = boundInt(noCount, 0, internal.MaxYesNoStreak)
+    yesCount = boundInt(yesCount, 0, internal.MaxYesNoStreak)
+    noCount = boundInt(noCount, 0, internal.MaxYesNoStreak)
 
-   if yesCount == 0 && noCount == 0 || yesCount == 1 && noCount == 1 || yesCount == 0 && streak > 0 || noCount == 0 && streak < 0 {
-      streak = 0
-   } else if noCount == 0 && yesCount > 0 {
-      streak = yesCount
-   } else if yesCount == 0 && noCount > 0 {
-      streak = -noCount
-   } else if streak >= yesCount {
-      streak = yesCount - 1
-   } else if -streak >= noCount {
-      streak = -(noCount - 1)
-   }
+    if yesCount == 0 && noCount == 0 {
+        curr = time.Time{}
+        next = time.Time{}
+    }
 
-	// Streak can't be larger than yes or no count.
-	if streak > yesCount {
-		yesCount = streak
-	} else if streak < -noCount {
-		noCount = -streak
-	}
+    if yesCount == 0 && noCount == 0 || yesCount == 1 && noCount == 1 || yesCount == 0 && streak > 0 || noCount == 0 && streak < 0 {
+        streak = 0
+    } else if noCount == 0 && yesCount > 0 {
+        streak = yesCount
+    } else if yesCount == 0 && noCount > 0 {
+        streak = -noCount
+    } else if streak >= yesCount {
+        streak = yesCount - 1
+    } else if -streak >= noCount {
+        streak = -(noCount - 1)
+    }
 
-	return &base{hash, next, curr, yesCount, noCount, streak}
+    // Streak can't be larger than yes or no count.
+    if streak > yesCount {
+        yesCount = streak
+    } else if streak < -noCount {
+        noCount = -streak
+    }
+
+    return &base{hash, next, curr, yesCount, noCount, streak}
 }
 
 func (b *base) nextStr() string { return b.next.Format(time.RFC3339) }

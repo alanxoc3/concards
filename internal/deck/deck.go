@@ -1,3 +1,4 @@
+// Owns the card text, a stack that keeps track of order, as well as historical metadata and predictions.
 package deck
 
 import (
@@ -29,40 +30,35 @@ func NewDeck(now time.Time) *Deck {
 	}
 }
 
-// Add cards only if they don't exist.
-func (d *Deck) AddCards(cards ...*card.Card) {
-	// See stacks.go for implementation details.
-	for _, c := range cards {
-		// Step 1: Cache the hash.
-		h := c.Hash()
-
-		// Step 2: Add to predict map if it isn't in there already.
-		if _, exist := d.predictMap[h]; !exist {
-			d.predictMap[h] = meta.NewDefaultPredict(h, "sm2")
-		}
-
-		// Step 3: Add to the stack.
-		if _, exist := d.cardMap[h]; !exist {
-			d.cardMap[h] = c
-		}
-
-		d.stack.Insert(h, d.predictMap[h].Next(), d.predictMap[h].YesCount() == 0)
-	}
-}
-
-// Add predictions only if they don't exist.
-func (d *Deck) AddPredicts(predicts ...*meta.Predict) {
+// Add predicts, overwriting existing predicts.
+func (d *Deck) UpsertPredicts(predicts... *meta.Predict) {
 	for _, p := range predicts {
-		h := p.Hash()
-		if v, predExist := d.predictMap[h]; !predExist || v.IsZero() {
+    	h := p.Hash()
+		if _, predExist := d.predictMap[h]; !predExist {
 			d.predictMap[h] = p
-			d.stack.Update(h, p.Next(), p.YesCount() == 0)
+			if _, cardExists := d.cardMap[h]; cardExists {
+        		d.stack.Upsert(h, p.Next())
+			}
 		}
 	}
 }
 
-func (d *Deck) ReviewLen() int { return d.stack.ReviewLen() }
-func (d *Deck) FutureLen() int { return d.stack.FutureLen() }
+// Add cards, overwriting existing cards.
+func (d *Deck) UpsertCards(cards ...*card.Card) {
+	for _, c := range cards {
+		h := c.Hash()
+		d.cardMap[h] = c
+
+		if p, contains := d.predictMap[h]; !contains {
+    		d.stack.Upsert(h, time.Time{})
+        } else {
+    		d.stack.Upsert(h, p.Next())
+        }
+	}
+}
+
+func (d *Deck) Len() int { return d.stack.Len() }
+func (d *Deck) Capacity() int { return d.stack.Capacity() }
 
 // Clones a deck into this deck.
 func (d *Deck) Clone(o *Deck) {
@@ -82,7 +78,6 @@ func (d *Deck) Copy() *Deck {
 	return nd
 }
 
-// Top shortcuts
 func (d *Deck) TopHash() *internal.Hash {
 	return d.stack.Top()
 }
@@ -96,7 +91,11 @@ func (d *Deck) TopCard() *card.Card {
 
 func (d *Deck) TopPredict() *meta.Predict {
 	if h := d.TopHash(); h != nil {
-		return d.predictMap[*h]
+    	if p, contains := d.predictMap[*h]; contains {
+    		return p
+    	} else {
+    		return meta.NewDefaultPredict(*h, "sm2")
+    	}
 	}
 	return nil
 }
@@ -112,7 +111,7 @@ func (d *Deck) DropTop() {
 // TODO: Concurrency locks for thread safety?
 func (d *Deck) ExecTop(input bool, now time.Time) (meta.Predict, error) {
 	// Step 1: Error if the deck is empty.
-	if d.stack.ReviewLen() == 0 {
+	if d.stack.Len() == 0 {
 		return *meta.NewPredictFromStrings(), fmt.Errorf("Tried to access card from an empty deck!")
 	}
 
@@ -130,8 +129,7 @@ func (d *Deck) ExecTop(input bool, now time.Time) (meta.Predict, error) {
 	d.stack.SetTime(now)
 
 	// Step 6: Update the stack.
-	updateStatus := d.stack.Update(np.Hash(), np.Next(), np.YesCount() == 0)
-	internal.AssertLogic(updateStatus, "stack didn't contain hash")
+	d.stack.Upsert(np.Hash(), np.Next())
 
 	return np, nil
 }
@@ -194,9 +192,9 @@ func (d *Deck) RemoveDone() {
 type CardsFunc func(string) ([]*card.Card, error)
 
 // TODO: Concurrency locks for thread safety?
-func (d *Deck) Edit(rf CardsFunc, ef CardsFunc) error {
+func (d *Deck) Edit(ef CardsFunc) error {
 	// Step 1: Exit if the deck is empty.
-	if d.ReviewLen() == 0 {
+	if d.Len() == 0 {
 		return fmt.Errorf("Error: The deck is empty.")
 	}
 
@@ -208,35 +206,28 @@ func (d *Deck) Edit(rf CardsFunc, ef CardsFunc) error {
 
 	filename := curCard.File()
 
-	// Step 3: Get the current state of the file before editing it.
-	beforeList, e := rf(filename)
-	if e != nil {
-		return e
-	}
-
-	// Step 4: Execute the edit function.
+	// Step 3: Execute the edit function.
 	afterList, e := ef(filename)
 	if e != nil {
 		return e
 	}
 
-	// Step 5: Remove cards that no longer exist.
+	// Step 4: Remove cards that no longer exist.
 	afterMap := cardListToMap(afterList)
 	d.filter(func(i int, h internal.Hash) bool {
 		_, contains := afterMap[h]
 		return d.cardMap[h].File() != filename || contains
 	})
 
-	// Step 6: Add all the cards new after editing.
-	beforeMap := cardListToMap(beforeList)
+	// Step 5: Add all the cards new after editing.
 	for k, v := range afterMap {
-		if _, exist := beforeMap[k]; !exist {
-			if _, exist := d.predictMap[k]; !exist {
-				d.AddPredicts(curMeta.Clone(v.Hash()))
-			}
-			d.AddCards(v)
-		}
+        if _, predExist := d.predictMap[k]; !predExist {
+            h := v.Hash()
+            d.predictMap[h] = curMeta.Clone(h)
+            d.stack.Upsert(h, curMeta.Next())
+        }
 	}
 
+    d.UpsertCards(afterList...)
 	return nil
 }

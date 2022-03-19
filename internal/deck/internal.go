@@ -29,7 +29,7 @@ func (d *Deck) filter(p predicate) {
 
 	for i, h := range hashes {
 		if p(i, h) {
-			n.AddCards(d.cardMap[h])
+			n.UpsertCards(d.cardMap[h])
 		}
 	}
 	d.Clone(n)

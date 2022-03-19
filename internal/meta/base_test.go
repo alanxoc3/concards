@@ -53,13 +53,19 @@ var metaTestFuncs = map[string]metaTestFunc{
 	},
 
 	"Next": func(t *testing.T, cf metaCreate) {
-		m := cf("", "2020-01-01T00:00:00Z")
+		m := cf("", "2020-01-01T00:00:00Z", "", "1")
 		assert.Equal(t, time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC), m.Next())
 	},
 
 	"NoCount": func(t *testing.T, cf metaCreate) {
 		m := cf("", "", "", "", "33")
 		assert.Equal(t, 33, m.NoCount())
+	},
+
+	"ZeroTotalZeroTime": func(t *testing.T, cf metaCreate) {
+		m := cf("", "2020-01-01T00:00:00Z", "2020-01-01T00:00:00Z")
+		assert.Equal(t, time.Time{}, m.Curr())
+		assert.Equal(t, time.Time{}, m.Next())
 	},
 
 	"StreakYesZero": func(t *testing.T, cf metaCreate) {
@@ -126,12 +132,12 @@ var metaTestFuncs = map[string]metaTestFunc{
 	},
 
 	"NextUTC": func(t *testing.T, cf metaCreate) {
-		m := cf("", "2020-01-01T00:00:00-06:00")
+		m := cf("", "2020-01-01T00:00:00-06:00", "", "1")
 		assert.Equal(t, time.Date(2020, 1, 1, 6, 0, 0, 0, time.UTC), m.Next())
 	},
 
 	"CurrUTC": func(t *testing.T, cf metaCreate) {
-		m := cf("", "", "2020-01-01T00:00:00-06:00")
+		m := cf("", "", "2020-01-01T00:00:00-06:00", "", "1")
 		assert.Equal(t, time.Date(2020, 1, 1, 6, 0, 0, 0, time.UTC), m.Curr())
 	},
 
@@ -146,7 +152,7 @@ var metaTestFuncs = map[string]metaTestFunc{
 		assertZero(t, m)
 	},
 	"Curr": func(t *testing.T, cf metaCreate) {
-		m := cf("", "", "2020-01-01T00:00:00Z")
+		m := cf("", "", "2020-01-01T00:00:00Z", "1")
 		assert.Equal(t, time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC), m.Curr())
 	},
 

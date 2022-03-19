@@ -36,7 +36,7 @@ func TermBoxRun(d *deck.Deck, cfg *internal.Config) error {
 	cmd.NewCmd(cfg.EventStartupFile).Start()
 
 	man.Save(d) // Save at beginning, and end of each editing command.
-	for d.ReviewLen() > 0 {
+	for d.TopCard() != nil {
 		drawScreen(d, cardShown, helpMode, statMode, finishedEditing)
 		finishedEditing = false
 
@@ -83,7 +83,7 @@ func TermBoxRun(d *deck.Deck, cfg *internal.Config) error {
 					d.DropTop()
 					man.Save(d)
 				} else if inp == "e" {
-					err := d.Edit(file.ReadCardsFromFile, func(filename string) ([]*card.Card, error) {
+					err := d.Edit(func(filename string) ([]*card.Card, error) {
 						return file.EditCards(filename, cfg)
 					})
 

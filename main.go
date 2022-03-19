@@ -38,9 +38,8 @@ func main() {
 
 func main_logic(c *internal.Config) {
 	d := deck.NewDeck(time.Now())
-
 	predicts := file.ReadPredictsFromFile(c.PredictFile)
-	d.AddPredicts(predicts...)
+	d.UpsertPredicts(predicts...)
 
 	if len(c.Files) == 0 {
 		internal.AssertError("You didn't provide any files to parse.")
@@ -50,9 +49,7 @@ func main_logic(c *internal.Config) {
 		if cm, err := file.ReadCardsFromFile(f); err != nil {
 			internal.AssertError(fmt.Sprintf("File \"%s\" does not exist!", f))
 		} else {
-			for _, c := range cm {
-				d.AddCards(c)
-			}
+			d.UpsertCards(cm...)
 		}
 	}
 

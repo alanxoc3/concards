@@ -17,7 +17,7 @@ func create(strs ...string) *history.Manager {
 	for _, s := range strs {
       d := deck.NewDeck(ONE_DATE)
       c, _ := card.NewCards(".", s)
-      d.AddCards(c...)
+      d.UpsertCards(c...)
       m.Save(d)
    }
 	return m
